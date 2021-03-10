@@ -1,0 +1,141 @@
+options
+{
+    LOOKAHEAD=1;
+}
+
+PARSER_BEGIN(Jmm)
+
+
+public class Jmm
+{
+    public static void main(String args[]) throws ParseException {
+      	System.out.println("Write an arithmetic expression:");
+		Jmm myCalc = new Jmm(System.in);
+		SimpleNode root = myCalc.Expression(); // returns reference to root node
+        	
+		root.dump(""); // prints the tree on the screen
+
+		//System.out.println("Expression value: "+myCalc.eval(root));
+    }
+	
+}
+
+PARSER_END(Jmm)
+
+SKIP :
+{
+   // Whitespace
+	" " |
+   "\r" |
+   "\t" |
+   "\n" | 
+
+   // Comments
+   ("//"(~["\n","\r"])*["\n","\r"]) |
+   < "/*" (~[])* "*/" >
+}
+
+TOKEN:
+{   
+   // Literals
+   < INTEGER_LITERAL:  (["0"-"9"])+ > |
+   < BOOLEAN_LITERAL: "true"|"false" > |
+   
+   // Punctuation
+   < SEMICOLON: ";" > |
+   < OPEN_BRACES: "{" > |
+   < CLOSE_BRACES: "}" > |
+   < OPEN_PARENTHESIS: "(" > |
+   < CLOSE_PARENTHESIS: ")" > |
+   < OPEN_BRACKETS: "[" > |
+   < CLOSE_BRACKETS: "]" > |
+   < COMMA : "," > |
+   < DOT : "."> |
+
+   // Import
+   < IMPORT: "import" > |
+   
+   // Class Declaration
+   < CLASS: "class" > |
+   < EXTENDS: "extends" > |
+   
+   // Methods and attributes
+   < PUBLIC: "public" > |
+   < STATIC: "static"> |
+   < VOID: "void" > | 
+   < MAIN: "main" > |
+   < STRING: "String" > |
+   < RETURN: "return" > |
+   < LENGTH: "length" > |
+   < NEW: "new" > |
+   < THIS: "this" > |
+
+   // Types
+   < INT: "int" > |
+   < BOOL: "boolean"> |
+      
+   // Logical Operators
+   < NOT: "!" > |
+   < AND: "&&" > |
+   < LT: "<" > |
+
+   // Arithmetic Operators
+   < PLUS: "+" > |
+   < MINUS: "-" > |
+   < MULT: "*" > |
+   < DIV: "/" > |
+
+   // Attribution Operator
+   < EQUAL: "=" > |
+   
+   // Decision
+   < IF: "if" > |
+   < ELSE: "else" > |
+
+   // Loop
+   < WHILE: "while" > |
+
+   // Identifier   
+   < IDENTIFIER: (["a"-"z","A"-"Z","_"]["a"-"z","A"-"Z","0"-"9","_"]*) >
+}
+
+SimpleNode Expression(): {}
+{
+   Expr1() <LF>  {return jjtThis;} // Java code inside brackets
+}
+
+void Expr1() #void: {}
+{
+   Expr2(1) [
+   	("+" Expr2(1) #Add(2)
+   	| "-" Expr2(1) #Sub(2)
+   	)
+   	
+   ]
+}
+
+void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
+{
+   Expr3(sign)  [
+   ("*" Expr3(1) #Mul(2) 
+   | "/" Expr3(1) #Div(2)
+   )
+   
+   ]
+/*
+   Expr3(sign) [
+   ("*" #Mul(2)
+   | "/" #Div(2)
+   )
+   Expr3(1)
+   ]
+   */
+   
+}
+
+void Expr3(int sign) #void: {Token t;}
+{
+    t=<INTEGER> {  jjtThis.val = sign *Integer.parseInt(t.image); } #Term
+    | "-" Expr3(-1)
+    | "(" Expr1() ")"
+}
