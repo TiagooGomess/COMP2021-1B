@@ -1,17 +1,25 @@
 options
 {
-    LOOKAHEAD=3;
+    LOOKAHEAD=2;
     FORCE_LA_CHECK=true;
 }
 
+class Hello { public static void main (String[] args) { int x; x = 2; }}
+
 PARSER_BEGIN(Jmm)
+
+/* import pt.up.fe.specs.util.SpecsIo; */
+
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 
 public class Jmm
 {
     public static void main(String args[]) throws ParseException {
-      System.out.println("Write an arithmetic expression:");
-		Jmm myCalc = new Jmm(System.in);
-		SimpleNode root = myCalc.parser(); // returns reference to root node
+      System.out.println("Compiling the code...\n\n");
+      // InputStream jmmStream = new ByteArrayInputStream(SpecsIo.getResource("fixtures/public/HelloWorld.jmm").getBytes());
+      Jmm myJmmCode = new Jmm(System.in);
+		SimpleNode root = myJmmCode.parser(); // returns reference to root node
         	
 		root.dump(""); // prints the tree on the screen
 
@@ -38,7 +46,7 @@ SKIP :
 TOKEN:
 {   
    // Literals
-   < INTEGER_LITERAL:  (["0"-"9"])+ > |
+   < INTEGER_LITERAL:  ["1"-"9"](["0"-"9"])* > |
    < BOOLEAN_LITERAL: "true"|"false" > |
    
    // Punctuation
@@ -156,7 +164,7 @@ void Statement(): {}
    <OPEN_BRACES> (Statement())* <CLOSE_BRACES>
    | <IF> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement() <ELSE> Statement()
    | <WHILE> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement()
-   | Expression() <SEMICOLON>
+   // | Expression() <SEMICOLON>
    | <IDENTIFIER> (<OPEN_BRACKETS> Expression() <CLOSE_BRACKETS>)? <EQUAL> Expression() <SEMICOLON>
 }
 
@@ -176,5 +184,5 @@ void Right() : {}
    (<AND> | <LT> | <PLUS> | <MINUS> | <MULT> | <DIV>) Expression() Right()
    | <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> Right()
    | <DOT> ((<LENGTH> Right()) | (<IDENTIFIER> <OPEN_PARENTHESIS> (Expression() (<COMMA> Expression())*)? <CLOSE_PARENTHESIS> Right()))
-   // | ""
+   | ""
 }
