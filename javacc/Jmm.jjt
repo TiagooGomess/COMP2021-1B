@@ -1,17 +1,17 @@
 options
 {
-    LOOKAHEAD=1;
+    LOOKAHEAD=3;
+    FORCE_LA_CHECK=true;
 }
 
 PARSER_BEGIN(Jmm)
 
-
 public class Jmm
 {
     public static void main(String args[]) throws ParseException {
-      	System.out.println("Write an arithmetic expression:");
+      System.out.println("Write an arithmetic expression:");
 		Jmm myCalc = new Jmm(System.in);
-		SimpleNode root = myCalc.Expression(); // returns reference to root node
+		SimpleNode root = myCalc.parser(); // returns reference to root node
         	
 		root.dump(""); // prints the tree on the screen
 
@@ -30,8 +30,8 @@ SKIP :
    "\t" |
    "\n" | 
 
-   // Comments
-   ("//"(~["\n","\r"])*["\n","\r"]) |
+   // Comments (VER COM O PROF)
+   < "//"(~["\n","\r"])*["\n","\r"]> |
    < "/*" (~[])* "*/" >
 }
 
@@ -96,46 +96,85 @@ TOKEN:
    < WHILE: "while" > |
 
    // Identifier   
-   < IDENTIFIER: (["a"-"z","A"-"Z","_"]["a"-"z","A"-"Z","0"-"9","_"]*) >
+   < IDENTIFIER: (["a"-"z","A"-"Z","_"](["a"-"z","A"-"Z","0"-"9","_"])*) >
 }
 
-SimpleNode Expression(): {}
+SimpleNode parser(): {}
 {
-   Expr1() <LF>  {return jjtThis;} // Java code inside brackets
+   ImportDeclaration() ClassDeclaration() <EOF> {return jjtThis;} 
 }
 
-void Expr1() #void: {}
+void ImportDeclaration(): {}
 {
-   Expr2(1) [
-   	("+" Expr2(1) #Add(2)
-   	| "-" Expr2(1) #Sub(2)
-   	)
-   	
-   ]
+   (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER>)* <SEMICOLON>)*
 }
 
-void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
+void ClassDeclaration(): {}
 {
-   Expr3(sign)  [
-   ("*" Expr3(1) #Mul(2) 
-   | "/" Expr3(1) #Div(2)
+   // Name
+   <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? 
+   // Implementation
+   <OPEN_BRACES> (VarDeclaration())* (MethodDeclaration())* <CLOSE_BRACES>
+}
+
+void VarDeclaration(): {}
+{
+   Type() <IDENTIFIER> <SEMICOLON>
+}
+
+void MethodDeclaration(): {}
+{
+   // Name
+   <PUBLIC> (
+   (
+      Type() <IDENTIFIER> 
+      // Arguments
+      <OPEN_PARENTHESIS> ( Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* )? <CLOSE_PARENTHESIS> 
+      // Implementation
+      <OPEN_BRACES> (VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <CLOSE_BRACES>
    )
-   
-   ]
-/*
-   Expr3(sign) [
-   ("*" #Mul(2)
-   | "/" #Div(2)
-   )
-   Expr3(1)
-   ]
-   */
+   | // Main
+   (
+      <STATIC> <VOID> <MAIN>
+      // Args
+      <OPEN_PARENTHESIS> <STRING> <OPEN_BRACKETS> <CLOSE_BRACKETS> <IDENTIFIER> <CLOSE_PARENTHESIS>
+      // Implementation without return
+      <OPEN_BRACES> (VarDeclaration())* (Statement())* <CLOSE_BRACES>
+   ))
    
 }
 
-void Expr3(int sign) #void: {Token t;}
+void Type(): {}
 {
-    t=<INTEGER> {  jjtThis.val = sign *Integer.parseInt(t.image); } #Term
-    | "-" Expr3(-1)
-    | "(" Expr1() ")"
+   <INT> (<OPEN_BRACKETS> <CLOSE_BRACKETS>)?
+   | <BOOL>
+   // | <IDENTIFIER>
+}
+
+void Statement(): {}
+{
+   <OPEN_BRACES> (Statement())* <CLOSE_BRACES>
+   | <IF> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement() <ELSE> Statement()
+   | <WHILE> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement()
+   | Expression() <SEMICOLON>
+   | <IDENTIFIER> (<OPEN_BRACKETS> Expression() <CLOSE_BRACKETS>)? <EQUAL> Expression() <SEMICOLON>
+}
+
+void Expression(): {}
+{
+   <INTEGER_LITERAL> Right()
+   | <BOOLEAN_LITERAL> Right()
+   | <IDENTIFIER> Right()
+   | <THIS> Right()
+   | <NEW> ((<INT> <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> Right()) | (Expression() <OPEN_PARENTHESIS> <CLOSE_PARENTHESIS> Right()))
+   | <NOT> Expression() Right()
+   | <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Right()
+}
+
+void Right() : {}
+{
+   (<AND> | <LT> | <PLUS> | <MINUS> | <MULT> | <DIV>) Expression() Right()
+   | <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> Right()
+   | <DOT> ((<LENGTH> Right()) | (<IDENTIFIER> <OPEN_PARENTHESIS> (Expression() (<COMMA> Expression())*)? <CLOSE_PARENTHESIS> Right()))
+   // | ""
 }
