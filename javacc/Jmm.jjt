@@ -4,8 +4,6 @@ options
     FORCE_LA_CHECK=true;
 }
 
-class Hello { public static void main (String[] args) { int x; x = 2; }}
-
 PARSER_BEGIN(Jmm)
 
 /* import pt.up.fe.specs.util.SpecsIo; */
