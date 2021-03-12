@@ -2,7 +2,7 @@
 .gradle/
 /build/
 /generated/
-comp2021-*.jar
+COMP2021-*.jar
 .idea/
 gradlew.bat
 gradlew
