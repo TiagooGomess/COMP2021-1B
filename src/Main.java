@@ -31,6 +31,8 @@ public class Main implements JmmParser {
             throw new RuntimeException("It's supposed to fail");
         }
 
+		System.out.println("Executing.....");
+
 		String jmmCode = SpecsIo.getResource("fixtures/public/HelloWorld.jmm");
 
 		Main a = new Main();

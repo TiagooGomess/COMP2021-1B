@@ -1,12 +1,12 @@
 options
 {
-    LOOKAHEAD=2;
-    FORCE_LA_CHECK=true;
+    LOOKAHEAD=1;
+    /* FORCE_LA_CHECK=true; */
 }
 
 PARSER_BEGIN(Jmm)
 
-/* import pt.up.fe.specs.util.SpecsIo; */
+// import pt.up.fe.specs.util.SpecsIo;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -137,7 +137,7 @@ void MethodDeclaration(): {}
       // Arguments
       <OPEN_PARENTHESIS> ( Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* )? <CLOSE_PARENTHESIS> 
       // Implementation
-      <OPEN_BRACES> (VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <CLOSE_BRACES>
+      <OPEN_BRACES> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <CLOSE_BRACES>
    )
    | // Main
    (
@@ -145,7 +145,7 @@ void MethodDeclaration(): {}
       // Args
       <OPEN_PARENTHESIS> <STRING> <OPEN_BRACKETS> <CLOSE_BRACKETS> <IDENTIFIER> <CLOSE_PARENTHESIS>
       // Implementation without return
-      <OPEN_BRACES> (VarDeclaration())* (Statement())* <CLOSE_BRACES>
+      <OPEN_BRACES> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <CLOSE_BRACES>
    ))
    
 }
@@ -154,7 +154,7 @@ void Type(): {}
 {
    <INT> (<OPEN_BRACKETS> <CLOSE_BRACKETS>)?
    | <BOOL>
-   // | <IDENTIFIER>
+   | <IDENTIFIER>
 }
 
 void Statement(): {}
@@ -162,25 +162,24 @@ void Statement(): {}
    <OPEN_BRACES> (Statement())* <CLOSE_BRACES>
    | <IF> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement() <ELSE> Statement()
    | <WHILE> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement()
-   // | Expression() <SEMICOLON>
-   | <IDENTIFIER> (<OPEN_BRACKETS> Expression() <CLOSE_BRACKETS>)? <EQUAL> Expression() <SEMICOLON>
+   | LOOKAHEAD(2) Expression() <SEMICOLON>
+   | LOOKAHEAD(2) <IDENTIFIER> (<OPEN_BRACKETS> Expression() <CLOSE_BRACKETS>)? <EQUAL> Expression() <SEMICOLON>
 }
 
 void Expression(): {}
 {
-   <INTEGER_LITERAL> Right()
-   | <BOOLEAN_LITERAL> Right()
-   | <IDENTIFIER> Right()
-   | <THIS> Right()
-   | <NEW> ((<INT> <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> Right()) | (Expression() <OPEN_PARENTHESIS> <CLOSE_PARENTHESIS> Right()))
-   | <NOT> Expression() Right()
-   | <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Right()
+   <INTEGER_LITERAL> (LOOKAHEAD(2) Right())?
+   | <BOOLEAN_LITERAL> (LOOKAHEAD(2) Right())?
+   | <IDENTIFIER> (LOOKAHEAD(2) Right())?
+   | <THIS> (LOOKAHEAD(2) Right())?
+   | <NEW> ((<INT> <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> (LOOKAHEAD(2) Right())?) | (Expression() <OPEN_PARENTHESIS> <CLOSE_PARENTHESIS> (LOOKAHEAD(2) Right())?))
+   | <NOT> Expression() (LOOKAHEAD(2) Right())?
+   | <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> (LOOKAHEAD(2) Right())?
 }
 
 void Right() : {}
 {
-   (<AND> | <LT> | <PLUS> | <MINUS> | <MULT> | <DIV>) Expression() Right()
-   | <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> Right()
-   | <DOT> ((<LENGTH> Right()) | (<IDENTIFIER> <OPEN_PARENTHESIS> (Expression() (<COMMA> Expression())*)? <CLOSE_PARENTHESIS> Right()))
-   | ""
+   (<AND> | <LT> | <PLUS> | <MINUS> | <MULT> | <DIV>) Expression() (LOOKAHEAD(2) Right())?
+   | <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> (LOOKAHEAD(2) Right())?
+   | <DOT> ((<LENGTH> (LOOKAHEAD(2) Right())?) |  (<IDENTIFIER> <OPEN_PARENTHESIS> (Expression() (<COMMA> Expression())*)? <CLOSE_PARENTHESIS> (LOOKAHEAD(2) Right())?))
 }
