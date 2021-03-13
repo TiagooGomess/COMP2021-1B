@@ -1,6 +1,7 @@
 options
 {
    LOOKAHEAD = 1;
+   FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(JmmCompiler)
