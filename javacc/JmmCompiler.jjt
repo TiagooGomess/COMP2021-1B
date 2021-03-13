@@ -1,0 +1,490 @@
+options
+{
+   LOOKAHEAD = 1;
+}
+
+PARSER_BEGIN(JmmCompiler)
+
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+
+public class JmmCompiler
+{
+   public static void main(String args[]) throws ParseException {
+      System.out.println("Compiling the code...\n\n");
+      JmmCompiler myJmmCode = new JmmCompiler(System.in);
+		SimpleNode root = myJmmCode.parser(); // returns reference to root node
+        	
+		root.dump(""); // prints the tree on the screen
+   }
+	
+}
+
+PARSER_END(JmmCompiler)
+
+SKIP :
+{
+   // Whitespace
+	" "
+   | "\r"
+   | "\t"
+   | "\n"
+
+   // Comments
+   | < "//"(~["\n","\r"])*["\n","\r"]>
+   | < "/*" (~[])* "*/" >
+}
+
+TOKEN:
+{   
+   // Literals
+   < INTEGER_LITERAL:  (["1"-"9"](["0"-"9"])* | "0") >
+   | < BOOLEAN_LITERAL: "true"|"false" >
+   
+   // Punctuation
+   | < SEMICOLON: ";" >
+   | < OPEN_BRACES: "{" >
+   | < CLOSE_BRACES: "}" >
+   | < OPEN_PARENTHESIS: "(" >
+   | < CLOSE_PARENTHESIS: ")" >
+   | < OPEN_BRACKETS: "[" >
+   | < CLOSE_BRACKETS: "]" >
+   | < COMMA : "," >
+   | < DOT : ".">
+
+   // Import
+   | < IMPORT: "import" >
+   
+   // Class Declaration
+   | < CLASS: "class" >
+   | < EXTENDS: "extends" >
+   
+   // Methods and attributes
+   | < PUBLIC: "public" >
+   | < STATIC: "static">
+   | < VOID: "void" >
+   | < MAIN: "main" >
+   | < STRING: "String" >
+   | < RETURN: "return" >
+   | < LENGTH: "length" >
+   | < NEW: "new" >
+   | < THIS: "this" >
+
+   // Types
+   | < INT: "int" >
+   | < BOOLEAN: "boolean">
+      
+   // Logical Operators
+   | < NOT: "!" >
+   | < AND: "&&" >
+   | < LT: "<" >
+
+   // Arithmetic Operators
+   | < PLUS: "+" >
+   | < MINUS: "-" >
+   | < MULT: "*" >
+   | < DIV: "/" >
+
+   // Attribution Operator
+   | < EQUAL: "=" >
+   
+   // Decision
+   | < IF: "if" >
+   | < ELSE: "else" >
+
+   // Loop
+   | < WHILE: "while" >
+
+   // Identifier   
+   | < IDENTIFIER: (["a"-"z","A"-"Z","_"](["a"-"z","A"-"Z","0"-"9","_"])*) >
+}
+
+// ----------------------------------------------------------------
+// Program
+// ----------------------------------------------------------------
+
+SimpleNode parser() : {}
+{
+   (ImportDeclaration())*
+   ClassDeclaration()
+   <EOF>
+
+   {return jjtThis;} 
+}
+
+// ----------------------------------------------------------------
+// Import
+// ----------------------------------------------------------------
+
+void ImportDeclaration() : {}
+{
+   <IMPORT>
+   <IDENTIFIER> 
+   (
+      <DOT>
+      <IDENTIFIER>
+   )* 
+   <SEMICOLON>
+}
+
+// ----------------------------------------------------------------
+// Class
+// ----------------------------------------------------------------
+
+void ClassDeclaration() : {}
+{
+   <CLASS>
+   <IDENTIFIER>
+   (
+      <EXTENDS>
+      <IDENTIFIER>
+   )?
+   <OPEN_BRACES>
+      (
+         VariableDeclaration()
+      )*
+      (
+         MethodDeclaration()
+      )*
+   <CLOSE_BRACES>
+}
+
+// ----------------------------------------------------------------
+// Variable
+// ----------------------------------------------------------------
+
+void VariableDeclaration() : {}
+{
+   (
+      VariableDeclarationNotIdentifier()
+   ) | (
+      <IDENTIFIER>
+      VariableDeclarationAfterIdentifier()
+   )
+}
+
+void VariableDeclarationAfterIdentifier() : {}
+{
+   <IDENTIFIER>
+   <SEMICOLON>
+}
+
+void VariableDeclarationNotIdentifier() : {}
+{
+   TypeNotIdentifier()
+   <IDENTIFIER>
+   <SEMICOLON>
+}
+
+// ----------------------------------------------------------------
+// Method
+// ----------------------------------------------------------------
+
+void MethodDeclaration() : {}
+{
+   <PUBLIC>
+   (
+      (
+         Type()
+         <IDENTIFIER>
+         MethodOpenParenthesis()
+         (
+            MethodArgument()
+            (
+               <COMMA>
+               MethodArgument()
+            )*
+         )?
+         MethodCloseParenthesis()
+         MethodImplementation()
+         <RETURN>
+         Expression()
+         <SEMICOLON>
+      ) | (
+         <STATIC>
+         <VOID>
+         <MAIN>
+         MethodOpenParenthesis()
+         <STRING>
+         ArrayVariableBrackets()
+         MethodArgumentName()
+         MethodCloseParenthesis()
+         MethodImplementation()
+      )
+   )
+   <CLOSE_BRACES>
+}
+
+void MethodOpenParenthesis() : {}
+{
+   <OPEN_PARENTHESIS>
+}
+
+void MethodCloseParenthesis() : {}
+{
+   <CLOSE_PARENTHESIS>
+   <OPEN_BRACES>
+}
+
+void MethodImplementation() : {}
+{
+   (
+      <IDENTIFIER>
+      (
+         (
+            StatementAfterIdentifier()
+            MethodStatements()
+         ) | (
+            VariableDeclarationAfterIdentifier()
+            (MethodImplementation())?
+         )
+      )
+   ) | (
+      StatementNotIdentifier()
+      MethodStatements()
+   ) | (
+      VariableDeclarationNotIdentifier()
+      (MethodImplementation())?
+   )
+}
+
+void MethodStatements() : {}
+{
+   (
+      (
+         (
+            StatementNotIdentifier()
+         ) | (
+            <IDENTIFIER> 
+            (
+               StatementAfterIdentifier()
+            )?
+         )
+      )
+   )*
+}
+
+void MethodArgument() : {}
+{
+   Type()
+   MethodArgumentName()  
+}
+
+void MethodArgumentName() : {}
+{
+   <IDENTIFIER>
+}
+
+// ----------------------------------------------------------------
+// Type
+// ----------------------------------------------------------------
+
+void Type() : {}
+{
+   TypeNotIdentifier()
+   | <IDENTIFIER>
+}
+
+void TypeNotIdentifier() : {}
+{
+   (
+      <INT>
+      (
+         ArrayVariableBrackets()
+      )?
+   ) | (
+      <BOOLEAN>
+   )
+}
+
+void ArrayVariableBrackets() : {}
+{
+   <OPEN_BRACKETS>
+   <CLOSE_BRACKETS>
+}
+
+// ----------------------------------------------------------------
+// Statement
+// ----------------------------------------------------------------
+
+void Statement() : {}
+{
+   (
+      StatementNotIdentifier()
+   ) | (
+      <IDENTIFIER>
+      (StatementAfterIdentifier())?
+   )
+}
+
+void StatementAfterIdentifier() : {}
+{
+   (
+      ArrayPosition()
+      (
+         (
+            <EQUAL>
+            Expression()
+         ) | (
+            RightExpressionAfterArrayPosition()
+         )
+      )
+   ) | (
+      (
+         (
+            <EQUAL>
+            Expression()
+         ) | (
+            RightExpressionNotArrayPosition()
+         )
+      )
+   )
+
+   <SEMICOLON>
+}
+
+void StatementNotIdentifier() : {}
+{
+   (
+      <OPEN_BRACES>
+      (
+         Statement()
+      )*
+      <CLOSE_BRACES>
+   ) | (
+      <IF>
+      LogicalExpression()
+      Statement()
+      <ELSE>
+      Statement()
+   ) | (
+      <WHILE>
+      LogicalExpression()
+      Statement()
+   ) | (
+      ExpressionNotIdentifier()
+      <SEMICOLON>
+   )
+}
+
+void LogicalExpression() : {}
+{
+   <OPEN_PARENTHESIS>
+   Expression()
+   <CLOSE_PARENTHESIS>
+}
+
+void ArrayPosition() : {}
+{
+   <OPEN_BRACKETS>
+   Expression()
+   <CLOSE_BRACKETS>
+}
+
+// ----------------------------------------------------------------
+// Expression
+// ----------------------------------------------------------------
+
+void Expression() : {}
+{
+   (
+      ExpressionNotIdentifier()
+      | <IDENTIFIER>
+   )
+
+   (RightExpression())?
+}
+
+void ExpressionAfterIdentifier() : {}
+{
+   (RightExpression())?
+}
+
+void ExpressionNotIdentifier() : {}
+{
+   (
+      (
+         <INTEGER_LITERAL>
+      ) | (
+         <BOOLEAN_LITERAL>
+      ) | (
+         <THIS>
+      ) | (
+         <NOT>
+         Expression()
+      ) | (
+         <OPEN_PARENTHESIS>
+         Expression()
+         <CLOSE_PARENTHESIS>
+      ) | (
+         <NEW>
+         (
+            (
+               <INT>
+               ArrayPosition()
+            ) | (
+               <IDENTIFIER>
+               <OPEN_PARENTHESIS>
+               <CLOSE_PARENTHESIS>
+            )
+         )
+      )
+   )
+   
+   (RightExpression())?
+}
+
+void RightExpression() : {}
+{
+   (
+      ArrayPosition()
+      RightExpressionAfterArrayPosition()
+   ) | (
+      RightExpressionNotArrayPosition()
+   )
+
+   (RightExpression())?
+}
+
+void RightExpressionAfterArrayPosition() : {}
+{
+   (RightExpression())?
+}
+
+void RightExpressionNotArrayPosition() : {}
+{
+   (
+      Operator()
+      Expression()
+   ) | (
+      <DOT>
+      (
+         <LENGTH>
+         | MethodCall()
+      )
+   )
+}
+
+void Operator() : {}
+{
+   <AND>
+   | <LT>
+   | <PLUS>
+   | <MINUS>
+   | <MULT>
+   | <DIV>
+}
+
+void MethodCall() : {}
+{
+   <IDENTIFIER>
+   <OPEN_PARENTHESIS>
+   (
+      Expression()
+      (
+         <COMMA>
+         Expression()
+      )*
+   )?
+   <CLOSE_PARENTHESIS>
+}
