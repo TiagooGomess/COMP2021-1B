@@ -31,8 +31,23 @@ SKIP :
    | "\n"
 
    // Comments
-   | < "//"(~["\n","\r"])*["\n","\r"]>
-   | < "/*" (~[])* "*/" >
+   | < 
+      "//"
+      (
+         ~["\n","\r"]
+      )*
+      ["\n","\r"] 
+   > | < 
+      "/*" 
+      (
+         (
+            ~["*"] 
+         ) | (
+            ["*"] ~["/"]
+         )
+      )*
+      "*/"
+   >
 }
 
 TOKEN:
@@ -196,7 +211,7 @@ void MethodDeclaration() : {}
             )*
          )?
          MethodCloseParenthesis()
-         MethodImplementation()
+         (MethodImplementation())?
          <RETURN>
          Expression()
          <SEMICOLON>
@@ -209,7 +224,7 @@ void MethodDeclaration() : {}
          ArrayVariableBrackets()
          MethodArgumentName()
          MethodCloseParenthesis()
-         MethodImplementation()
+         (MethodImplementation())?
       )
    )
    <CLOSE_BRACES>
@@ -320,17 +335,17 @@ void Statement() : {}
 void StatementAfterIdentifier() : {}
 {
    (
-      ArrayPosition()
       (
+         ArrayPosition()
          (
-            <EQUAL>
-            Expression()
-         ) | (
-            RightExpressionAfterArrayPosition()
+            (
+               <EQUAL>
+               Expression()
+            ) | (
+               RightExpressionAfterArrayPosition()
+            )
          )
-      )
-   ) | (
-      (
+      ) | (
          (
             <EQUAL>
             Expression()
@@ -392,12 +407,9 @@ void Expression() : {}
       | <IDENTIFIER>
    )
 
-   (RightExpression())?
-}
-
-void ExpressionAfterIdentifier() : {}
-{
-   (RightExpression())?
+   (
+      RightExpression()
+   )?
 }
 
 void ExpressionNotIdentifier() : {}
@@ -431,7 +443,9 @@ void ExpressionNotIdentifier() : {}
       )
    )
    
-   (RightExpression())?
+   (
+      RightExpression()
+   )?
 }
 
 void RightExpression() : {}
@@ -442,13 +456,13 @@ void RightExpression() : {}
    ) | (
       RightExpressionNotArrayPosition()
    )
-
-   (RightExpression())?
 }
 
 void RightExpressionAfterArrayPosition() : {}
 {
-   (RightExpression())?
+   (
+      RightExpression()
+   )?
 }
 
 void RightExpressionNotArrayPosition() : {}
@@ -463,6 +477,10 @@ void RightExpressionNotArrayPosition() : {}
          | MethodCall()
       )
    )
+
+   (
+      RightExpression()
+   )?
 }
 
 void Operator() : {}
