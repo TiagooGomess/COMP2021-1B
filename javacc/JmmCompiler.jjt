@@ -18,6 +18,10 @@ public class JmmCompiler
 		root.dump(""); // prints the tree on the screen
    }
 	
+   public static void exitWithError(String message, Exception exception) {
+      System.err.println("Expected " + message + ": " + exception.getMessage());
+      System.exit(1);
+   }
 }
 
 PARSER_END(JmmCompiler)
@@ -120,9 +124,20 @@ TOKEN:
 
 SimpleNode parser() : {}
 {
-   (ImportDeclaration())*
-   ClassDeclaration()
-   <EOF>
+   try {
+      (
+         ImportDeclaration()
+      )*
+      ClassDeclaration()
+   } catch (Exception e) {
+      exitWithError("import statement or class declaration", e);
+   }  
+
+   try {
+      <EOF>
+   } catch (Exception e) {
+      exitWithError("end of file at the end of the program", e);
+   }
 
    {return jjtThis;} 
 }
@@ -134,12 +149,21 @@ SimpleNode parser() : {}
 void ImportDeclaration() : {}
 {
    <IMPORT>
-   <IDENTIFIER> 
-   (
-      <DOT>
-      <IDENTIFIER>
-   )* 
-   <SEMICOLON>
+   try {
+      <IDENTIFIER> 
+      (
+         <DOT>
+         <IDENTIFIER>
+      )* 
+   } catch (Exception e) {
+      exitWithError("valid identifier to be imported", e);
+   }
+
+   try {
+      <SEMICOLON>
+   } catch (Exception e) {
+      exitWithError("semicolon at the end of import statement", e);
+   }
 }
 
 // ----------------------------------------------------------------
@@ -149,19 +173,44 @@ void ImportDeclaration() : {}
 void ClassDeclaration() : {}
 {
    <CLASS>
-   <IDENTIFIER>
+
+   try {
+      <IDENTIFIER>
+   } catch (Exception e) {
+      exitWithError("valid identifier for class being declared", e);
+   }
+   
    (
       <EXTENDS>
-      <IDENTIFIER>
+      try {
+         <IDENTIFIER>
+      } catch (Exception e) {
+         exitWithError("valid identifier for class being extended", e);
+      }
    )?
-   <OPEN_BRACES>
+
+   try {
+      <OPEN_BRACES>
+   } catch (Exception e) {
+      exitWithError("opening of class implementation curly brackets", e);
+   }
+
+   try {
       (
          VariableDeclaration()
       )*
       (
          MethodDeclaration()
       )*
-   <CLOSE_BRACES>
+   } catch (Exception e) {
+      exitWithError("attribute declaration or method implementatio", e);
+   }
+
+   try {
+      <CLOSE_BRACES>
+   } catch (Exception e) {
+      exitWithError("closing of class implementation curly brackets", e);
+   }
 }
 
 // ----------------------------------------------------------------
