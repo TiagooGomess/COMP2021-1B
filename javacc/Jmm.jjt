@@ -36,7 +36,7 @@ SKIP :
    "\t" |
    "\n" | 
 
-   // Comments (VER COM O PROF)
+   // Comments
    < "//"(~["\n","\r"])*["\n","\r"]> |
    < "/*" (~[])* "*/" >
 }
@@ -44,7 +44,7 @@ SKIP :
 TOKEN:
 {   
    // Literals
-   < INTEGER_LITERAL:  ["1"-"9"](["0"-"9"])* > |
+   < INTEGER_LITERAL:  (["1"-"9"](["0"-"9"])* | "0") > |
    < BOOLEAN_LITERAL: "true"|"false" > |
    
    // Punctuation
@@ -107,79 +107,482 @@ TOKEN:
 
 SimpleNode parser(): {}
 {
-   ImportDeclaration() ClassDeclaration() <EOF> {return jjtThis;} 
+   ImportDeclaration() ClassDeclaration() 
+
+   try {
+      <EOF>
+   } catch (Exception e) {
+      System.err.println("Expected end of file after class implementation: " + e.getMessage());
+      System.exit(1);
+   }
+
+   {return jjtThis;} 
 }
 
 void ImportDeclaration(): {}
 {
-   (<IMPORT> <IDENTIFIER> (<DOT> <IDENTIFIER>)* <SEMICOLON>)*
+   (
+      <IMPORT>
+
+      try {
+         <IDENTIFIER> (<DOT> <IDENTIFIER>)*
+      } catch (Exception e) {
+         System.err.println("Expected valid import identifier: " + e.getMessage());
+         System.exit(1);
+      }
+
+      try {
+         <SEMICOLON>
+      } catch (Exception e) {
+         System.err.println("Expected semicolon at end of import statement: " + e.getMessage());
+         System.exit(1);
+      }
+   )*
 }
 
 void ClassDeclaration(): {}
 {
    // Name
-   <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? 
+   try {
+      <CLASS>
+   } catch(Exception e) {
+      System.err.println("Expected class declaration: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <IDENTIFIER>
+   } catch(Exception e) {
+      System.err.println("Expected valid class name: " + e.getMessage());
+      System.exit(1);
+   }
+
+   (<EXTENDS>
+   try {
+       <IDENTIFIER>
+   } catch(Exception e) {
+      System.err.println("Expected valid class name: " + e.getMessage());
+      System.exit(1);
+   }
+   )? 
+   
    // Implementation
-   <OPEN_BRACES> (VarDeclaration())* (MethodDeclaration())* <CLOSE_BRACES>
+   try {
+      <OPEN_BRACES>
+   } catch(Exception e) {
+      System.err.println("Expected opening of class implementation curly brackets: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      (VarDeclaration())* (MethodDeclaration())*
+   } catch(Exception e) {
+      System.err.println("Expected method or attribute declaration: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <CLOSE_BRACES>
+   } catch(Exception e) {
+      System.err.println("Expected closing of class implementation curly brackets: " + e.getMessage());
+      System.exit(1);
+   }
 }
 
 void VarDeclaration(): {}
 {
-   Type() <IDENTIFIER> <SEMICOLON>
+   try {
+      Type()
+   } catch(Exception e) {
+      System.err.println("Expected valid type for variable declaration: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <IDENTIFIER>
+   } catch(Exception e) {
+      System.err.println("Expected valid identifier for variable declaration: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <SEMICOLON>
+   } catch(Exception e) {
+      System.err.println("Expected semicolon at end of variable declaration: " + e.getMessage());
+      System.exit(1);
+   }
+     
 }
 
 void MethodDeclaration(): {}
 {
-   // Name
-   <PUBLIC> (
+   <PUBLIC> 
    (
-      Type() <IDENTIFIER> 
+      MainImplementation()
+      
+      | try {
+         Type() 
+      } catch (Exception e) {
+         System.err.println("Expected valid type for method declaration: " + e.getMessage());
+         System.exit(1);
+      }
+
+      try {
+         <IDENTIFIER> 
+      } catch (Exception e) {
+         System.err.println("Expected valid name for method declaration: " + e.getMessage());
+         System.exit(1);
+      }
+      
       // Arguments
-      <OPEN_PARENTHESIS> ( Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)* )? <CLOSE_PARENTHESIS> 
+      try {
+         <OPEN_PARENTHESIS>
+      } catch (Exception e) {
+         System.err.println("Expected opening of arguments parenthesis: " + e.getMessage());
+         System.exit(1);
+      }
+
+      (
+         try {
+            MethodArgument()  
+         } catch (Exception e) {
+            System.err.println("Expected valid name for argument: " + e.getMessage());
+            System.exit(1);
+         }
+
+         (<COMMA> MethodArgument())*
+      )? 
+
+      try {
+         <CLOSE_PARENTHESIS> 
+      } catch (Exception e) {
+         System.err.println("Expected closing of arguments parenthesis: " + e.getMessage());
+         System.exit(1);
+      }
+       
       // Implementation
-      <OPEN_BRACES> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <RETURN> Expression() <SEMICOLON> <CLOSE_BRACES>
+      try {
+         <OPEN_BRACES>
+      } catch (Exception e) {
+         System.err.println("Expected opening of method implementation curly brackets: " + e.getMessage());
+         System.exit(1);
+      }
+
+      MethodImplementation()
+
+      try {
+         <RETURN>
+      } catch (Exception e) {
+         System.err.println("Expected return statement: " + e.getMessage());
+         System.exit(1);
+      }
+
+      try {
+         Expression()
+      } catch (Exception e) {
+         System.err.println("Expected valid return expression: " + e.getMessage());
+         System.exit(1);
+      }
+
+      try {
+         <SEMICOLON>
+      } catch (Exception e) {
+         System.err.println("Expected semicolon at end of return statement: " + e.getMessage());
+         System.exit(1);
+      }
+
+      try {
+         <CLOSE_BRACES>
+      } catch (Exception e) {
+         System.err.println("Expected closing of method implementation curly brackets: " + e.getMessage());
+         System.exit(1);
+      }
    )
-   | // Main
-   (
-      <STATIC> <VOID> <MAIN>
-      // Args
-      <OPEN_PARENTHESIS> <STRING> <OPEN_BRACKETS> <CLOSE_BRACKETS> <IDENTIFIER> <CLOSE_PARENTHESIS>
-      // Implementation without return
-      <OPEN_BRACES> (LOOKAHEAD(2) VarDeclaration())* (Statement())* <CLOSE_BRACES>
-   ))
-   
+}
+
+void MethodArgument() : {}
+{
+   Type()
+   try {
+      <IDENTIFIER>  
+   } catch (Exception e) {
+      System.err.println("Expected valid name for method argument: " + e.getMessage());
+      System.exit(1);
+   }
+}
+
+void MainImplementation() : {}
+{
+   <STATIC>
+
+   try {
+      <VOID>
+   } catch (Exception e) {
+      System.err.println("All static methods must have void as return type: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <MAIN>
+   } catch (Exception e) {
+      System.err.println("The \"main\" method is the only one that can be declared static: " + e.getMessage());
+      System.exit(1);
+   }
+
+   // Args
+   try {
+      <OPEN_PARENTHESIS>
+   } catch (Exception e) {
+      System.err.println("Expected opening of arguments parenthesis: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <STRING> <OPEN_BRACKETS> <CLOSE_BRACKETS>
+   } catch (Exception e) {
+      System.err.println("The main function must have a \"String[]\" argument and only it: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <IDENTIFIER> 
+   } catch (Exception e) {
+      System.err.println("Expected valid name for the argument of \"main\" method: " + e.getMessage());
+      System.exit(1);
+   }
+
+   try {
+      <CLOSE_PARENTHESIS> 
+   } catch (Exception e) {
+      System.err.println("Expected closing of arguments parenthesis: " + e.getMessage());
+      System.exit(1);
+   }
+       
+   // Implementation without return
+   try {
+      <OPEN_BRACES>
+   } catch (Exception e) {
+      System.err.println("Expected opening of \"main\" implementation curly brackets: " + e.getMessage());
+      System.exit(1);
+   }
+      
+   MethodImplementation()
+
+   try {
+      <CLOSE_BRACES>
+   } catch (Exception e) {
+      System.err.println("Expected closing of \"main\" implementation curly brackets: " + e.getMessage());
+      System.exit(1);
+   }
+}
+
+void MethodImplementation() : {}
+{   
+   (LOOKAHEAD(2) VarDeclaration())* (Statement())*
 }
 
 void Type(): {}
-{
-   <INT> (<OPEN_BRACKETS> <CLOSE_BRACKETS>)?
-   | <BOOL>
-   | <IDENTIFIER>
+{  
+   try {
+      <INT>
+         ( 
+            <OPEN_BRACKETS>
+            try {
+               <CLOSE_BRACKETS>
+            } catch(Exception e) {
+               System.err.println("Expected closing of array brackets: " + e.getMessage());
+               System.exit(1);
+            }
+         )?
+      | <BOOL>
+      | <IDENTIFIER>
+   } catch(Exception e) {
+      System.err.println("Expected valid type: " + e.getMessage());
+      System.exit(1);
+   }
 }
 
 void Statement(): {}
 {
-   <OPEN_BRACES> (Statement())* <CLOSE_BRACES>
-   | <IF> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement() <ELSE> Statement()
-   | <WHILE> <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> Statement()
-   | LOOKAHEAD(2) Expression() <SEMICOLON>
-   | LOOKAHEAD(2) <IDENTIFIER> (<OPEN_BRACKETS> Expression() <CLOSE_BRACKETS>)? <EQUAL> Expression() <SEMICOLON>
+   <OPEN_BRACES> (Statement())*
+   try {
+      <CLOSE_BRACES>
+   } catch (Exception e) {
+      System.err.println("Expected closing of statement curly brackets: " + e.getMessage());
+      System.exit(1);
+   }
+
+   | <IF>
+   try {
+      <OPEN_PARENTHESIS>
+   } catch (Exception e) {
+      System.err.println("Expected opening of logical if expression parenthesis: " + e.getMessage());
+      System.exit(1);
+   }
+   Expression()
+   try {
+      <CLOSE_PARENTHESIS>
+   } catch (Exception e) {
+      System.err.println("Expected closing of logical if expression parenthesis: " + e.getMessage());
+      System.exit(1);
+   }
+   Statement()
+   try {
+      <ELSE>
+   } catch (Exception e) {
+      System.err.println("Expected else block: " + e.getMessage());
+      System.exit(1);
+   }
+   Statement()
+
+   | <WHILE>
+   try {
+      <OPEN_PARENTHESIS>
+   } catch (Exception e) {
+      System.err.println("Expected opening of logical while expression parenthesis: " + e.getMessage());
+      System.exit(1);
+   }
+   Expression()
+   try {
+      <CLOSE_PARENTHESIS>
+   } catch (Exception e) {
+      System.err.println("Expected closing of logical while expression parenthesis: " + e.getMessage());
+      System.exit(1);
+   }
+   Statement()
+
+   | LOOKAHEAD(2) Expression() 
+   try {
+      <SEMICOLON>
+   } catch (Exception e) {
+      System.err.println("Expected semicolon at end of statement: " + e.getMessage());
+      System.exit(1);
+   }
+
+   |
+   try {
+      (LOOKAHEAD(2) <IDENTIFIER>)
+   } catch (Exception e) {
+      System.err.println("Expected valid identifier for statement: " + e.getMessage());
+      System.exit(1);
+   }
+   (
+      <OPEN_BRACKETS> Expression()
+      try {
+         <CLOSE_BRACKETS>
+      } catch (Exception e) {
+         System.err.println("Expected closing of array access brackets: " + e.getMessage());
+         System.exit(1);
+      }
+   )?
+   try {
+      <EQUAL>
+   } catch (Exception e) {
+      System.err.println("Expected assignment using \"=\" operator: " + e.getMessage());
+      System.exit(1);
+   }
+   Expression()
+   try {
+      <SEMICOLON>
+   } catch (Exception e) {
+      System.err.println("Expected semicolon at end of statement: " + e.getMessage());
+      System.exit(1);
+   }
 }
 
 void Expression(): {}
 {
    <INTEGER_LITERAL> (LOOKAHEAD(2) Right())?
    | <BOOLEAN_LITERAL> (LOOKAHEAD(2) Right())?
-   | <IDENTIFIER> (LOOKAHEAD(2) Right())?
    | <THIS> (LOOKAHEAD(2) Right())?
-   | <NEW> ((<INT> <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> (LOOKAHEAD(2) Right())?) | (Expression() <OPEN_PARENTHESIS> <CLOSE_PARENTHESIS> (LOOKAHEAD(2) Right())?))
+   | <IDENTIFIER> (LOOKAHEAD(2) Right())?
+   | <NEW>
+      (
+         (
+            <INT> 
+            try {
+               <OPEN_BRACKETS>
+            } catch (Exception e) {
+               System.err.println("Expected opening of array brackets: " + e.getMessage());
+               System.exit(1);
+            }
+            Expression()
+            try {
+               <CLOSE_BRACKETS>
+            } catch (Exception e) {
+               System.err.println("Expected closing of array brackets: " + e.getMessage());
+               System.exit(1);
+            }
+            (LOOKAHEAD(2) Right())?
+         )
+         | (
+            <IDENTIFIER> 
+            try {
+               <OPEN_PARENTHESIS>
+            } catch (Exception e) {
+               System.err.println("Expected opening of constructor parenthesis: " + e.getMessage());
+               System.exit(1);
+            }
+            try {
+               <CLOSE_PARENTHESIS>
+            } catch (Exception e) {
+               System.err.println("Expected closing of constructor parenthesis: " + e.getMessage());
+               System.exit(1);
+            }
+            (LOOKAHEAD(2) Right())?
+         )
+      )
    | <NOT> Expression() (LOOKAHEAD(2) Right())?
-   | <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS> (LOOKAHEAD(2) Right())?
+   | <OPEN_PARENTHESIS> 
+      Expression() 
+      try {
+         <CLOSE_PARENTHESIS>
+      } catch (Exception e) {
+         System.err.println("Expected closing of parenthesis: " + e.getMessage());
+         System.exit(1);
+      }
+      (LOOKAHEAD(2) Right())? 
 }
 
 void Right() : {}
-{
+{  
    (<AND> | <LT> | <PLUS> | <MINUS> | <MULT> | <DIV>) Expression() (LOOKAHEAD(2) Right())?
-   | <OPEN_BRACKETS> Expression() <CLOSE_BRACKETS> (LOOKAHEAD(2) Right())?
-   | <DOT> ((<LENGTH> (LOOKAHEAD(2) Right())?) |  (<IDENTIFIER> <OPEN_PARENTHESIS> (Expression() (<COMMA> Expression())*)? <CLOSE_PARENTHESIS> (LOOKAHEAD(2) Right())?))
+   | <OPEN_BRACKETS> 
+      Expression()
+      try {
+         <CLOSE_BRACKETS>
+      } catch (Exception e) {
+         System.err.println("Expected closing of array access brackets: " + e.getMessage());
+         System.exit(1);
+      }
+      (LOOKAHEAD(2) Right())?
+   | <DOT> 
+      (
+         (<LENGTH> (LOOKAHEAD(2) Right())?) 
+         | (
+            <IDENTIFIER>
+            try {
+               <OPEN_PARENTHESIS>
+            } catch (Exception e) {
+               System.err.println("Expected opening of method call parenthesis: " + e.getMessage());
+               System.exit(1);
+            }
+            (Expression() (
+               try {
+                  <COMMA> 
+               } catch (Exception e) {
+                  System.err.println("Expected comma to separate arguments of method call: " + e.getMessage());
+                  System.exit(1);
+               }
+               Expression()
+            )*)?
+            try {
+               <CLOSE_PARENTHESIS>
+            } catch (Exception e) {
+               System.err.println("Expected closing of method call parenthesis: " + e.getMessage());
+               System.exit(1);
+            }
+            (LOOKAHEAD(2) Right())?
+         )
+      )
 }
