@@ -1,6 +1,6 @@
 options
 {
-   LOOKAHEAD = 3;
+   LOOKAHEAD = 1;
    // FORCE_LA_CHECK = true;
 }
 
