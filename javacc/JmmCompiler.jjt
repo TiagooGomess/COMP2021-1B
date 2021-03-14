@@ -1,7 +1,7 @@
 options
 {
-   LOOKAHEAD = 1;
-   FORCE_LA_CHECK = true;
+   LOOKAHEAD = 3;
+   // FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(JmmCompiler)
@@ -458,6 +458,7 @@ void Expression() : {}
    )
 
    (
+      LOOKAHEAD(2) 
       RightExpression()
    )?
 }
@@ -494,6 +495,7 @@ void ExpressionNotIdentifier() : {}
    )
    
    (
+      LOOKAHEAD(2) 
       RightExpression()
    )?
 }
@@ -511,6 +513,7 @@ void RightExpression() : {}
 void RightExpressionAfterArrayPosition() : {}
 {
    (
+      LOOKAHEAD(2) 
       RightExpression()
    )?
 }
@@ -529,6 +532,7 @@ void RightExpressionNotArrayPosition() : {}
    )
 
    (
+      LOOKAHEAD(2) 
       RightExpression()
    )?
 }
