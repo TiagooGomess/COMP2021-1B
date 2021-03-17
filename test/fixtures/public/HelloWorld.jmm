@@ -1,6 +1,14 @@
-import ioPlus;
-class HelloWorld {
+import ioPlus.deiedhdei.jdeijeod;
+import java.util.Map;
+
+class HelloWorld extends Hello {
+	int x;
+	String result;
+	TestObject obj;
 	public static void main(String[] args) {
 		ioPlus.printHelloWorld();
+	}
+	public int functionF(int x, String yu) {
+		return 0;
 	}
 }
