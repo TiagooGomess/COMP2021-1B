@@ -40,7 +40,7 @@ public class JmmCompiler
    }
 	
    public static void expect(String message, Exception exception) {
-      System.err.println("Expected " + message + ": " + exception.getMessage());
+      System.err.println("Expected " + message);
    }
 }
 
@@ -137,6 +137,25 @@ TOKEN:
    // Identifier   
    | < IDENTIFIER: (["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*) >
 }
+
+// https://www.cs.purdue.edu/homes/hosking/javacc/doc/errorrecovery.html
+JAVACODE
+
+void error_skipto(int kind) {
+   ParseException e = generateParseException();  // generate the exception object.
+   System.out.println(e.toString());  // print the error message
+   Token t;
+
+   while (getToken(1).kind != kind) {
+      t = getNextToken();
+   }
+   // The above loop consumes tokens all the way up to a token of
+   // "kind".  We use a do-while loop rather than a while because the
+   // current token is the one immediately before the erroneous token
+   // (in our case the token immediately before what should have been
+   // "if"/"while".
+}
+
 
 // ----------------------------------------------------------------
 // Program
@@ -507,7 +526,12 @@ void StatementNotIdentifier() : {}
       Statement()
    ) | (
       <WHILE>
-      LogicalExpression()
+      try {
+         LogicalExpression()
+      } catch(ParseException e) {
+         expect("valid while expression, ignoring the one provided...", e);
+         error_skipto(OPEN_BRACES);
+      }
       Statement()
    ) | (
       ExpressionNotIdentifier()
