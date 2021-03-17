@@ -25,7 +25,7 @@ public class JmmCompiler
 
       FileInputStream file;
 		try {
-			file = new FileInputStream("test/fixtures/public/HelloWorld.jmm");
+			file = new FileInputStream("test/fixtures/public/" + args[0] + ".jmm");
 		} catch (Exception e) {
 			System.err.println("File not found");
 			return;
@@ -222,27 +222,39 @@ void Extends() : {}
 // Variable
 // ----------------------------------------------------------------
 
-void VariableDeclaration() : {Token type;}
+void VariableDeclaration() #void : {}
 {
    (
       VariableDeclarationNotIdentifier()
    ) | (
-      VariableDeclarationAfterIdentifier()
+      VariableDeclarationWithIdentifier()
    )
 }
 
-void VariableDeclarationAfterIdentifier() #void : {}
+void VariableDeclarationAfterIdentifier() : {}
+{
+   VariableName()
+   <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
+}
+
+void VariableDeclarationWithIdentifier() : {}
 {
    VariableType()
    VariableName()
    <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
 }
 
-void VariableDeclarationNotIdentifier() #void : {}
+void VariableDeclarationNotIdentifier() : {}
 {
    TypeNotIdentifier()
    VariableName()
    <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
 }
 
 void VariableType() : {Token type;}
@@ -279,15 +291,18 @@ void MethodDeclaration() : {}
             )*
          )?
          MethodCloseParenthesis()
-         (MethodImplementation())?
-         <RETURN>
-         Expression()
-         <SEMICOLON>
+         MethodImplementation()
       ) | (
          main()
       )
    )
-   <CLOSE_BRACES>
+}
+
+void Return() : {}
+{
+   <RETURN>
+   Expression()
+   <SEMICOLON>
 }
 
 void main() : {}
@@ -300,7 +315,7 @@ void main() : {}
    ArrayVariableBrackets()
    <IDENTIFIER>
    MethodCloseParenthesis()
-   (MethodImplementation())?
+   MainImplementation()
 }
 
 void MethodVisibility() #void : {}
@@ -322,12 +337,27 @@ void MethodOpenParenthesis() #void : {}
 void MethodCloseParenthesis() #void : {}
 {
    <CLOSE_PARENTHESIS>
-   <OPEN_BRACES>
 }
 
-void MethodImplementation() #void : {}
+void MethodImplementation() : {}
+{
+   <OPEN_BRACES>
+   (MethodBody())?
+   Return()
+   <CLOSE_BRACES>
+}
+
+void MainImplementation() : {}
+{
+   <OPEN_BRACES>
+   (MethodBody())?
+   <CLOSE_BRACES>
+}
+
+void MethodBody() #void : {}
 {
    (
+      // TODO: Add identifier to dump
       <IDENTIFIER>
       (
          (
@@ -335,7 +365,7 @@ void MethodImplementation() #void : {}
             MethodStatements()
          ) | (
             VariableDeclarationAfterIdentifier()
-            (MethodImplementation())?
+            (MethodBody())?
          )
       )
    ) | (
@@ -343,7 +373,7 @@ void MethodImplementation() #void : {}
       MethodStatements()
    ) | (
       VariableDeclarationNotIdentifier()
-      (MethodImplementation())?
+      (MethodBody())?
    )
 }
 
@@ -433,7 +463,7 @@ void Statement() #void : {}
    )
 }
 
-void StatementAfterIdentifier() #void : {}
+void StatementAfterIdentifier() : {}
 {
    (
       (
@@ -457,9 +487,11 @@ void StatementAfterIdentifier() #void : {}
    )
 
    <SEMICOLON>
+
+   {jjtThis.put("name", "Statement");}
 }
 
-void StatementNotIdentifier() #void : {}
+void StatementNotIdentifier() : {}
 {
    (
       <OPEN_BRACES>
@@ -481,6 +513,8 @@ void StatementNotIdentifier() #void : {}
       ExpressionNotIdentifier()
       <SEMICOLON>
    )
+
+   {jjtThis.put("name", "Statement");}
 }
 
 void LogicalExpression() #void : {}

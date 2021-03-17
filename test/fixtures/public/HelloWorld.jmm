@@ -9,6 +9,9 @@ class HelloWorld extends Hello {
 		ioPlus.printHelloWorld();
 	}
 	public int functionF(int x, String yu) {
+		int x;
+		String a;
+		x = 1 + 2;
 		return 0;
 	}
 }
