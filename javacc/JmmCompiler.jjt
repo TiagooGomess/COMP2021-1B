@@ -691,7 +691,7 @@ void Operator() #void : {}
 
 
 
-void Expression() : {}
+void Expression() #void : {}
 {
    AndExpression()
 }
@@ -718,29 +718,33 @@ void ArrayPosition() #void : {}
    <CLOSE_BRACKETS>
 }
 
-void TerminalExpression() #void : {}
+void TerminalExpression() : {Token t;}
 {
    (
-      <INTEGER_LITERAL>
-   ) | (
-      <BOOLEAN_LITERAL>
-   ) | (
-      <THIS>
-   ) | (
-      <NEW>
       (
+         t = <INTEGER_LITERAL>
+      ) | (
+         t = <BOOLEAN_LITERAL>
+      ) | (
+         t = <THIS>
+      ) | (
+         t = <NEW>
          (
-            <INT>
-            ArrayPosition()
-         ) | (
-            <IDENTIFIER>
-            <OPEN_PARENTHESIS>
-            <CLOSE_PARENTHESIS>
+            (
+               <INT>
+               ArrayPosition()
+            ) | (
+               <IDENTIFIER>
+               <OPEN_PARENTHESIS>
+               <CLOSE_PARENTHESIS>
+            )
          )
+      ) | (
+         t = <IDENTIFIER>
       )
-   ) | (
-      <IDENTIFIER>
    )
+
+   { jjtThis.put("name", t.image); }
 }
 
 void ParenthesisExpression() #void : {}
@@ -776,6 +780,7 @@ void NotExpression() #void : {}
    | (
       <NOT>
       NotExpression()
+      #Negation
    )
 }
 
@@ -785,9 +790,13 @@ void MultDivExpression() #void : {}
    (
       (
          <MULT>
-         | <DIV>
+         MultDivExpression()
+         #Multiplication
+      ) | (
+         <DIV>
+         MultDivExpression()
+         #Division
       )
-      MultDivExpression()
    )?
 }
 
@@ -797,9 +806,13 @@ void AddSubExpression() #void : {}
    (
       (
          <PLUS>
-         | <MINUS>
+         AddSubExpression()
+         #Addition
+      ) | (
+         <MINUS>
+         AddSubExpression()
+         #Subtraction
       )
-      AddSubExpression()
    )?
 }
 
@@ -809,6 +822,7 @@ void ComparisonExpression() #void : {}
    (
       <LT>
       ComparisonExpression()
+      #Comparison
    )?
 }
 
@@ -818,6 +832,7 @@ void AndExpression() #void : {}
    (
       <AND>
       AndExpression()
+      #AndExpression
    )?
 }
 
