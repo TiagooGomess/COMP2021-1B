@@ -1,0 +1,855 @@
+options
+{
+   LOOKAHEAD = 3;
+   // FORCE_LA_CHECK = true;
+}
+
+PARSER_BEGIN(JmmCompiler)
+
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+
+import pt.up.fe.comp.jmm.JmmParser;
+import pt.up.fe.comp.jmm.JmmParserResult;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.specs.util.SpecsIo;
+
+import java.io.*;
+
+public class JmmCompiler
+{
+   public static void main(String args[]) throws ParseException {
+      System.out.println("Compiling the code...\n\n");
+
+      /* InputStream jmmStream = new ByteArrayInputStream(SpecsIo.getResource("public/HelloWorld.jmm").getBytes()); */
+
+      FileInputStream file;
+		try {
+			file = new FileInputStream("test/fixtures/public/" + args[0] + ".jmm");
+		} catch (Exception e) {
+			System.err.println("File not found");
+			return;
+		}
+
+      JmmCompiler myJmmCode = new JmmCompiler(file);
+		SimpleNode root = myJmmCode.Program(); // returns reference to root node
+        	
+		root.dump(""); // prints the tree on the screen
+
+   
+   }
+	
+   public static void expect(String message, Exception exception) {
+      System.err.println("Expected " + message + ":\n  " + exception.getMessage());
+   }
+}
+
+PARSER_END(JmmCompiler)
+
+SKIP :
+{
+   // Whitespace
+	" "
+   | "\r"
+   | "\t"
+   | "\n"
+
+   // Comments
+   | < 
+      "//"
+      (
+         ~["\n","\r"]
+      )*
+      ["\n","\r"] 
+   > | < 
+      "/*" 
+      (
+         (
+            ~["*"] 
+         ) | (
+            ["*"] ~["/"]
+         )
+      )*
+      "*/"
+   >
+}
+
+TOKEN:
+{   
+   // Literals
+   < INTEGER_LITERAL:  (["1"-"9"](["0"-"9"])* | "0") >
+   | < BOOLEAN_LITERAL: "true"|"false" >
+   
+   // Punctuation
+   | < SEMICOLON: ";" >
+   | < OPEN_BRACES: "{" >
+   | < CLOSE_BRACES: "}" >
+   | < OPEN_PARENTHESIS: "(" >
+   | < CLOSE_PARENTHESIS: ")" >
+   | < OPEN_BRACKETS: "[" >
+   | < CLOSE_BRACKETS: "]" >
+   | < COMMA : "," >
+   | < DOT : ".">
+
+   // Import
+   | < IMPORT: "import" >
+   
+   // Class Declaration
+   | < CLASS: "class" >
+   | < EXTENDS: "extends" >
+   
+   // Methods and attributes
+   | < PUBLIC: "public" >
+   | < STATIC: "static">
+   | < VOID: "void" >
+   | < MAIN: "main" >
+   | < STRING: "String" >
+   | < RETURN: "return" >
+   | < LENGTH: "length" >
+   | < NEW: "new" >
+   | < THIS: "this" >
+
+   // Types
+   | < INT: "int" >
+   | < BOOLEAN: "boolean">
+      
+   // Logical Operators
+   | < NOT: "!" >
+   | < AND: "&&" >
+   | < LT: "<" >
+
+   // Arithmetic Operators
+   | < PLUS: "+" >
+   | < MINUS: "-" >
+   | < MULT: "*" >
+   | < DIV: "/" >
+
+   // Attribution Operator
+   | < EQUAL: "=" >
+   
+   // Decision
+   | < IF: "if" >
+   | < ELSE: "else" >
+
+   // Loop
+   | < WHILE: "while" >
+
+   // Identifier   
+   | < IDENTIFIER: (["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*) >
+}
+
+// https://www.cs.purdue.edu/homes/hosking/javacc/doc/errorrecovery.html
+JAVACODE
+
+void error_skipto(int kind) {
+   ParseException e = generateParseException();  // generate the exception object.
+   System.out.println(e.toString());  // print the error message
+   Token t;
+
+   while (getToken(1).kind != kind && getToken(1).kind != EOF) {
+      t = getNextToken();
+   }
+}
+
+
+// ----------------------------------------------------------------
+// Program
+// ----------------------------------------------------------------
+
+SimpleNode Program() : {}
+{
+   (
+      ImportDeclaration()
+   )*
+   ClassDeclaration()
+
+   <EOF>
+
+   {return jjtThis;} 
+}
+
+// ----------------------------------------------------------------
+// Import
+// ----------------------------------------------------------------
+
+void ImportDeclaration() : {}
+{
+   <IMPORT>
+
+   ImportName()
+   (
+      <DOT>
+      ImportName()
+   )*
+
+   <SEMICOLON>
+}
+
+void ImportName() : {Token name;}
+{
+   name = <IDENTIFIER>
+
+   {jjtThis.put("name", name.image);}
+}
+
+// ----------------------------------------------------------------
+// Class
+// ----------------------------------------------------------------
+
+void ClassDeclaration() : {Token name;}
+{
+   <CLASS>
+
+   ClassName()
+   
+   (
+      Extends()
+   )?
+
+   <OPEN_BRACES>
+
+   (
+      VariableDeclaration()
+   )*
+   (
+      MethodDeclaration()
+   )*
+
+   <CLOSE_BRACES>
+}
+
+void ClassName() : {Token name;}
+{
+   name = <IDENTIFIER>
+
+   {jjtThis.put("name", name.image);}
+}
+
+void Extends() : {}
+{
+   <EXTENDS>
+   ClassName()
+}
+
+// ----------------------------------------------------------------
+// Variable
+// ----------------------------------------------------------------
+
+void VariableDeclaration() #void : {}
+{
+   (
+      VariableDeclarationNotIdentifier()
+   ) | (
+      VariableDeclarationWithIdentifier()
+   )
+}
+
+void VariableDeclarationAfterIdentifier() : {}
+{
+   VariableName()
+   <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
+}
+
+void VariableDeclarationWithIdentifier() : {}
+{
+   VariableType()
+   VariableName()
+   <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
+}
+
+void VariableDeclarationNotIdentifier() : {}
+{
+   TypeNotIdentifier()
+   VariableName()
+   <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
+}
+
+void VariableType() : {Token type;}
+{
+   type = <IDENTIFIER>
+
+   {jjtThis.put("name", type.image);}
+}
+
+void VariableName() : {Token name;}
+{
+   name = <IDENTIFIER>
+
+   {jjtThis.put("name", name.image);}
+}
+
+// ----------------------------------------------------------------
+// Method
+// ----------------------------------------------------------------
+
+void MethodDeclaration() : {}
+{
+   MethodVisibility()
+   (
+      (
+         Type()
+         MethodName()
+         MethodOpenParenthesis()
+         (
+            MethodArgument()
+            (
+               <COMMA>
+               MethodArgument()
+            )*
+         )?
+         MethodCloseParenthesis()
+         MethodImplementation()
+      ) | (
+         main()
+      )
+   )
+}
+
+void Return() : {}
+{
+   <RETURN>
+   Expression()
+   <SEMICOLON>
+}
+
+void main() : {}
+{
+   <STATIC>
+   <VOID>
+   <MAIN>
+   MethodOpenParenthesis()
+   <STRING>
+   ArrayVariableBrackets()
+   <IDENTIFIER>
+   MethodCloseParenthesis()
+   MainImplementation()
+}
+
+void MethodVisibility() #void : {}
+{
+   <PUBLIC>
+}
+
+void MethodName() : {Token name;}
+{
+   name = <IDENTIFIER>
+   {jjtThis.put("name", name.image);}
+}
+
+void MethodOpenParenthesis() #void : {}
+{
+   <OPEN_PARENTHESIS>
+}
+
+void MethodCloseParenthesis() #void : {}
+{
+   <CLOSE_PARENTHESIS>
+}
+
+void MethodImplementation() : {}
+{
+   <OPEN_BRACES>
+   (MethodBody())?
+   Return()
+   <CLOSE_BRACES>
+}
+
+void MainImplementation() : {}
+{
+   <OPEN_BRACES>
+   (MethodBody())?
+   <CLOSE_BRACES>
+}
+
+void MethodBody() #void : {}
+{
+   (
+      VariableDeclaration()
+      MethodBody()
+   ) | (
+      Statement()
+      (
+         Statement()
+      )*
+   )
+}
+
+void MethodArgument() : {}
+{
+   Type()
+   MethodArgumentName()  
+}
+
+void MethodArgumentName() : {Token name;}
+{
+   name = <IDENTIFIER>
+
+   {jjtThis.put("name", name.image);}
+}
+
+// ----------------------------------------------------------------
+// Type
+// ----------------------------------------------------------------
+
+void Type() #void : {}
+{
+   TypeNotIdentifier()
+   | TypeIdentifier()
+}
+
+void TypeIdentifier() : {Token type;}
+{
+   type = <IDENTIFIER>
+
+   {jjtThis.put("name", type.image);}
+}
+
+void TypeNotIdentifier() : {Token type; boolean is_array = false;}
+{
+   (
+      (
+         type = <INT>
+         (
+            ArrayVariableBrackets(){
+               is_array = true;
+            }
+         )?
+      ) | (
+         type = <BOOLEAN>
+      ) | (
+         type = <STRING>
+      )
+   )
+
+   {jjtThis.put("name", type.image);}
+}
+
+void ArrayVariableBrackets() #void : {}
+{
+   <OPEN_BRACKETS>
+   <CLOSE_BRACKETS>
+}
+
+// ----------------------------------------------------------------
+// Statement
+// ----------------------------------------------------------------
+
+void Statement() : {}
+{
+   (
+      <OPEN_BRACES>
+      (
+         Statement()
+      )*
+      <CLOSE_BRACES>
+   ) | (
+      <IF>
+      <OPEN_PARENTHESIS>
+      Expression()
+      <CLOSE_PARENTHESIS>
+      Statement()
+      <ELSE>
+      Statement()
+   ) | (
+      <WHILE>
+      try {
+         Expression()
+      } catch(ParseException e) {
+         expect("valid while expression, ignoring the one provided", e);
+         error_skipto(OPEN_BRACES);
+      }
+      Statement()
+   ) | (
+      Expression()
+      <SEMICOLON>
+   ) | (
+      <IDENTIFIER>
+      <EQUAL>
+      Expression()
+      <SEMICOLON>
+   ) | (
+      <IDENTIFIER>
+      ArrayPosition()
+      <EQUAL>
+      Expression()
+      <SEMICOLON>
+   )
+}
+
+
+
+
+/*void Statement() #void : {}
+{
+   (
+      StatementNotIdentifier()
+   ) | (
+      <IDENTIFIER>
+      StatementAfterIdentifier()
+   )
+}
+
+void StatementAfterIdentifier() : {}
+{
+   (
+      (
+         (
+            ArrayPosition()
+            (
+               (
+                  <EQUAL>
+                  Expression()
+               ) | (
+                  RightExpressionAfterArrayPosition()
+               )
+            )
+         ) | (
+            (
+               <EQUAL>
+               Expression()
+            ) | (
+               RightExpressionNotArrayPosition()
+            )
+         )
+      )
+      <SEMICOLON>
+   ) | (
+      <SEMICOLON>
+   )
+
+   {jjtThis.put("name", "Statement");}
+}
+
+void StatementNotIdentifier() : {}
+{
+   (
+      <OPEN_BRACES>
+      (
+         Statement()
+      )*
+      <CLOSE_BRACES>
+   ) | (
+      <IF>
+      LogicalExpression()
+      Statement()
+      <ELSE>
+      Statement()
+   ) | (
+      <WHILE>
+      try {
+         LogicalExpression()
+      } catch(ParseException e) {
+         expect("valid while expression, ignoring the one provided", e);
+         error_skipto(OPEN_BRACES);
+      }
+      Statement()
+   ) | (
+      ExpressionNotIdentifier()
+      <SEMICOLON>
+   )
+
+   {jjtThis.put("name", "Statement");}
+}
+
+void LogicalExpression() #void : {}
+{
+   <OPEN_PARENTHESIS>
+   Expression()
+   <CLOSE_PARENTHESIS>
+}
+
+void ArrayPosition() #void : {}
+{
+   <OPEN_BRACKETS>
+   Expression()
+   <CLOSE_BRACKETS>
+}
+*/
+
+// ----------------------------------------------------------------
+// Expression
+// ----------------------------------------------------------------
+
+/*void Expression() #void : {}
+{
+   (
+      ExpressionNotIdentifier()
+      | <IDENTIFIER>
+   )
+
+   (
+      LOOKAHEAD(2) 
+      RightExpression()
+   )?
+}
+
+void ExpressionNotIdentifier() #void : {}
+{
+   (
+      (
+         <INTEGER_LITERAL>
+      ) | (
+         <BOOLEAN_LITERAL>
+      ) | (
+         <THIS>
+      ) | (
+         <NOT>
+         Expression()
+      ) | (
+         <OPEN_PARENTHESIS>
+         Expression()
+         <CLOSE_PARENTHESIS>
+      ) | (
+         <NEW>
+         (
+            (
+               <INT>
+               ArrayPosition()
+            ) | (
+               <IDENTIFIER>
+               <OPEN_PARENTHESIS>
+               <CLOSE_PARENTHESIS>
+            )
+         )
+      )
+   )
+   
+   (
+      LOOKAHEAD(2) 
+      RightExpression()
+   )?
+}
+
+void RightExpression() #void : {}
+{
+   (
+      ArrayPosition()
+      RightExpressionAfterArrayPosition()
+   ) | (
+      RightExpressionNotArrayPosition()
+   )
+}
+
+void RightExpressionAfterArrayPosition() #void : {}
+{
+   (
+      LOOKAHEAD(2) 
+      RightExpression()
+   )?
+}
+
+void RightExpressionNotArrayPosition() #void : {}
+{
+   (
+      Operator()
+      Expression()
+   ) | (
+      <DOT>
+      (
+         <LENGTH>
+         | MethodCall()
+      )
+   )
+
+   (
+      LOOKAHEAD(2) 
+      RightExpression()
+   )?
+}
+
+void Operator() #void : {}
+{
+   <AND>
+   | <LT>
+   | <PLUS>
+   | <MINUS>
+   | <MULT>
+   | <DIV>
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void Expression() #void : {}
+{
+   AndExpression()
+}
+
+void MethodCall() #void : {}
+{
+   <IDENTIFIER>
+   <OPEN_PARENTHESIS>
+   (
+      Expression()
+      (
+         <COMMA>
+         Expression()
+      )*
+   )?
+   <CLOSE_PARENTHESIS>
+}
+
+
+void ArrayPosition() #void : {}
+{
+   <OPEN_BRACKETS>
+   Expression()
+   <CLOSE_BRACKETS>
+}
+
+void TerminalExpression() : {Token t;}
+{
+   (
+      (
+         t = <INTEGER_LITERAL>
+      ) | (
+         t = <BOOLEAN_LITERAL>
+      ) | (
+         t = <THIS>
+      ) | (
+         t = <NEW>
+         (
+            (
+               <INT>
+               ArrayPosition()
+            ) | (
+               <IDENTIFIER>
+               <OPEN_PARENTHESIS>
+               <CLOSE_PARENTHESIS>
+            )
+         )
+      ) | (
+         t = <IDENTIFIER>
+      )
+   )
+
+   { jjtThis.put("name", t.image); }
+}
+
+void ParenthesisExpression() #void : {}
+{
+   TerminalExpression()
+   | <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS>
+}
+
+void ClassMemberExpression() #void : {}
+{
+   ParenthesisExpression()
+   (
+      (
+         <DOT>
+         (
+            (
+               <LENGTH>
+            ) | (
+               MethodCall()
+            )*
+         )
+      ) | (
+         <OPEN_BRACKETS>
+         Expression()
+         <CLOSE_BRACKETS>
+      )
+   )?
+}
+
+void NotExpression() #void : {}
+{
+   ClassMemberExpression()
+   | (
+      <NOT>
+      NotExpression()
+      #Negation
+   )
+}
+
+void MultDivExpression() #void : {}
+{
+   NotExpression()
+   (
+      (
+         <MULT>
+         MultDivExpression()
+         #Multiplication
+      ) | (
+         <DIV>
+         MultDivExpression()
+         #Division
+      )
+   )?
+}
+
+void AddSubExpression() #void : {}
+{
+   MultDivExpression()
+   (
+      (
+         <PLUS>
+         AddSubExpression()
+         #Addition
+      ) | (
+         <MINUS>
+         AddSubExpression()
+         #Subtraction
+      )
+   )?
+}
+
+void ComparisonExpression() #void : {}
+{
+   AddSubExpression()
+   (
+      <LT>
+      ComparisonExpression()
+      #Comparison
+   )?
+}
+
+void AndExpression() #void : {}
+{
+   ComparisonExpression()
+   (
+      <AND>
+      AndExpression()
+      #AndExpression
+   )?
+}
+
+/* {
+   new identifier(),
+   new int identifier[Expression()],
+   this,
+   identifier,
+   BOOLEAN_LITERAL,
+   INTEGER_LITERAL
+   Expression.length
+   Expression[Expression]
+   Expression.identifier(...)
+}
+{(a)}
+{!a}
+{a * b, a / b}
+{a + b, a - b}
+{a < b}
+{a && b} */

@@ -51,11 +51,11 @@ void Expr1() #void: {}
 void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-‘ unitary operator
 {
    Expr3(sign)  [
-   ("*" Expr3(1) #Mul(2) 
-   | "/" Expr3(1) #Div(2)
-   )
-   
+      ("*" Expr3(1) #Mul(2) 
+      | "/" Expr3(1) #Div(2)
+      )
    ]
+
 /*
    Expr3(sign) [
    ("*" #Mul(2)
@@ -69,7 +69,7 @@ void Expr2(int sign) #void: {} // 1: positive; -1: negative, because of the ‘-
 
 void Expr3(int sign) #void: {Token t;}
 {
-    t=<INTEGER> {  jjtThis.val = sign *Integer.parseInt(t.image); } #Term
+    t=<INTEGER> {  jjtThis.val = sign * Integer.parseInt(t.image); } #Term
     | "-" Expr3(-1)
     | "(" Expr1() ")"
 }
