@@ -469,10 +469,11 @@ void Statement() : {}
       Expression()
       <SEMICOLON>
    ) | (
-      <IDENTIFIER>
+      VariableName()
       <EQUAL>
       Expression()
       <SEMICOLON>
+      #Assignment(2)
    ) | (
       <IDENTIFIER>
       ArrayPosition()
@@ -791,11 +792,11 @@ void MultDivExpression() #void : {}
       (
          <MULT>
          MultDivExpression()
-         #Multiplication
+         #Multiplication(2)
       ) | (
          <DIV>
          MultDivExpression()
-         #Division
+         #Division(2)
       )
    )?
 }
@@ -807,11 +808,11 @@ void AddSubExpression() #void : {}
       (
          <PLUS>
          AddSubExpression()
-         #Addition
+         #Addition(2)
       ) | (
          <MINUS>
          AddSubExpression()
-         #Subtraction
+         #Subtraction(2)
       )
    )?
 }
@@ -822,7 +823,7 @@ void ComparisonExpression() #void : {}
    (
       <LT>
       ComparisonExpression()
-      #Comparison
+      #Comparison(2)
    )?
 }
 
@@ -832,7 +833,7 @@ void AndExpression() #void : {}
    (
       <AND>
       AndExpression()
-      #AndExpression
+      #AndExpression(2)
    )?
 }
 
