@@ -1,6 +1,7 @@
 class Test {
     public static void main(String[] args){
-        identifier x;
-        isadsa;
+        int x;
+        x = 2;
+        x = x + 2 * 5;
     }
 }
