@@ -14,11 +14,9 @@ public class Main implements JmmParser {
 	public JmmParserResult parse(String jmmCode) {
 		
 		try {
-		    Calculator myCalc = new Calculator(new StringReader(jmmCode));
-    		SimpleNode root = myCalc.Expression(); // returns reference to root node
+		    JmmCompiler jmmCompiler = new JmmCompiler(new StringReader(jmmCode));
+    		SimpleNode root = jmmCompiler.Program(); // returns reference to root node
             	
-    		root.dump(""); // prints the tree on the screen
-    	
     		return new JmmParserResult(root, new ArrayList<Report>());
 		} catch(ParseException e) {
 			throw new RuntimeException("Error while parsing", e);
@@ -31,12 +29,7 @@ public class Main implements JmmParser {
             throw new RuntimeException("It's supposed to fail");
         }
 
-		System.out.println("Executing.....");
 
-		String jmmCode = SpecsIo.getResource("fixtures/public/HelloWorld.jmm");
-
-		Main a = new Main();
-		a.parse(jmmCode);
     }
 
 	
