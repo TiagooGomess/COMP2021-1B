@@ -1,7 +1,10 @@
 class Test {
     public static void main(String[] args){
         int x;
+        int a;
         x = 2;
         x = x + 2 * 5;
+        
+        this.getNumber() + new int [2 + this.length];
     }
 }

@@ -36,6 +36,8 @@ public class JmmCompiler
         	
 		root.dump(""); // prints the tree on the screen
 
+      System.out.println(root.toJson());
+
    
    }
 	

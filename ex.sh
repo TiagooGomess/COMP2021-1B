@@ -1,3 +1,3 @@
 rm -Rf generated/
 gradle build
-java -cp "./build/classes/java/main/:./libs/utils.jar" JmmCompiler "Test"
+java -cp "./build/classes/java/main/:./libs/utils.jar:./libs/gson-2.8.2.jar" JmmCompiler "Test"
