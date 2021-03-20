@@ -1,48 +1,35 @@
 options
 {
-   LOOKAHEAD = 3;
-   // FORCE_LA_CHECK = true;
+   LOOKAHEAD = 1;
+   FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(JmmCompiler)
 
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.specs.util.SpecsIo;
+
+import pt.up.fe.comp.jmm.report.*;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import java.io.*;
 
 public class JmmCompiler
 {
-   public static void main(String args[]) throws ParseException {
-      System.out.println("Compiling the code...\n\n");
+   List<Report> reports = new ArrayList<Report>();
+   int parenthesisDepth = 0;
 
-      /* InputStream jmmStream = new ByteArrayInputStream(SpecsIo.getResource("public/HelloWorld.jmm").getBytes()); */
-
-      FileInputStream file;
-		try {
-			file = new FileInputStream("test/fixtures/public/" + args[0] + ".jmm");
-		} catch (Exception e) {
-			System.err.println("File not found");
-			return;
-		}
-
-      JmmCompiler myJmmCode = new JmmCompiler(file);
-		SimpleNode root = myJmmCode.Program(); // returns reference to root node
-        	
-		root.dump(""); // prints the tree on the screen
-
-      System.out.println(root.toJson());
+   public List<Report> getReports() {
+      return this.reports;
    }
-	
-   public static void expect(String message, Exception exception) {
-      System.err.println("Expected " + message + ":\n  " + exception.getMessage());
+
+   public void addReport(Exception e, String message){
+      reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, e.getStackTrace()[0].getLineNumber(), message));
    }
 }
+
 
 PARSER_END(JmmCompiler)
 
@@ -141,16 +128,33 @@ TOKEN:
 // https://www.cs.purdue.edu/homes/hosking/javacc/doc/errorrecovery.html
 JAVACODE
 
-void error_skipto(int kind) {
+void skipParenthesis() {
    ParseException e = generateParseException();  // generate the exception object.
    System.out.println(e.toString());  // print the error message
    Token t;
+   boolean end = false;
 
-   while (getToken(1).kind != kind && getToken(1).kind != EOF) {
-      t = getNextToken();
+   while(this.parenthesisDepth != 0) {
+      t = getToken(1);
+      System.out.println(t.image);
+      switch (t.kind) {
+         case OPEN_PARENTHESIS:
+            this.parenthesisDepth++;
+            break;
+         case CLOSE_PARENTHESIS:
+            this.parenthesisDepth--;
+            break;
+         case EOF:
+            return;
+         case OPEN_BRACES:
+            this.parenthesisDepth = 0;
+            return;
+         default:
+            break;
+      }
+      getNextToken();
    }
 }
-
 
 // ----------------------------------------------------------------
 // Program
@@ -158,12 +162,17 @@ void error_skipto(int kind) {
 
 SimpleNode Program() : {}
 {
-   (
-      ImportDeclaration()
-   )*
-   ClassDeclaration()
+   try {
+      (
+         ImportDeclaration()
+      )*
+      ClassDeclaration()
 
-   <EOF>
+      <EOF>
+   } catch(Exception e){
+      System.err.println(e.getMessage());
+      addReport(e, e.getMessage());
+   }
 
    {return jjtThis;} 
 }
@@ -185,18 +194,16 @@ void ImportDeclaration() : {}
    <SEMICOLON>
 }
 
-void ImportName() : {Token name;}
+void ImportName() : {}
 {
-   name = <IDENTIFIER>
-
-   {jjtThis.put("name", name.image);}
+   <IDENTIFIER>
 }
 
 // ----------------------------------------------------------------
 // Class
 // ----------------------------------------------------------------
 
-void ClassDeclaration() : {Token name;}
+void ClassDeclaration() : {}
 {
    <CLASS>
 
@@ -218,11 +225,9 @@ void ClassDeclaration() : {Token name;}
    <CLOSE_BRACES>
 }
 
-void ClassName() : {Token name;}
+void ClassName() : {}
 {
-   name = <IDENTIFIER>
-
-   {jjtThis.put("name", name.image);}
+   <IDENTIFIER>
 }
 
 void Extends() : {}
@@ -235,13 +240,22 @@ void Extends() : {}
 // Variable
 // ----------------------------------------------------------------
 
-void VariableDeclaration() #void : {}
+void VariableDeclaration() : {}
 {
    (
-      VariableDeclarationNotIdentifier()
+      VariableDeclarationWithoutIdentifier()
    ) | (
       VariableDeclarationWithIdentifier()
    )
+}
+
+void VariableDeclarationWithoutIdentifier() : {}
+{
+   TypeWithoutIdentifier()
+   VariableName()
+   <SEMICOLON>
+
+   {jjtThis.put("name", "VariableDeclaration");}
 }
 
 void VariableDeclarationAfterIdentifier() : {}
@@ -261,27 +275,14 @@ void VariableDeclarationWithIdentifier() : {}
    {jjtThis.put("name", "VariableDeclaration");}
 }
 
-void VariableDeclarationNotIdentifier() : {}
+void VariableType() : {}
 {
-   TypeNotIdentifier()
-   VariableName()
-   <SEMICOLON>
-
-   {jjtThis.put("name", "VariableDeclaration");}
+   <IDENTIFIER>
 }
 
-void VariableType() : {Token type;}
+void VariableName() : {}
 {
-   type = <IDENTIFIER>
-
-   {jjtThis.put("name", type.image);}
-}
-
-void VariableName() : {Token name;}
-{
-   name = <IDENTIFIER>
-
-   {jjtThis.put("name", name.image);}
+   <IDENTIFIER>
 }
 
 // ----------------------------------------------------------------
@@ -331,25 +332,26 @@ void main() : {}
    MainImplementation()
 }
 
-void MethodVisibility() #void : {}
+void MethodVisibility() : {}
 {
    <PUBLIC>
 }
 
-void MethodName() : {Token name;}
+void MethodName() : {}
 {
-   name = <IDENTIFIER>
-   {jjtThis.put("name", name.image);}
+   <IDENTIFIER>
 }
 
-void MethodOpenParenthesis() #void : {}
+void MethodOpenParenthesis() : {}
 {
    <OPEN_PARENTHESIS>
+   {this.parenthesisDepth++;}
 }
 
-void MethodCloseParenthesis() #void : {}
+void MethodCloseParenthesis() : {}
 {
    <CLOSE_PARENTHESIS>
+   {this.parenthesisDepth--;}
 }
 
 void MethodImplementation() : {}
@@ -367,17 +369,35 @@ void MainImplementation() : {}
    <CLOSE_BRACES>
 }
 
-void MethodBody() #void : {}
+void MethodBody() : {}
 {
    (
-      VariableDeclaration()
-      MethodBody()
-   ) | (
-      Statement()
+      <IDENTIFIER>
       (
-         Statement()
-      )*
+         (
+            VariableDeclarationAfterIdentifier()
+            MethodBody()
+         ) | (
+            StatementAfterIdentifier()
+            MethodStatements()
+         )
+      )
+   ) | (
+      (
+         VariableDeclarationWithoutIdentifier()
+         MethodBody()
+      ) | (
+         StatementWithoutIdentifier()
+         MethodStatements()
+      )
    )
+}
+
+void MethodStatements() : {} 
+{
+   (
+      Statement()
+   )*
 }
 
 void MethodArgument() : {}
@@ -386,20 +406,18 @@ void MethodArgument() : {}
    MethodArgumentName()  
 }
 
-void MethodArgumentName() : {Token name;}
+void MethodArgumentName() : {}
 {
-   name = <IDENTIFIER>
-
-   {jjtThis.put("name", name.image);}
+   <IDENTIFIER>
 }
 
 // ----------------------------------------------------------------
 // Type
 // ----------------------------------------------------------------
 
-void Type() #void : {}
+void Type() : {}
 {
-   TypeNotIdentifier()
+   TypeWithoutIdentifier()
    | TypeIdentifier()
 }
 
@@ -410,7 +428,7 @@ void TypeIdentifier() : {Token type;}
    {jjtThis.put("name", type.image);}
 }
 
-void TypeNotIdentifier() : {Token type; boolean is_array = false;}
+void TypeWithoutIdentifier() : {Token type; boolean is_array = false;}
 {
    (
       (
@@ -430,7 +448,7 @@ void TypeNotIdentifier() : {Token type; boolean is_array = false;}
    {jjtThis.put("name", type.image);}
 }
 
-void ArrayVariableBrackets() #void : {}
+void ArrayVariableBrackets() : {}
 {
    <OPEN_BRACKETS>
    <CLOSE_BRACKETS>
@@ -443,6 +461,18 @@ void ArrayVariableBrackets() #void : {}
 void Statement() : {}
 {
    (
+      (
+         StatementWithoutIdentifier()
+      ) | (
+         <IDENTIFIER>
+         StatementAfterIdentifier()
+      )
+   )
+}
+
+void StatementWithoutIdentifier() : {}
+{
+   (
       <OPEN_BRACES>
       (
          Statement()
@@ -451,48 +481,29 @@ void Statement() : {}
    ) | (
       <IF>
       <OPEN_PARENTHESIS>
+      {this.parenthesisDepth++;}
       Expression()
       <CLOSE_PARENTHESIS>
+      {this.parenthesisDepth--;}
       Statement()
       <ELSE>
       Statement()
    ) | (
       <WHILE>
+      <OPEN_PARENTHESIS>
+      {this.parenthesisDepth++;}
       try {
          Expression()
+         <CLOSE_PARENTHESIS>
+         {this.parenthesisDepth--;}
       } catch(ParseException e) {
-         expect("valid while expression, ignoring the one provided", e);
-         error_skipto(OPEN_BRACES);
+         addReport(e, "Expected valid while expression, ignoring the one provided");
+         skipParenthesis();
       }
       Statement()
    ) | (
-      Expression()
+      ExpressionWithoutIdentifier()
       <SEMICOLON>
-   ) | (
-      VariableName()
-      <EQUAL>
-      Expression()
-      <SEMICOLON>
-      #Assignment(2)
-   ) | (
-      <IDENTIFIER>
-      ArrayPosition()
-      <EQUAL>
-      Expression()
-      <SEMICOLON>
-      #Assignment(2)
-   )
-}
-
-
-
-/*void Statement() #void : {}
-{
-   (
-      StatementNotIdentifier()
-   ) | (
-      <IDENTIFIER>
-      StatementAfterIdentifier()
    )
 }
 
@@ -500,224 +511,332 @@ void StatementAfterIdentifier() : {}
 {
    (
       (
+         <EQUAL>
+         Expression()
+         <SEMICOLON>
+      ) | (
+         ArrayPosition()
          (
-            ArrayPosition()
-            (
-               (
-                  <EQUAL>
-                  Expression()
-               ) | (
-                  RightExpressionAfterArrayPosition()
-               )
-            )
-         ) | (
-            (
-               <EQUAL>
-               Expression()
-            ) | (
-               RightExpressionNotArrayPosition()
-            )
-         )
+            <EQUAL>
+            Expression()
+         )?
+         <SEMICOLON>
+      ) | (
+         ExpressionWithoutArrayPosition()
+         <SEMICOLON>
       )
-      <SEMICOLON>
-   ) | (
-      <SEMICOLON>
    )
-
-   {jjtThis.put("name", "Statement");}
 }
-
-void StatementNotIdentifier() : {}
-{
-   (
-      <OPEN_BRACES>
-      (
-         Statement()
-      )*
-      <CLOSE_BRACES>
-   ) | (
-      <IF>
-      LogicalExpression()
-      Statement()
-      <ELSE>
-      Statement()
-   ) | (
-      <WHILE>
-      try {
-         LogicalExpression()
-      } catch(ParseException e) {
-         expect("valid while expression, ignoring the one provided", e);
-         error_skipto(OPEN_BRACES);
-      }
-      Statement()
-   ) | (
-      ExpressionNotIdentifier()
-      <SEMICOLON>
-   )
-
-   {jjtThis.put("name", "Statement");}
-}
-
-void LogicalExpression() #void : {}
-{
-   <OPEN_PARENTHESIS>
-   Expression()
-   <CLOSE_PARENTHESIS>
-}
-
-void ArrayPosition() #void : {}
-{
-   <OPEN_BRACKETS>
-   Expression()
-   <CLOSE_BRACKETS>
-}
-*/
 
 // ----------------------------------------------------------------
 // Expression
 // ----------------------------------------------------------------
 
-/*void Expression() #void : {}
+void Expression() : {}
 {
    (
-      ExpressionNotIdentifier()
-      | <IDENTIFIER>
+      ExpressionWithoutIdentifier()
+   ) | (
+      <IDENTIFIER>
+      ExpressionAfterIdentifier()
    )
+}
 
+void ExpressionWithoutIdentifier() : {}
+{
+   AndExpressionWithoutIdentifier()
+}
+
+void ExpressionAfterIdentifier() : {}
+{
+   AndExpressionAfterIdentifier()
+}
+
+void ExpressionWithoutArrayPosition() : {}
+{
+   AndExpressionWithoutArrayPosition()
+}
+
+// ----------------------------------------------------------------
+// Logical Expressions
+// ----------------------------------------------------------------
+
+void AndExpression() : {}
+{
+   ComparisonExpression()
+   RightAndExpression()
+}
+
+void AndExpressionWithoutIdentifier() : {}
+{
+   ComparisonExpressionWithoutIdentifier()
+   RightAndExpression()
+}
+
+void AndExpressionAfterIdentifier() : {}
+{
+   ComparisonExpressionAfterIdentifier()
+   RightAndExpression()
+}
+
+void AndExpressionWithoutArrayPosition() : {}
+{
+   ComparisonExpressionWithoutArrayPosition()
+   RightAndExpression()
+}
+
+void RightAndExpression() : {}
+{
    (
-      LOOKAHEAD(2) 
-      RightExpression()
+      <AND>
+      AndExpression()
    )?
 }
 
-void ExpressionNotIdentifier() #void : {}
+void ComparisonExpression() : {}
+{
+   AddSubExpression()
+   RightComparisonExpression()
+}
+
+void ComparisonExpressionWithoutIdentifier() : {}
+{
+   AddSubExpressionWithoutIdentifier()
+   RightComparisonExpression()
+}
+
+void ComparisonExpressionAfterIdentifier() : {}
+{
+   AddSubExpressionAfterIdentifier()
+   RightComparisonExpression()
+}
+
+void ComparisonExpressionWithoutArrayPosition() : {}
+{
+   AddSubExpressionWithoutArrayPosition()
+   RightComparisonExpression()
+}
+
+void RightComparisonExpression() : {}
+{
+   (
+      <LT>
+      ComparisonExpression()
+   )?
+}
+
+// ----------------------------------------------------------------
+// Arithmetic Expressions
+// ----------------------------------------------------------------
+
+void AddSubExpression() : {}
+{
+   MultDivExpression()
+   RightAddSubExpression()
+}
+
+void AddSubExpressionWithoutIdentifier() : {}
+{
+   MultDivExpressionWithoutIdentifier()
+   RightAddSubExpression()
+}
+
+void AddSubExpressionAfterIdentifier() : {}
+{
+   MultDivExpressionAfterIdentifier()
+   RightAddSubExpression()
+}
+
+void AddSubExpressionWithoutArrayPosition() : {}
+{
+   MultDivExpressionWithoutArrayPosition()
+   RightAddSubExpression()
+}
+
+void RightAddSubExpression() : {}
 {
    (
       (
-         <INTEGER_LITERAL>
+         <PLUS>
+         AddSubExpression()
       ) | (
-         <BOOLEAN_LITERAL>
+         <MINUS>
+         AddSubExpression()
+      )
+   )?
+}
+
+void MultDivExpression() : {}
+{
+   NotExpression()
+   RightMultDivExpression()
+}
+
+void MultDivExpressionWithoutIdentifier() : {}
+{
+   NotExpressionWithoutIdentifier()
+   RightMultDivExpression()
+}
+
+void MultDivExpressionAfterIdentifier() : {}
+{
+   NotExpressionAfterIdentifier()
+   RightMultDivExpression()
+}
+
+void MultDivExpressionWithoutArrayPosition() : {}
+{
+   NotExpressionWithoutArrayPosition()
+   RightMultDivExpression()
+}
+
+void RightMultDivExpression() : {}
+{
+   (
+      (
+         <MULT>
+         MultDivExpression()
       ) | (
-         <THIS>
-      ) | (
-         <NOT>
-         Expression()
-      ) | (
-         <OPEN_PARENTHESIS>
-         Expression()
-         <CLOSE_PARENTHESIS>
-      ) | (
-         <NEW>
+         <DIV>
+         MultDivExpression()
+      )
+   )?
+}
+
+// ----------------------------------------------------------------
+// Not Expressions
+// ----------------------------------------------------------------
+
+void NotExpression() : {}
+{
+   ClassMemberExpression()
+   | (
+      <NOT>
+      NotExpression()
+   )
+}
+
+void NotExpressionWithoutIdentifier() : {}
+{
+   ClassMemberExpressionWithoutIdentifier()
+   | (
+      <NOT>
+      NotExpression()
+   )
+}
+
+void NotExpressionAfterIdentifier() : {}
+{
+   ClassMemberExpressionAfterIdentifier()
+}
+
+void NotExpressionWithoutArrayPosition() : {}
+{
+   (
+      ClassMemberExpressionWithoutArrayPosition()
+   )?
+}
+
+// ----------------------------------------------------------------
+// Class Member Expressions
+// ----------------------------------------------------------------
+
+void ClassMemberExpression() : {}
+{
+   ParenthesisExpression()
+   (
+      (
+         <DOT>
          (
             (
-               <INT>
-               ArrayPosition()
+               <LENGTH>
             ) | (
-               <IDENTIFIER>
-               <OPEN_PARENTHESIS>
-               <CLOSE_PARENTHESIS>
+               MethodCalls()
             )
          )
+      ) | (
+         <OPEN_BRACKETS>
+         Expression()
+         <CLOSE_BRACKETS>
       )
-   )
-   
-   (
-      LOOKAHEAD(2) 
-      RightExpression()
    )?
 }
 
-void RightExpression() #void : {}
+void ClassMemberExpressionWithoutIdentifier() : {}
 {
+   ParenthesisExpressionWithoutIdentifier()
    (
-      ArrayPosition()
-      RightExpressionAfterArrayPosition()
-   ) | (
-      RightExpressionNotArrayPosition()
-   )
-}
-
-void RightExpressionAfterArrayPosition() #void : {}
-{
-   (
-      LOOKAHEAD(2) 
-      RightExpression()
+      (
+         <DOT>
+         (
+            (
+               <LENGTH>
+            ) | (
+               MethodCalls()
+            )
+         )
+      ) | (
+         <OPEN_BRACKETS>
+         Expression()
+         <CLOSE_BRACKETS>
+      )
    )?
 }
 
-void RightExpressionNotArrayPosition() #void : {}
+void ClassMemberExpressionAfterIdentifier() : {}
 {
    (
-      Operator()
-      Expression()
-   ) | (
-      <DOT>
+      (
+         ArrayPosition()
+      ) | (
+         ClassMemberExpressionWithoutArrayPosition()
+      )
+   )?
+}
+
+void ClassMemberExpressionWithoutArrayPosition() : {}
+{
+   <DOT>
+   (
       (
          <LENGTH>
-         | MethodCall()
+      ) | (
+         MethodCalls()
       )
    )
-
-   (
-      LOOKAHEAD(2) 
-      RightExpression()
-   )?
 }
 
-void Operator() #void : {}
+// ----------------------------------------------------------------
+// Parenthesis Expressions
+// ----------------------------------------------------------------
+
+void ParenthesisExpression() : {}
 {
-   <AND>
-   | <LT>
-   | <PLUS>
-   | <MINUS>
-   | <MULT>
-   | <DIV>
-}*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void Expression() #void : {}
-{
-   AndExpression()
-}
-
-void MethodCall() #void : {}
-{
-   <IDENTIFIER>
-   <OPEN_PARENTHESIS>
-   (
+   TerminalExpression()
+   | (
+      <OPEN_PARENTHESIS>
+      {this.parenthesisDepth++;}
       Expression()
-      (
-         <COMMA>
-         Expression()
-      )*
-   )?
-   <CLOSE_PARENTHESIS>
+      <CLOSE_PARENTHESIS>
+      {this.parenthesisDepth--;}
+   )
 }
 
-
-void ArrayPosition() #void : {}
+void ParenthesisExpressionWithoutIdentifier() : {}
 {
-   <OPEN_BRACKETS>
-   Expression()
-   <CLOSE_BRACKETS>
+   TerminalExpressionWithoutIdentifier()
+   | (
+      <OPEN_PARENTHESIS>
+      {this.parenthesisDepth++;}
+      Expression()
+      <CLOSE_PARENTHESIS>
+      {this.parenthesisDepth--;}
+   )
 }
+
+// ----------------------------------------------------------------
+// Terminal Expressions
+// ----------------------------------------------------------------
 
 void TerminalExpression() : {Token t;}
 {
@@ -748,109 +867,70 @@ void TerminalExpression() : {Token t;}
    { jjtThis.put("name", t.image); }
 }
 
-void ParenthesisExpression() #void : {}
+void TerminalExpressionWithoutIdentifier() : {Token t;}
 {
-   TerminalExpression()
-   | <OPEN_PARENTHESIS> Expression() <CLOSE_PARENTHESIS>
-}
-
-void ClassMemberExpression() #void : {}
-{
-   ParenthesisExpression()
    (
       (
-         <DOT>
+         t = <INTEGER_LITERAL>
+      ) | (
+         t = <BOOLEAN_LITERAL>
+      ) | (
+         t = <THIS>
+      ) | (
+         t = <NEW>
          (
             (
-               <LENGTH>
+               <INT>
+               ArrayPosition()
             ) | (
-               MethodCall()
-            )*
+               <IDENTIFIER>
+               <OPEN_PARENTHESIS>
+               <CLOSE_PARENTHESIS>
+            )
          )
-      ) | (
-         <OPEN_BRACKETS>
-         Expression()
-         <CLOSE_BRACKETS>
       )
-   )?
-}
-
-void NotExpression() #void : {}
-{
-   ClassMemberExpression()
-   | (
-      <NOT>
-      NotExpression()
-      #Negation
    )
+
+   { jjtThis.put("name", t.image); }
 }
 
-void MultDivExpression() #void : {}
+// ----------------------------------------------------------------
+// Sub Expressions
+// ----------------------------------------------------------------
+
+void MethodCalls() : {}
 {
-   NotExpression()
+   MethodCall()
    (
+      <DOT>
+      MethodCall()
+   )*
+}
+
+void MethodCall() : {}
+{
+   <IDENTIFIER>
+   MethodCallArguments()
+}
+
+void MethodCallArguments() : {}
+{
+   <OPEN_PARENTHESIS>
+   {this.parenthesisDepth++;}
+   (
+      Expression()
       (
-         <MULT>
-         MultDivExpression()
-         #Multiplication(2)
-      ) | (
-         <DIV>
-         MultDivExpression()
-         #Division(2)
-      )
+         <COMMA>
+         Expression()
+      )*
    )?
+   <CLOSE_PARENTHESIS>
+   {this.parenthesisDepth--;}
 }
 
-void AddSubExpression() #void : {}
+void ArrayPosition() : {}
 {
-   MultDivExpression()
-   (
-      (
-         <PLUS>
-         AddSubExpression()
-         #Addition(2)
-      ) | (
-         <MINUS>
-         AddSubExpression()
-         #Subtraction(2)
-      )
-   )?
+   <OPEN_BRACKETS>
+   Expression()
+   <CLOSE_BRACKETS>
 }
-
-void ComparisonExpression() #void : {}
-{
-   AddSubExpression()
-   (
-      <LT>
-      ComparisonExpression()
-      #Comparison(2)
-   )?
-}
-
-void AndExpression() #void : {}
-{
-   ComparisonExpression()
-   (
-      <AND>
-      AndExpression()
-      #AndExpression(2)
-   )?
-}
-
-/* {
-   new identifier(),
-   new int identifier[Expression()],
-   this,
-   identifier,
-   BOOLEAN_LITERAL,
-   INTEGER_LITERAL
-   Expression.length
-   Expression[Expression]
-   Expression.identifier(...)
-}
-{(a)}
-{!a}
-{a * b, a / b}
-{a + b, a - b}
-{a < b}
-{a && b} */

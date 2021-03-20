@@ -17,18 +17,14 @@ public class SimpleNode implements Node, JmmNode {
   protected Node[] children;
   protected int id;
   protected Object value;
-  protected Calculator parser;
+  protected JmmCompiler parser;
   protected Map<String, String> attributes = new HashMap<String, String>();
-
-  // added
-  public int val;
-  public Operator op = null;
 
   public SimpleNode(int i) {
     id = i;
   }
 
-  public SimpleNode(Calculator p, int i) {
+  public SimpleNode(JmmCompiler p, int i) {
     this(i);
     parser = p;
   }
@@ -52,7 +48,6 @@ public class SimpleNode implements Node, JmmNode {
   }
 
   public List<JmmNode> getChildren() {
-    /* return (children == null) ? new ArrayList<>() : Arrays.asList((JmmNode[]) children); */
     return JmmNode.convertChildren(children);
   }
 
