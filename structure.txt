@@ -11,7 +11,7 @@ Class
     name: hello
     extends: Remote
     
-    Declaration
+    VarDeclaration
         type: int
         name: x
 

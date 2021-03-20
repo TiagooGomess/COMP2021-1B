@@ -254,7 +254,7 @@ String Extends() #void : {String name;}
 // Variable
 // ----------------------------------------------------------------
 
-void VariableDeclaration() : {}
+void VariableDeclaration() #void : {}
 {
    (
       VariableDeclarationWithoutIdentifier()
@@ -263,51 +263,60 @@ void VariableDeclaration() : {}
    )
 }
 
-void VariableDeclarationWithoutIdentifier() : {}
+void VariableDeclarationWithoutIdentifier() #void : {String type; String name;}
 {
-   TypeWithoutIdentifier()
-   VariableName()
+   type =  TypeWithoutIdentifier()
+   name = VariableName()
    <SEMICOLON>
+   VarDeclaration("type", name)
 }
 
-void VariableDeclarationAfterIdentifier(String type) : {}
+void VariableDeclarationAfterIdentifier(String type) #void : {String name;}
 {
-   VariableName()
+   name = VariableName()
    <SEMICOLON>
+   VarDeclaration(type, name)
 }
 
-void VariableDeclarationWithIdentifier() : {}
+void VariableDeclarationWithIdentifier() #void : {String type;}
 {
-   VariableType()
-   VariableName()
-   <SEMICOLON>
+   type = VariableType()
+   VariableDeclarationAfterIdentifier(type)
 }
 
-void VariableType() : {Token type;}
+String VariableType() #void : {Token type;}
 {
    type = <IDENTIFIER>
 
-   {jjtThis.put("type", type.image);}
+   {return type.image;}
 }
 
-void VariableName() : {Token name;}
+String VariableName() #void : {Token name;}
 {
    name = <IDENTIFIER>
 
-   {jjtThis.put("name", name.image);}
+   {return name.image;}
+}
+
+void VarDeclaration(String type, String name) : {}
+{
+   {
+      jjtThis.put("type", type);
+      jjtThis.put("name", name);
+   }
 }
 
 // ----------------------------------------------------------------
 // Method
 // ----------------------------------------------------------------
 
-void MethodDeclaration() #void : {}
+void MethodDeclaration() : {String visibility; boolean isStatic = false; String methodName; String type;}
 {
-   MethodVisibility()
+   visibility = MethodVisibility()
    (
       (
-         Type()
-         MethodName()
+         type = Type()
+         methodName = MethodName()
          MethodOpenParenthesis()
          (
             MethodArgument()
@@ -319,9 +328,27 @@ void MethodDeclaration() #void : {}
          MethodCloseParenthesis()
          MethodImplementation()
       ) | (
-         main()
+         <STATIC>
+         {
+            isStatic = true;
+         }
+         type = Void()
+         methodName = Main()
+         MethodOpenParenthesis()
+         <STRING>
+         ArrayVariableBrackets()
+         <IDENTIFIER>
+         MethodCloseParenthesis()
+         MainImplementation()
       )
    )
+
+   {
+      jjtThis.put("name",methodName);
+      jjtThis.put("visibility",visibility);
+      jjtThis.put("isStatic",isStatic ? "true" : "false");
+      jjtThis.put("type",type);
+   }
 }
 
 void Return() #void : {}
@@ -331,27 +358,28 @@ void Return() #void : {}
    <SEMICOLON>
 }
 
-void main() #void : {}
+String Void() #void : {Token v;}
 {
-   <STATIC>
-   <VOID>
-   <MAIN>
-   MethodOpenParenthesis()
-   <STRING>
-   ArrayVariableBrackets()
-   <IDENTIFIER>
-   MethodCloseParenthesis()
-   MainImplementation()
+   v = <VOID>
+   {return v.image;}
 }
 
-void MethodVisibility() #void : {}
+String Main() #void : {Token m;}
 {
-   <PUBLIC>
+   m = <MAIN>
+   {return m.image;}
 }
 
-void MethodName() #void : {}
+String MethodVisibility() #void : {Token v;}
 {
-   <IDENTIFIER>
+   v = <PUBLIC>
+   {return v.image;}
+}
+
+String MethodName() #void : {Token name;}
+{
+   name = <IDENTIFIER>
+   {return name.image;}
 }
 
 void MethodOpenParenthesis() #void : {}
@@ -427,31 +455,45 @@ void MethodArgumentName() #void : {}
 // Type
 // ----------------------------------------------------------------
 
-void Type() #void : {}
-{
-   TypeWithoutIdentifier()
-   | TypeIdentifier()
+String Type() #void : {String type;}
+{  
+   ( 
+      (
+         type = TypeWithoutIdentifier()
+      ) | (
+         type = TypeIdentifier()
+      )
+   )
+
+   {return type;}
 }
 
-void TypeIdentifier() #void : {}
+String TypeIdentifier() #void : {Token t;}
 {
-   <IDENTIFIER>
+   t = <IDENTIFIER>
+
+   {return t.image;}
 }
 
-void TypeWithoutIdentifier() #void : {}
+String TypeWithoutIdentifier() #void : {Token type; boolean isArray = false;}
 {
    (
       (
-         <INT>
+         type = <INT>
          (
             ArrayVariableBrackets()
+            {
+               isArray = true;
+            }
          )?
       ) | (
-         <BOOLEAN>
+         type = <BOOLEAN>
       ) | (
-         <STRING>
+         type = <STRING>
       )
    )
+   
+   {return type.image + (isArray ? "[]" : "");}
 }
 
 void ArrayVariableBrackets() #void : {}
@@ -670,7 +712,6 @@ void AddSubExpressionAfterIdentifier(String identifier) #void : {}
       (
          <PLUS>
          AddSubExpression()
-         #Operation
       ) | (
          <MINUS>
          AddSubExpression()

@@ -2,6 +2,10 @@ import java.utils.List;
 import python.lib.test;
 
 class Test extends Remote {
+    int x;
+    Strub v;
+    int[] a;
+
     public static void main(String[] args){
         int x;
         int a;
