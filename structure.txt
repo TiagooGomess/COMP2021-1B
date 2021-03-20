@@ -1,0 +1,95 @@
+
+Program
+    Import
+    Class
+        
+Import
+    name.name.name
+    name.name.name
+
+Class
+    name: hello
+    extends: Remote
+    
+    Declaration
+        type: int
+        name: x
+
+    Method
+        (visibility: public) ?
+        static: true
+        type: void
+        name: main
+        Arguments
+            Argument
+                type: String[]
+                name: args
+        Implementation
+            Declaration
+                type: int
+                name: x
+            Statement
+                if
+                    condition
+                        Expression
+                    then
+                        Statement
+                    else
+                        Statement
+                while
+                    condition
+                        Expression
+                    Statement
+                Expression
+                Attribution
+                    name:
+                    Position
+                        Expression
+                    Value
+                        Expression
+
+Expression
+    And
+        Expression
+        Expression
+    Comparison
+        Expression
+        Expression
+    Addition
+        Expression
+        Expression
+    Subtraction
+        Expression
+        Expression
+    Multiplication
+        Expression
+        Expression
+    Division
+        Expression
+        Expression
+    Access
+        Expression
+        Expression
+    Length
+        Expression
+    Call
+        name:
+        Object
+            Expression
+        Arguments
+            Expression
+    Integer
+        value:
+    Boolean
+        value:
+    this
+    Construction
+        type:
+    Negation
+        Expression
+    
+
+                
+TODO:
+    MethodCall
+    Length

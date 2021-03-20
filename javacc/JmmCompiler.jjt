@@ -181,36 +181,41 @@ SimpleNode Program() : {}
 // Import
 // ----------------------------------------------------------------
 
-void ImportDeclaration() : {}
+void ImportDeclaration() : {String name; String imports;}
 {
    <IMPORT>
 
-   ImportName()
+   name = ImportName()
    (
       <DOT>
-      ImportName()
+      imports = ImportName()
+      {name += "." + imports;}
    )*
 
    <SEMICOLON>
+
+   {jjtThis.put("name", name);}
 }
 
-void ImportName() : {}
+String ImportName() #void : {Token name;}
 {
-   <IDENTIFIER>
+   name = <IDENTIFIER>
+
+   {return name.image;}
 }
 
 // ----------------------------------------------------------------
 // Class
 // ----------------------------------------------------------------
 
-void ClassDeclaration() : {}
+void ClassDeclaration() : {String className; String extendsName = null;}
 {
    <CLASS>
 
-   ClassName()
+   className = ClassName()
    
    (
-      Extends()
+      extendsName = Extends()
    )?
 
    <OPEN_BRACES>
@@ -223,17 +228,26 @@ void ClassDeclaration() : {}
    )*
 
    <CLOSE_BRACES>
+
+   {
+      jjtThis.put("name", className);
+      if(extendsName != null)
+         jjtThis.put("extends", extendsName);
+   }
 }
 
-void ClassName() : {}
+String ClassName() #void : {Token name;}
 {
-   <IDENTIFIER>
+   name = <IDENTIFIER>
+
+   {return name.image;}
 }
 
-void Extends() : {}
+String Extends() #void : {String name;}
 {
    <EXTENDS>
-   ClassName()
+   name = ClassName()
+   {return name;}
 }
 
 // ----------------------------------------------------------------
@@ -254,16 +268,12 @@ void VariableDeclarationWithoutIdentifier() : {}
    TypeWithoutIdentifier()
    VariableName()
    <SEMICOLON>
-
-   {jjtThis.put("name", "VariableDeclaration");}
 }
 
-void VariableDeclarationAfterIdentifier() : {}
+void VariableDeclarationAfterIdentifier(String type) : {}
 {
    VariableName()
    <SEMICOLON>
-
-   {jjtThis.put("name", "VariableDeclaration");}
 }
 
 void VariableDeclarationWithIdentifier() : {}
@@ -271,25 +281,27 @@ void VariableDeclarationWithIdentifier() : {}
    VariableType()
    VariableName()
    <SEMICOLON>
-
-   {jjtThis.put("name", "VariableDeclaration");}
 }
 
-void VariableType() : {}
+void VariableType() : {Token type;}
 {
-   <IDENTIFIER>
+   type = <IDENTIFIER>
+
+   {jjtThis.put("type", type.image);}
 }
 
-void VariableName() : {}
+void VariableName() : {Token name;}
 {
-   <IDENTIFIER>
+   name = <IDENTIFIER>
+
+   {jjtThis.put("name", name.image);}
 }
 
 // ----------------------------------------------------------------
 // Method
 // ----------------------------------------------------------------
 
-void MethodDeclaration() : {}
+void MethodDeclaration() #void : {}
 {
    MethodVisibility()
    (
@@ -312,14 +324,14 @@ void MethodDeclaration() : {}
    )
 }
 
-void Return() : {}
+void Return() #void : {}
 {
    <RETURN>
    Expression()
    <SEMICOLON>
 }
 
-void main() : {}
+void main() #void : {}
 {
    <STATIC>
    <VOID>
@@ -332,29 +344,29 @@ void main() : {}
    MainImplementation()
 }
 
-void MethodVisibility() : {}
+void MethodVisibility() #void : {}
 {
    <PUBLIC>
 }
 
-void MethodName() : {}
+void MethodName() #void : {}
 {
    <IDENTIFIER>
 }
 
-void MethodOpenParenthesis() : {}
+void MethodOpenParenthesis() #void : {}
 {
    <OPEN_PARENTHESIS>
    {this.parenthesisDepth++;}
 }
 
-void MethodCloseParenthesis() : {}
+void MethodCloseParenthesis() #void : {}
 {
    <CLOSE_PARENTHESIS>
    {this.parenthesisDepth--;}
 }
 
-void MethodImplementation() : {}
+void MethodImplementation() #void : {}
 {
    <OPEN_BRACES>
    (MethodBody())?
@@ -362,23 +374,23 @@ void MethodImplementation() : {}
    <CLOSE_BRACES>
 }
 
-void MainImplementation() : {}
+void MainImplementation() #void : {}
 {
    <OPEN_BRACES>
    (MethodBody())?
    <CLOSE_BRACES>
 }
 
-void MethodBody() : {}
+void MethodBody() #void : {Token identifier;}
 {
    (
-      <IDENTIFIER>
+      identifier = <IDENTIFIER>
       (
          (
-            VariableDeclarationAfterIdentifier()
+            VariableDeclarationAfterIdentifier(identifier.image)
             MethodBody()
          ) | (
-            StatementAfterIdentifier()
+            StatementAfterIdentifier(identifier.image)
             MethodStatements()
          )
       )
@@ -393,20 +405,20 @@ void MethodBody() : {}
    )
 }
 
-void MethodStatements() : {} 
+void MethodStatements() #void : {} 
 {
    (
       Statement()
    )*
 }
 
-void MethodArgument() : {}
+void MethodArgument() #void : {}
 {
    Type()
    MethodArgumentName()  
 }
 
-void MethodArgumentName() : {}
+void MethodArgumentName() #void : {}
 {
    <IDENTIFIER>
 }
@@ -415,40 +427,34 @@ void MethodArgumentName() : {}
 // Type
 // ----------------------------------------------------------------
 
-void Type() : {}
+void Type() #void : {}
 {
    TypeWithoutIdentifier()
    | TypeIdentifier()
 }
 
-void TypeIdentifier() : {Token type;}
+void TypeIdentifier() #void : {}
 {
-   type = <IDENTIFIER>
-
-   {jjtThis.put("name", type.image);}
+   <IDENTIFIER>
 }
 
-void TypeWithoutIdentifier() : {Token type; boolean is_array = false;}
+void TypeWithoutIdentifier() #void : {}
 {
    (
       (
-         type = <INT>
+         <INT>
          (
-            ArrayVariableBrackets(){
-               is_array = true;
-            }
+            ArrayVariableBrackets()
          )?
       ) | (
-         type = <BOOLEAN>
+         <BOOLEAN>
       ) | (
-         type = <STRING>
+         <STRING>
       )
    )
-
-   {jjtThis.put("name", type.image);}
 }
 
-void ArrayVariableBrackets() : {}
+void ArrayVariableBrackets() #void : {}
 {
    <OPEN_BRACKETS>
    <CLOSE_BRACKETS>
@@ -458,19 +464,19 @@ void ArrayVariableBrackets() : {}
 // Statement
 // ----------------------------------------------------------------
 
-void Statement() : {}
+void Statement() #void : {Token identifier;}
 {
    (
       (
          StatementWithoutIdentifier()
       ) | (
-         <IDENTIFIER>
-         StatementAfterIdentifier()
+         identifier = <IDENTIFIER>
+         StatementAfterIdentifier(identifier.image)
       )
    )
 }
 
-void StatementWithoutIdentifier() : {}
+void StatementWithoutIdentifier() #void : {}
 {
    (
       <OPEN_BRACES>
@@ -507,7 +513,7 @@ void StatementWithoutIdentifier() : {}
    )
 }
 
-void StatementAfterIdentifier() : {}
+void StatementAfterIdentifier(String identifier) #void : {}
 {
    (
       (
@@ -522,7 +528,7 @@ void StatementAfterIdentifier() : {}
          )?
          <SEMICOLON>
       ) | (
-         ExpressionWithoutArrayPosition()
+         ExpressionWithoutArrayPosition(identifier)
          <SEMICOLON>
       )
    )
@@ -532,60 +538,60 @@ void StatementAfterIdentifier() : {}
 // Expression
 // ----------------------------------------------------------------
 
-void Expression() : {}
+void Expression() #void : {Token identifier;}
 {
    (
       ExpressionWithoutIdentifier()
    ) | (
-      <IDENTIFIER>
-      ExpressionAfterIdentifier()
+      identifier = <IDENTIFIER>
+      ExpressionAfterIdentifier(identifier.image)
    )
 }
 
-void ExpressionWithoutIdentifier() : {}
+void ExpressionWithoutIdentifier() #void : {}
 {
    AndExpressionWithoutIdentifier()
 }
 
-void ExpressionAfterIdentifier() : {}
+void ExpressionAfterIdentifier(String identifier) #void : {}
 {
-   AndExpressionAfterIdentifier()
+   AndExpressionAfterIdentifier(identifier)
 }
 
-void ExpressionWithoutArrayPosition() : {}
+void ExpressionWithoutArrayPosition(String identifier) #void : {}
 {
-   AndExpressionWithoutArrayPosition()
+   AndExpressionWithoutArrayPosition(identifier)
 }
 
 // ----------------------------------------------------------------
 // Logical Expressions
 // ----------------------------------------------------------------
 
-void AndExpression() : {}
+void AndExpression() #void : {}
 {
    ComparisonExpression()
    RightAndExpression()
 }
 
-void AndExpressionWithoutIdentifier() : {}
+void AndExpressionWithoutIdentifier() #void : {}
 {
    ComparisonExpressionWithoutIdentifier()
    RightAndExpression()
 }
 
-void AndExpressionAfterIdentifier() : {}
+void AndExpressionAfterIdentifier(String identifier) #void : {}
 {
-   ComparisonExpressionAfterIdentifier()
+   ComparisonExpressionAfterIdentifier(identifier)
    RightAndExpression()
 }
 
-void AndExpressionWithoutArrayPosition() : {}
+void AndExpressionWithoutArrayPosition(String identifier) #void : {}
 {
-   ComparisonExpressionWithoutArrayPosition()
+   ComparisonExpressionWithoutArrayPosition(identifier)
    RightAndExpression()
 }
 
-void RightAndExpression() : {}
+void RightAndExpression() #void : {}
 {
    (
       <AND>
@@ -593,31 +599,31 @@ void RightAndExpression() : {}
    )?
 }
 
-void ComparisonExpression() : {}
+void ComparisonExpression() #void : {}
 {
    AddSubExpression()
    RightComparisonExpression()
 }
 
-void ComparisonExpressionWithoutIdentifier() : {}
+void ComparisonExpressionWithoutIdentifier() #void : {}
 {
    AddSubExpressionWithoutIdentifier()
    RightComparisonExpression()
 }
 
-void ComparisonExpressionAfterIdentifier() : {}
+void ComparisonExpressionAfterIdentifier(String identifier) #void : {}
 {
-   AddSubExpressionAfterIdentifier()
+   AddSubExpressionAfterIdentifier(identifier)
    RightComparisonExpression()
 }
 
-void ComparisonExpressionWithoutArrayPosition() : {}
+void ComparisonExpressionWithoutArrayPosition(String identifier) #void : {}
 {
-   AddSubExpressionWithoutArrayPosition()
+   AddSubExpressionWithoutArrayPosition(identifier)
    RightComparisonExpression()
 }
 
-void RightComparisonExpression() : {}
+void RightComparisonExpression() #void : {}
 {
    (
       <LT>
@@ -629,32 +635,9 @@ void RightComparisonExpression() : {}
 // Arithmetic Expressions
 // ----------------------------------------------------------------
 
-void AddSubExpression() : {}
+void AddSubExpression() #void : {}
 {
    MultDivExpression()
-   RightAddSubExpression()
-}
-
-void AddSubExpressionWithoutIdentifier() : {}
-{
-   MultDivExpressionWithoutIdentifier()
-   RightAddSubExpression()
-}
-
-void AddSubExpressionAfterIdentifier() : {}
-{
-   MultDivExpressionAfterIdentifier()
-   RightAddSubExpression()
-}
-
-void AddSubExpressionWithoutArrayPosition() : {}
-{
-   MultDivExpressionWithoutArrayPosition()
-   RightAddSubExpression()
-}
-
-void RightAddSubExpression() : {}
-{
    (
       (
          <PLUS>
@@ -666,31 +649,74 @@ void RightAddSubExpression() : {}
    )?
 }
 
-void MultDivExpression() : {}
+void AddSubExpressionWithoutIdentifier() #void : {}
+{
+   MultDivExpressionWithoutIdentifier()
+   (
+      (
+         <PLUS>
+         AddSubExpression()
+      ) | (
+         <MINUS>
+         AddSubExpression()
+      )
+   )?
+}
+
+void AddSubExpressionAfterIdentifier(String identifier) #void : {}
+{
+   MultDivExpressionAfterIdentifier(identifier)
+   (
+      (
+         <PLUS>
+         AddSubExpression()
+         #Operation
+      ) | (
+         <MINUS>
+         AddSubExpression()
+      )
+   )?
+}
+
+void AddSubExpressionWithoutArrayPosition(String identifier) #void : {}
+{
+   MultDivExpressionWithoutArrayPosition(identifier)
+   (
+      (
+         <PLUS>
+         AddSubExpression()
+      ) | (
+         <MINUS>
+         AddSubExpression()
+      )
+   )?
+}
+
+void MultDivExpression() #void : {}
 {
    NotExpression()
    RightMultDivExpression()
 }
 
-void MultDivExpressionWithoutIdentifier() : {}
+void MultDivExpressionWithoutIdentifier() #void : {}
 {
    NotExpressionWithoutIdentifier()
    RightMultDivExpression()
 }
 
-void MultDivExpressionAfterIdentifier() : {}
+void MultDivExpressionAfterIdentifier(String identifier) #void : {}
 {
-   NotExpressionAfterIdentifier()
+   NotExpressionAfterIdentifier(identifier)
    RightMultDivExpression()
 }
 
-void MultDivExpressionWithoutArrayPosition() : {}
+void MultDivExpressionWithoutArrayPosition(String identifier) #void : {}
 {
-   NotExpressionWithoutArrayPosition()
+   NotExpressionWithoutArrayPosition(identifier)
    RightMultDivExpression()
 }
 
-void RightMultDivExpression() : {}
+void RightMultDivExpression() #void : {}
 {
    (
       (
@@ -707,53 +733,51 @@ void RightMultDivExpression() : {}
 // Not Expressions
 // ----------------------------------------------------------------
 
-void NotExpression() : {}
+void NotExpression() #void : {}
 {
    ClassMemberExpression()
    | (
       <NOT>
-      NotExpression()
+      Negation()
    )
 }
 
-void NotExpressionWithoutIdentifier() : {}
+void NotExpressionWithoutIdentifier() #void : {}
 {
    ClassMemberExpressionWithoutIdentifier()
    | (
       <NOT>
-      NotExpression()
+      Negation()
    )
 }
 
-void NotExpressionAfterIdentifier() : {}
+void NotExpressionAfterIdentifier(String identifier) #void : {}
 {
-   ClassMemberExpressionAfterIdentifier()
+   ClassMemberExpressionAfterIdentifier(identifier)
 }
 
-void NotExpressionWithoutArrayPosition() : {}
+void NotExpressionWithoutArrayPosition(String identifier) #void : {}
 {
    (
-      ClassMemberExpressionWithoutArrayPosition()
+      ClassMemberExpressionWithoutArrayPosition(identifier)
    )?
+}
+
+void Negation() : {}
+{
+   NotExpression()
 }
 
 // ----------------------------------------------------------------
 // Class Member Expressions
 // ----------------------------------------------------------------
 
-void ClassMemberExpression() : {}
+void ClassMemberExpression() #void : {}
 {
    ParenthesisExpression()
    (
       (
-         <DOT>
-         (
-            (
-               <LENGTH>
-            ) | (
-               MethodCalls()
-            )
-         )
+         RightClassMemberExpression("IDENTIFIER")
       ) | (
          <OPEN_BRACKETS>
          Expression()
@@ -762,19 +786,12 @@ void ClassMemberExpression() : {}
    )?
 }
 
-void ClassMemberExpressionWithoutIdentifier() : {}
+void ClassMemberExpressionWithoutIdentifier() #void : {}
 {
    ParenthesisExpressionWithoutIdentifier()
    (
       (
-         <DOT>
-         (
-            (
-               <LENGTH>
-            ) | (
-               MethodCalls()
-            )
-         )
+         RightClassMemberExpression("IDENTIFIER")
       ) | (
          <OPEN_BRACKETS>
          Expression()
@@ -783,18 +800,23 @@ void ClassMemberExpressionWithoutIdentifier() : {}
    )?
 }
 
-void ClassMemberExpressionAfterIdentifier() : {}
+void ClassMemberExpressionAfterIdentifier(String identifier) #void : {}
 {
    (
       (
          ArrayPosition()
       ) | (
-         ClassMemberExpressionWithoutArrayPosition()
+         ClassMemberExpressionWithoutArrayPosition(identifier)
       )
    )?
 }
 
-void ClassMemberExpressionWithoutArrayPosition() : {}
+void ClassMemberExpressionWithoutArrayPosition(String identifier) #void : {}
+{
+   RightClassMemberExpression(identifier)
+}
+
+void RightClassMemberExpression(String identifier) #void : {}
 {
    <DOT>
    (
@@ -810,7 +832,7 @@ void ClassMemberExpressionWithoutArrayPosition() : {}
 // Parenthesis Expressions
 // ----------------------------------------------------------------
 
-void ParenthesisExpression() : {}
+void ParenthesisExpression() #void : {}
 {
    TerminalExpression()
    | (
@@ -822,7 +844,7 @@ void ParenthesisExpression() : {}
    )
 }
 
-void ParenthesisExpressionWithoutIdentifier() : {}
+void ParenthesisExpressionWithoutIdentifier() #void : {}
 {
    TerminalExpressionWithoutIdentifier()
    | (
@@ -838,67 +860,91 @@ void ParenthesisExpressionWithoutIdentifier() : {}
 // Terminal Expressions
 // ----------------------------------------------------------------
 
-void TerminalExpression() : {Token t;}
+void TerminalExpression() #void : {}
 {
    (
       (
-         t = <INTEGER_LITERAL>
+         TerminalExpressionWithoutIdentifier()
       ) | (
-         t = <BOOLEAN_LITERAL>
-      ) | (
-         t = <THIS>
-      ) | (
-         t = <NEW>
-         (
-            (
-               <INT>
-               ArrayPosition()
-            ) | (
-               <IDENTIFIER>
-               <OPEN_PARENTHESIS>
-               <CLOSE_PARENTHESIS>
-            )
-         )
-      ) | (
-         t = <IDENTIFIER>
+         VariableToRead()
       )
    )
-
-   { jjtThis.put("name", t.image); }
 }
 
-void TerminalExpressionWithoutIdentifier() : {Token t;}
+void VariableToRead() #void : {Token name;}
+{
+   name = <IDENTIFIER>
+   Variable(name.image)
+}
+
+void Variable(String name) : {}
+{
+   {
+      jjtThis.put("name", name);
+   }
+}
+
+void TerminalExpressionWithoutIdentifier() #void : {}
 {
    (
       (
-         t = <INTEGER_LITERAL>
+         Integer()
       ) | (
-         t = <BOOLEAN_LITERAL>
+         Boolean()
       ) | (
-         t = <THIS>
+         This()
       ) | (
-         t = <NEW>
-         (
-            (
-               <INT>
-               ArrayPosition()
-            ) | (
-               <IDENTIFIER>
-               <OPEN_PARENTHESIS>
-               <CLOSE_PARENTHESIS>
-            )
-         )
+         <NEW>
+         Construction()
       )
    )
+}
 
-   { jjtThis.put("name", t.image); }
+void Integer() : {Token value;}
+{
+   value = <INTEGER_LITERAL>
+   {jjtThis.put("value", value.image);}
+}
+
+void Boolean() : {Token value;}
+{
+   value = <BOOLEAN_LITERAL>
+   {jjtThis.put("value", value.image);}
+}
+
+void This() : {}
+{
+   <THIS>
+}
+
+void Construction() : {Token type; int size = 0; boolean isArray = false;}
+{
+   (
+      (
+         type = <INT>
+         Size()
+         {isArray = true;}
+      ) | (
+         type = <IDENTIFIER>
+         <OPEN_PARENTHESIS>
+         <CLOSE_PARENTHESIS>
+      )
+   )
+   {jjtThis.put("type", type.image + (isArray ? "[]" : ""));}
+}
+
+void Size() : {}
+{
+   <OPEN_BRACKETS>
+   Expression()
+   <CLOSE_BRACKETS>
 }
 
 // ----------------------------------------------------------------
 // Sub Expressions
 // ----------------------------------------------------------------
 
-void MethodCalls() : {}
+void MethodCalls() #void : {}
 {
    MethodCall()
    (
@@ -907,13 +953,13 @@ void MethodCalls() : {}
    )*
 }
 
-void MethodCall() : {}
+void MethodCall() #void : {}
 {
    <IDENTIFIER>
    MethodCallArguments()
 }
 
-void MethodCallArguments() : {}
+void MethodCallArguments() #void : {}
 {
    <OPEN_PARENTHESIS>
    {this.parenthesisDepth++;}
@@ -928,7 +974,7 @@ void MethodCallArguments() : {}
    {this.parenthesisDepth--;}
 }
 
-void ArrayPosition() : {}
+void ArrayPosition() #void : {}
 {
    <OPEN_BRACKETS>
    Expression()

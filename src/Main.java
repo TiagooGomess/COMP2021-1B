@@ -42,12 +42,13 @@ public class Main implements JmmParser {
 
 		try {
 			root = myJmmCode.Program(); // returns reference to root node
+			//System.out.println(root.toJson());
+			root.dump("");
+
 		} catch(ParseException exception){
 			System.err.println("Errors were found while parsing file.\n" + exception.getMessage());
 		}
 				
 		// root.dump(""); // prints the tree on the screen
-
-		// System.out.println(root.toJson());
     }
 }

@@ -19,6 +19,7 @@ public class SimpleNode implements Node, JmmNode {
   protected Object value;
   protected JmmCompiler parser;
   protected Map<String, String> attributes = new HashMap<String, String>();
+  private final static String spacesPrefix = "  ";
 
   public SimpleNode(int i) {
     id = i;
@@ -112,11 +113,15 @@ public class SimpleNode implements Node, JmmNode {
    */
 
   public String toString() {
-    return this.get("name") != null ? this.get("name") : JmmCompilerTreeConstants.jjtNodeName[id];
+    return JmmCompilerTreeConstants.jjtNodeName[id];
   }
 
   public String toString(String prefix) {
-    return prefix + toString();
+    String result = prefix + toString();
+    for(String attribute : getAttributes()){
+      result += "\n" + prefix + spacesPrefix + attribute + ": " + get(attribute);
+    }
+    return result;
   }
 
   /*
@@ -130,7 +135,7 @@ public class SimpleNode implements Node, JmmNode {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode) children[i];
         if (n != null) {
-          n.dump(prefix + "  ");
+          n.dump(prefix + spacesPrefix);
         }
       }
     }
