@@ -2,21 +2,53 @@ import java.utils.List;
 import python.lib.test;
 
 class Test extends Remote {
-    int x;
-    Strub v;
-    int[] a;
 
     public static void main(String[] args){
-        int x;
+        /*int x;
         int a;
         x = 2;
-        //x = x + 2 * 5;
+        x = x + 2 * 5;
+
+        while(true)
+            x = x + 2;
         
-        //this.getNumber() + new int [2 + this.length];
-        !(x + 2);
+        a = new Array();
+
+        c[3] = 4;
+        
+        this.getNumber() + new int [2 + this.length];
+        !(x + 2);*/
+
+        b.get().put(a);
+        2 + a.get();
     }
 
-    public int f(int x, String y) {
+    /*public int f(int x, String y) {
+        if(x < 2){
+            {
+                {
+                    a = x + 1;
+                }
+            }
+        } else {
+            nothing;
+        }
         return x;
     }
+
+    public int j(){
+        // c[3] = 4;
+
+        // a = x + 2;
+
+        // 2+ 3 + 4;
+
+        // a = t.length - 1;
+
+        // 2 + (2 + 3 + 5) * 5;
+
+        2 * 4 + var.le() -3 / 4;
+
+        return c[5];
+    }*/
 }

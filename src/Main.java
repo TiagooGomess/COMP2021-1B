@@ -19,7 +19,7 @@ public class Main implements JmmParser {
     		SimpleNode root = jmmCompiler.Program(); // returns reference to root node
 			return new JmmParserResult(root, jmmCompiler.getReports());
 		} catch(Exception e){
-			System.err.println("Error catched in main");
+			System.err.println("Error catch in main");
 			return null;
 		}
 	}

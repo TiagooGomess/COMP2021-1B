@@ -91,5 +91,8 @@ Expression
 
                 
 TODO:
-    MethodCall
-    Length
+    Expression
+    ArgumentBlock
+    VariableDeclarationBlock
+    StatementsBlock
+    WithoutArrayPosition
