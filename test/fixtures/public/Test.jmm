@@ -4,51 +4,10 @@ import python.lib.test;
 class Test extends Remote {
 
     public static void main(String[] args){
-        /*int x;
-        int a;
-        x = 2;
-        x = x + 2 * 5;
-
-        while(true)
-            x = x + 2;
         
-        a = new Array();
-
-        c[3] = 4;
-        
-        this.getNumber() + new int [2 + this.length];
-        !(x + 2);*/
-
-        b.get().put(a).length;
-        (((b.get()).put(a)).length);
+        //a = c[a[i*3]] + 3 + 5;
+        b = c[i].length + 2;
+        //c[i] = 2;
+        //a + b + c[1+i];
     }
-
-    /*public int f(int x, String y) {
-        if(x < 2){
-            {
-                {
-                    a = x + 1;
-                }
-            }
-        } else {
-            nothing;
-        }
-        return x;
-    }
-
-    public int j(){
-        // c[3] = 4;
-
-        // a = x + 2;
-
-        // 2+ 3 + 4;
-
-        // a = t.length - 1;
-
-        // 2 + (2 + 3 + 5) * 5;
-
-        2 * 4 + var.le() -3 / 4;
-
-        return c[5];
-    }*/
 }
