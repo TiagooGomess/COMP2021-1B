@@ -49,6 +49,5 @@ public class Main implements JmmParser {
 			System.err.println("Errors were found while parsing file.\n" + exception.getMessage());
 		}
 				
-		// root.dump(""); // prints the tree on the screen
     }
 }

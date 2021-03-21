@@ -19,8 +19,8 @@ class Test extends Remote {
         this.getNumber() + new int [2 + this.length];
         !(x + 2);*/
 
-        b.get().put(a);
-        2 + a.get();
+        b.get().put(a).length;
+        (((b.get()).put(a)).length);
     }
 
     /*public int f(int x, String y) {

@@ -96,3 +96,28 @@ TODO:
     VariableDeclarationBlock
     StatementsBlock
     WithoutArrayPosition
+
+
+
+
+a.b().c().d().length
+
+Variable
+    a
+    MethodCall
+        name : b
+        MethodCall
+            name: c
+            MethodCall
+                name: d
+                Length
+
+Length
+    MethodCall
+        name: d
+        MethodCall
+            name: c
+            MethodCall
+                name: b
+                Variable
+                    name: a

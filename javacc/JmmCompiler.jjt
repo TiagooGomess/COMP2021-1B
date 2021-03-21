@@ -967,13 +967,7 @@ void ClassMemberExpression() #void : {}
    (
       (
          <DOT>
-         (
-            (
-               Length("expression")
-            ) | (
-               MethodCalls("expression")
-            )
-         )
+         MethodCalls("expression")
       ) | (
          <OPEN_BRACKETS>
          Expression()
@@ -988,13 +982,7 @@ void ClassMemberExpressionWithoutIdentifier() #void : {}
    (
       (
          <DOT>
-         (
-            (
-               Length("expression")
-            ) | (
-               MethodCalls("expression")
-            )
-         )
+         MethodCalls("expression")
       ) | (
          <OPEN_BRACKETS>
          Expression()
@@ -1019,13 +1007,7 @@ void ClassMemberExpressionAfterIdentifier(String identifier) #void : {}
 void ClassMemberExpressionWithoutArrayPosition(String identifier) #void : {}
 {
    <DOT>
-   (
-      (
-         Length(identifier)
-      ) | (
-         MethodCalls(identifier)
-      )
-   )
+   MethodCalls(identifier)
 }
 
 void Length(String identifier) : {}
@@ -1152,9 +1134,15 @@ void Size() : {}
 // Sub Expressions
 // ----------------------------------------------------------------
 
-void MethodCalls(String identifier) #void : {}
+void MethodCalls(String identifier) : {}
 {
-   MethodCall()
+   (
+      (
+         MethodCall()
+      ) | (
+          <LENGTH>
+      )
+   )
    (
       <DOT>
       MethodCalls(identifier)
@@ -1162,12 +1150,16 @@ void MethodCalls(String identifier) #void : {}
    )?
 }
 
-void MethodCall() : {Token n;}
+void MethodCall() #void : {Token n;}
 {
    n = <IDENTIFIER>
-   MethodCallArguments()
+   Method(n.image)
+}
 
-   {jjtThis.put("name", n.image);}
+void Method(String name) : {}
+{
+   MethodCallArguments()
+   {jjtThis.put("name", name);}
 }
 
 void MethodCallArguments() : {}
