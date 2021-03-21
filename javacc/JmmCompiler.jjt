@@ -1,7 +1,7 @@
 options
 {
    LOOKAHEAD = 1;
-   FORCE_LA_CHECK = true;
+   //FORCE_LA_CHECK = true;
 }
 
 PARSER_BEGIN(JmmCompiler)
@@ -92,7 +92,6 @@ TOKEN:
    | < STATIC: "static">
    | < VOID: "void" >
    | < MAIN: "main" >
-   | < STRING: "String" >
    | < RETURN: "return" >
    | < LENGTH: "length" >
    | < NEW: "new" >
@@ -101,6 +100,7 @@ TOKEN:
    // Types
    | < INT: "int" >
    | < BOOLEAN: "boolean">
+   | < STRING: "String">
       
    // Logical Operators
    | < NOT: "!" >
@@ -127,12 +127,9 @@ TOKEN:
    | < IDENTIFIER: (["a"-"z","A"-"Z","_","$"](["a"-"z","A"-"Z","0"-"9","_","$"])*) >
 }
 
-// https://www.cs.purdue.edu/homes/hosking/javacc/doc/errorrecovery.html
 JAVACODE
 
 void skipParenthesis() {
-   ParseException e = generateParseException();  // generate the exception object.
-   System.out.println(e.toString());  // print the error message
    Token t;
    boolean end = false;
 
@@ -168,8 +165,7 @@ SimpleNode Program() : {}
       (
          ImportDeclaration()
       )*
-      ClassDeclaration()
-
+      Class()
       <EOF>
    } catch(Exception e){
       System.err.println(e.getMessage());
@@ -210,101 +206,34 @@ String ImportName() #void : {Token name;}
 // Class
 // ----------------------------------------------------------------
 
-void ClassDeclaration() : {String className; String extendsName = null;}
+void Class() : {String name; String extendsName = null; int numberOfAttributes = 0; int numberOfMethods = 0;}
 {
    <CLASS>
-
-   className = ClassName()
-   
+   name = Name()
    (
-      extendsName = Extends()
+      <EXTENDS>
+      extendsName = Name()
    )?
-
    <OPEN_BRACES>
-
    (
-      VariableDeclaration()
+      AttributeDeclaration()
+      {
+         numberOfAttributes++;
+      }
    )*
+   #Attributes(numberOfAttributes)
    (
       MethodDeclaration()
+      {
+         numberOfMethods++;
+      }
    )*
-
+   #Methods(numberOfMethods)
    <CLOSE_BRACES>
-
    {
-      jjtThis.put("name", className);
+      jjtThis.put("name", name);
       if(extendsName != null)
          jjtThis.put("extends", extendsName);
-   }
-}
-
-String ClassName() #void : {Token name;}
-{
-   name = <IDENTIFIER>
-
-   {return name.image;}
-}
-
-String Extends() #void : {String name;}
-{
-   <EXTENDS>
-   name = ClassName()
-   {return name;}
-}
-
-// ----------------------------------------------------------------
-// Variables
-// ----------------------------------------------------------------
-
-void VariableDeclaration() #void : {}
-{
-   (
-      VariableDeclarationWithoutIdentifier()
-   ) | (
-      VariableDeclarationWithIdentifier()
-   )
-}
-
-void VariableDeclarationWithoutIdentifier() #void : {String type; String name;}
-{
-   type =  TypeWithoutIdentifier()
-   name = VariableName()
-   <SEMICOLON>
-   VarDeclaration("type", name)
-}
-
-void VariableDeclarationAfterIdentifier(String type) #void : {String name;}
-{
-   name = VariableName()
-   <SEMICOLON>
-   VarDeclaration(type, name)
-}
-
-void VariableDeclarationWithIdentifier() #void : {String type;}
-{
-   type = VariableType()
-   VariableDeclarationAfterIdentifier(type)
-}
-
-String VariableType() #void : {Token type;}
-{
-   type = <IDENTIFIER>
-
-   {return type.image;}
-}
-
-String VariableName() #void : {Token name;}
-{
-   name = <IDENTIFIER>
-
-   {return name.image;}
-}
-
-void VarDeclaration(String type, String name) : {}
-{
-   {
-      jjtThis.put("type", type);
-      jjtThis.put("name", name);
    }
 }
 
@@ -312,198 +241,156 @@ void VarDeclaration(String type, String name) : {}
 // Method
 // ----------------------------------------------------------------
 
-void MethodDeclaration() : {String visibility; boolean isStatic = false; String methodName; String type; int arguments = 0;}
+void MethodDeclaration() : {Token visibility; boolean isStatic = false; String type = "void"; String name = "main";}
 {
-   visibility = MethodVisibility()
+   visibility = <PUBLIC>
    (
       (
          type = Type()
-         methodName = MethodName()
-         MethodOpenParenthesis()
-         (
-            MethodArgument()
-            {
-               arguments++;
-            }
-            (
-               <COMMA>
-               MethodArgument()
-               {
-                  arguments++;
-               }
-            )*
-            #Arguments(arguments)
-         )?
-         MethodCloseParenthesis()
-         MethodImplementation()
+         name = Name()
+         MethodArguments()
       ) | (
          <STATIC>
          {
             isStatic = true;
          }
-         type = Void()
-         methodName = Main()
-         MethodOpenParenthesis()
-         Arguments()
-         MethodCloseParenthesis()
-         MainImplementation()
+         <VOID>
+         <MAIN>
+         MainArguments()
       )
    )
+   <OPEN_BRACES>
+   Body(type)
+   <CLOSE_BRACES>
 
    {
-      jjtThis.put("name", methodName);
-      jjtThis.put("visibility", visibility);
-      jjtThis.put("isStatic", isStatic ? "true" : "false");
+      jjtThis.put("type", type);
+      jjtThis.put("name", name);
+      jjtThis.put("isStatic", String.valueOf(isStatic));
+   }
+}
+
+void MethodArguments() #void : {int numberOfArguments = 0;}
+{
+   OpenParenthesis()
+   (
+      Argument()
+      {
+         numberOfArguments++;
+      }
+      (
+         <COMMA>
+         Argument()
+         {
+            numberOfArguments++;
+         }
+      )*
+   )?
+   CloseParenthesis()
+
+
+   {
+      if(numberOfArguments == 0)
+         return;
+   }
+
+   #Arguments(numberOfArguments)
+}
+
+void Argument() : {String type; String identifier;}
+{
+   type = Type()
+   identifier = Name()
+
+   {
+      jjtThis.put("name", identifier);
       jjtThis.put("type", type);
    }
 }
 
-void Argument(Map<String, String> argument) : {}
+void MainArguments() #void : {}
 {
-   {
-      jjtThis.put("name", argument.get("name"));
-      jjtThis.put("type", argument.get("type"));
-   }
-} 
-
-/*void Arguments(List<Map<String, String>> arguments) : {} 
-{
-   {
-      if(arguments.isEmpty())
-         return;
-   }
-
-   Argument()
-   
-   arguments.get(0)
-   {
-      for (int i = 0; i < arguments.size(); i++) {
-         Argument(arguments.get(i));
-      }
-   }
-}*/
-
-void Arguments() : {Token t; Token n; Map<String, String> argument = new HashMap<String, String>();}
-{
-   t = <STRING>
-   ArrayVariableBrackets()
-   n = <IDENTIFIER>
-
-   {
-      argument.put("type", t.image + "[]");
-      argument.put("name", n.image);
-   }
-
-   Argument(argument)
+   OpenParenthesis()
+   <STRING>
+   <OPEN_BRACKETS>
+   <CLOSE_BRACKETS>
+   <IDENTIFIER>
+   CloseParenthesis()
 }
 
-void Return() : {}
-{
-   <RETURN>
-   Expression()
-   <SEMICOLON>
-}
-
-String Void() #void : {Token v;}
-{
-   v = <VOID>
-   {return v.image;}
-}
-
-String Main() #void : {Token m;}
-{
-   m = <MAIN>
-   {return m.image;}
-}
-
-String MethodVisibility() #void : {Token v;}
-{
-   v = <PUBLIC>
-   {return v.image;}
-}
-
-String MethodName() #void : {Token name;}
-{
-   name = <IDENTIFIER>
-   {return name.image;}
-}
-
-void MethodOpenParenthesis() #void : {}
-{
-   <OPEN_PARENTHESIS>
-   {this.parenthesisDepth++;}
-}
-
-void MethodCloseParenthesis() #void : {}
-{
-   <CLOSE_PARENTHESIS>
-   {this.parenthesisDepth--;}
-}
-
-void MethodImplementation() #void : {}
-{
-   <OPEN_BRACES>
-   (MethodBody())?
-   Return()
-   <CLOSE_BRACES>
-}
-
-void MainImplementation() #void : {}
-{
-   <OPEN_BRACES>
-   (MethodBody())?
-   <CLOSE_BRACES>
-}
-
-void MethodBody() #void : {Token identifier;}
+void Body(String type) : {}
 {
    (
-      identifier = <IDENTIFIER>
-      (
-         (
-            VariableDeclarationAfterIdentifier(identifier.image)
-            MethodBody()
-         ) | (
-            StatementAfterIdentifier(identifier.image)
-            MethodStatements()
-         )
-      )
+      MethodBody()
+   )?
+   Return(type)
+}
+
+void MethodBody() #void : {String name; String type;}
+{
+   LOOKAHEAD(2)
+   (
+      type = Type()
+      name = Name()
+      <SEMICOLON>
+      VariableDeclaration(type, name)
+      MethodBody()
    ) | (
-      (
-         VariableDeclarationWithoutIdentifier()
-         MethodBody()
-      ) | (
-         StatementWithoutIdentifier()
-         MethodStatements()
-      )
+      Statement()
+      MethodStatements()
    )
 }
 
-void MethodStatements() #void : {} 
+void MethodStatements() #void : {}
 {
    (
       Statement()
    )*
 }
 
-void MethodArgument() #void : {String t; String n;Map<String, String> m = new HashMap<String, String>();}
+void Return(String type) #void : {}
 {
-   t = Type()
-   n = MethodArgumentName()
-
    {
-      m.put("type", t);
-      m.put("name", n);
+      if(type == "void"){
+         return;
+      }
    }
 
-   Argument(m)
+   <RETURN>
+   Expression()
+   #Return(1)
+   <SEMICOLON>
 }
 
-String MethodArgumentName() #void : {Token i;}
+String Name() #void : {Token n;}
 {
-   i = <IDENTIFIER>
+   n = <IDENTIFIER>
+
    {
-      return i.image;
+      return n.image;
+   }
+}
+
+// ----------------------------------------------------------------
+// Variable Declaration
+// ----------------------------------------------------------------
+
+void VariableDeclaration(String type, String name) : {}
+{
+   {
+      jjtThis.put("type", type);
+      jjtThis.put("name", name);
+   }
+}
+
+void AttributeDeclaration() : {String type; String name;}
+{
+   type = Type()
+   name = Name()
+   <SEMICOLON>
+   {
+      jjtThis.put("type", type);
+      jjtThis.put("name", name);
    }
 }
 
@@ -511,33 +398,29 @@ String MethodArgumentName() #void : {Token i;}
 // Type
 // ----------------------------------------------------------------
 
-String Type() #void : {String type;}
-{  
-   ( 
-      (
-         type = TypeWithoutIdentifier()
-      ) | (
-         type = TypeIdentifier()
-      )
-   )
-
-   {return type;}
-}
-
-String TypeIdentifier() #void : {Token t;}
+String Type() #void : {Token type; String nativeType;}
 {
-   t = <IDENTIFIER>
-
-   {return t.image;}
+   (
+      nativeType = NativeType()
+      {
+         return nativeType;
+      }
+   ) | (
+      type = <IDENTIFIER>
+      {
+         return type.image;
+      }
+   )
 }
 
-String TypeWithoutIdentifier() #void : {Token type; boolean isArray = false;}
+String NativeType() #void : {Token type; boolean isArray = false;}
 {
    (
       (
          type = <INT>
          (
-            ArrayVariableBrackets()
+            <OPEN_BRACKETS>
+            <CLOSE_BRACKETS>
             {
                isArray = true;
             }
@@ -548,59 +431,28 @@ String TypeWithoutIdentifier() #void : {Token type; boolean isArray = false;}
          type = <STRING>
       )
    )
-   
-   {return type.image + (isArray ? "[]" : "");}
-}
 
-void ArrayVariableBrackets() #void : {}
-{
-   <OPEN_BRACKETS>
-   <CLOSE_BRACKETS>
+   {
+      return type.image + (isArray ? "[]" : "");
+   }
 }
 
 // ----------------------------------------------------------------
 // Statement
 // ----------------------------------------------------------------
 
-void Statement() #void : {Token identifier;}
+void Statement() #void : {}
 {
    (
-      (
-         StatementWithoutIdentifier()
-      ) | (
-         identifier = <IDENTIFIER>
-         StatementAfterIdentifier(identifier.image)
-      )
+      Block()
+   ) | (
+      If()
+   ) | (
+      While()
+   ) | (
+      Assignment()
+      <SEMICOLON>
    )
-
-}
-
-void If() : {}
-{
-   <IF>
-   <OPEN_PARENTHESIS>
-   {this.parenthesisDepth++;}
-   Condition()
-   <CLOSE_PARENTHESIS>
-   {this.parenthesisDepth--;}
-   Then()
-   <ELSE>
-   Else()
-}
-
-void Then() : {} 
-{
-   Statement()
-}
-
-void Else() : {}
-{
-   Statement()
-}
-
-void Condition() : {}
-{
-   Expression()
 }
 
 void Block() : {}
@@ -612,72 +464,43 @@ void Block() : {}
    <CLOSE_BRACES>
 }
 
-void StatementWithoutIdentifier() #void : {}
+void If() : {}
 {
-   (
-      Block()
-   ) | (
-      If()
-   ) | (
-      While()
-   ) | (
-      ExpressionWithoutIdentifier()
-      <SEMICOLON>
-   )
+   <IF>
+   Condition()
+   Statement()
+   #Then(1)
+   <ELSE>
+   Statement()
+   #Else(1)
 }
 
 void While() : {}
 {
    <WHILE>
-   <OPEN_PARENTHESIS>
-   {this.parenthesisDepth++;}
-   try {
-      Condition()
-      <CLOSE_PARENTHESIS>
-      {this.parenthesisDepth--;}
-   } catch(ParseException e) {
-      addReport(e, "Expected valid while expression, ignoring the one provided");
-      skipParenthesis();
-   }
+   Condition()
    Statement()
 }
 
-void StatementAfterIdentifier(String identifier) #void : {}
+void Assignment() #void : {}
 {
+   Expression()
    (
-      (
-         Assignment(identifier)
-         <SEMICOLON>
-      ) | (
-         ArrayPosition()
-         (
-            (
-               <EQUAL>
-               Variable(identifier)
-               Expression()
-               <SEMICOLON>
-               #ArrayAssignment(3)
-            ) | (
-               Variable(identifier)
-               #ArrayAccess(2)
-               ExpressionAfterIdentifier(identifier)
-               <SEMICOLON>
-            )
-         )
-      ) | (
-         ExpressionWithoutArrayPosition(identifier)
-         <SEMICOLON>
-      )
-   )  
+      <EQUAL>
+      Expression()
+      #Assignment(2)
+   )?
 }
 
-void Assignment(String variable) : {}
+void Condition() : {}
 {
-   <EQUAL>
-   Expression()
-
-   {
-      jjtThis.put("variable", variable);
+   try {
+      OpenParenthesis()
+      Expression()
+      CloseParenthesis()
+   } catch(ParseException e) {
+      addReport(e, "Expected valid condition, ignoring the one provided");
+      skipParenthesis();
    }
 }
 
@@ -685,382 +508,189 @@ void Assignment(String variable) : {}
 // Expression
 // ----------------------------------------------------------------
 
-void Expression() #void : {Token identifier;}
+void Expression() #void : {}
+{
+   ConjunctionExpression()
+}
+
+void ConjunctionExpression() #void : {}
+{
+   ComparisonExpression()
+   (
+      <AND>
+      Operator("Conjunction")
+      ConjunctionExpression()
+      #Operation(3)
+   )?
+}
+
+void ComparisonExpression() #void : {}
+{
+   AdditionExpression()
+   (
+      <LT>
+      Operator("Comparison")
+      ComparisonExpression()
+      #Operation(3)
+   )?
+}
+
+// ----------------------------------------------------------------
+// Arithmetic Expression
+// ----------------------------------------------------------------
+
+void AdditionExpression() #void : {}
+{
+   SubtractionExpression()
+   (
+      <PLUS>
+      Operator("Addition")
+      AdditionExpression()
+      #Operation(3)
+   )?
+}
+
+void SubtractionExpression() #void : {}
+{
+   MultiplicationExpression()
+   (
+      <MINUS>
+      Operator("Subtraction")
+      SubtractionExpression()
+      #Operation(3)
+   )?
+}
+
+void MultiplicationExpression() #void : {}
+{
+   DivisionExpression()
+   (
+      <MULT>
+      Operator("Multiplication")
+      MultiplicationExpression()
+      #Operation(3)
+   )?
+}
+
+void DivisionExpression() #void : {}
+{
+   AccessExpression()
+   (
+      <DIV>
+      Operator("Division")
+      DivisionExpression()
+      #Operation(3)
+   )?
+}
+
+// ----------------------------------------------------------------
+// Variable Expressions
+// ----------------------------------------------------------------
+
+void AccessExpression() #void : {}
+{
+   ConstructionExpression()
+   (
+      (
+         <OPEN_BRACKETS>
+         Expression()
+         #Position(1)
+         <CLOSE_BRACKETS>
+         #Access(2)
+      ) | (
+         (
+            <DOT>
+            Method()
+            #Call(2)
+         )
+      )
+   )*
+}
+
+void ConstructionExpression() #void : {}
 {
    (
-      ExpressionWithoutIdentifier()
+      NotExpression() 
    ) | (
-      identifier = <IDENTIFIER>
-      ExpressionAfterIdentifier(identifier.image)
+      <NEW>
+      Construction()
    )
 }
 
-void ExpressionWithoutIdentifier() #void : {}
+void Method() : {Token name;}
 {
-   AndExpressionWithoutIdentifier()
+   (
+      (
+         name = <IDENTIFIER>
+         OpenParenthesis()
+         Arguments()
+         CloseParenthesis()
+      ) | (
+         name = <LENGTH>
+      )
+   )
+
+   {
+      jjtThis.put("name", name.image);
+   }
 }
 
-void ExpressionAfterIdentifier(String identifier) #void : {}
+void Arguments() #void : {int numberOfArguments = 0;}
 {
-   AndExpressionAfterIdentifier(identifier)
+   (
+      Expression()
+      {
+         numberOfArguments++;
+      }
+      (
+         <COMMA>
+         Expression()
+         {
+            numberOfArguments++;
+         }
+      )*
+
+      #Arguments(numberOfArguments)
+   )?
 }
 
-void ExpressionWithoutArrayPosition(String identifier) #void : {}
+void Construction() : {Token t; boolean isArray = false;}
 {
-   AndExpressionWithoutArrayPosition(identifier)
+   (
+      (
+         t = <IDENTIFIER>
+         OpenParenthesis()
+         CloseParenthesis()
+      ) | (
+         t = <INT>
+         <OPEN_BRACKETS>
+         Expression()
+         #Size(1)
+         <CLOSE_BRACKETS>
+         {
+            isArray = true;
+         }
+      )
+   )
+
+   {
+      jjtThis.put("type", t.image + (isArray ? "[]" : ""));
+   }
 }
 
 // ----------------------------------------------------------------
 // Logical Expressions
 // ----------------------------------------------------------------
 
-void AndExpression() #void : {}
-{
-   ComparisonExpression()
-   (
-      <AND>
-      AndExpression()
-      #And(2)
-   )?
-}
-
-void AndExpressionWithoutIdentifier() #void : {}
-{
-   ComparisonExpressionWithoutIdentifier()
-   (
-      <AND>
-      AndExpression()
-      #And(2)
-   )?
-}
-
-void AndExpressionAfterIdentifier(String identifier) #void : {}
-{
-   ComparisonExpressionAfterIdentifier(identifier)
-   (
-      <AND>
-      AndExpression()
-      #And(2)
-   )?
-}
-
-void AndExpressionWithoutArrayPosition(String identifier) #void : {}
-{
-   ComparisonExpressionWithoutArrayPosition(identifier)
-   (
-      <AND>
-      AndExpression()
-      #And(2)
-   )?
-}
-
-void ComparisonExpression() #void : {}
-{
-   AddSubExpression()
-   (
-      <LT>
-      ComparisonExpression()
-      #LessThan(2)
-   )?
-}
-
-void ComparisonExpressionWithoutIdentifier() #void : {}
-{
-   AddSubExpressionWithoutIdentifier()
-   (
-      <LT>
-      ComparisonExpression()
-      #LessThan(2)
-   )?
-}
-
-void ComparisonExpressionAfterIdentifier(String identifier) #void : {}
-{
-   AddSubExpressionAfterIdentifier(identifier)
-   (
-      <LT>
-      ComparisonExpression()
-      #LessThan(2)
-   )?
-}
-
-void ComparisonExpressionWithoutArrayPosition(String identifier) #void : {}
-{
-   AddSubExpressionWithoutArrayPosition(identifier)
-   (
-      <LT>
-      ComparisonExpression()
-      #LessThan(2)
-   )?
-}
-
-// ----------------------------------------------------------------
-// Arithmetic Expressions
-// ----------------------------------------------------------------
-
-void AddSubExpression() #void : {}
-{
-   MultDivExpression()
-   (
-      (
-         <PLUS>
-         AddSubExpression()
-         #Addition(2)
-      ) | (
-         <MINUS>
-         AddSubExpression()
-         #Subtraction(2)
-      )
-   )?
-}
-
-void AddSubExpressionWithoutIdentifier() #void : {}
-{
-   MultDivExpressionWithoutIdentifier()
-   (
-      (
-         <PLUS>
-         AddSubExpression()
-         #Addition(2)
-      ) | (
-         <MINUS>
-         AddSubExpression()
-         #Subtraction(2)
-      )
-   )?
-}
-
-void AddSubExpressionAfterIdentifier(String identifier) #void : {}
-{
-   MultDivExpressionAfterIdentifier(identifier)
-   (
-      (
-         <PLUS>
-         AddSubExpression()
-         #Addition(2)
-      ) | (
-         <MINUS>
-         AddSubExpression()
-         #Subtraction(2)
-      )
-   )?
-}
-
-void AddSubExpressionWithoutArrayPosition(String identifier) #void : {}
-{
-   MultDivExpressionWithoutArrayPosition(identifier)
-   (
-      (
-         <PLUS>
-         AddSubExpression()
-         #Addition(2)
-      ) | (
-         <MINUS>
-         AddSubExpression()
-         #Subtraction(2)
-      )
-   )?
-}
-
-void MultDivExpression() #void : {}
-{
-   NotExpression()
-   (
-      (
-         <MULT>
-         MultDivExpression()
-         #Multiplication(2)
-      ) | (
-         <DIV>
-         MultDivExpression()
-         #Division(2)
-      )
-   )?
-}
-
-void MultDivExpressionWithoutIdentifier() #void : {}
-{
-   NotExpressionWithoutIdentifier()
-   (
-      (
-         <MULT>
-         MultDivExpression()
-         #Multiplication(2)
-      ) | (
-         <DIV>
-         MultDivExpression()
-         #Division(2)
-      )
-   )?
-}
-
-void MultDivExpressionAfterIdentifier(String identifier) #void : {}
-{
-   NotExpressionAfterIdentifier(identifier)
-   (
-      (
-         <MULT>
-         MultDivExpression()
-         #Multiplication(2)
-      ) | (
-         <DIV>
-         MultDivExpression()
-         #Division(2)
-      )
-   )?
-}
-
-void MultDivExpressionWithoutArrayPosition(String identifier) #void : {}
-{
-   NotExpressionWithoutArrayPosition(identifier)
-   (
-      (
-         <MULT>
-         MultDivExpression()
-         #Multiplication(2)
-      ) | (
-         <DIV>
-         MultDivExpression()
-         #Division(2)
-      )
-   )?
-}
-
-// ----------------------------------------------------------------
-// Not Expressions
-// ----------------------------------------------------------------
-
 void NotExpression() #void : {}
 {
-   ClassMemberExpression()
-   | (
-      <NOT>
-      Negation()
-   )
-}
-
-void NotExpressionWithoutIdentifier() #void : {}
-{
-   ClassMemberExpressionWithoutIdentifier()
-   | (
-      <NOT>
-      Negation()
-   )
-}
-
-void NotExpressionAfterIdentifier(String identifier) #void : {}
-{
-   ClassMemberExpressionAfterIdentifier(identifier)
-}
-
-void NotExpressionWithoutArrayPosition(String identifier) #void : {}
-{
    (
-      ClassMemberExpressionWithoutArrayPosition(identifier)
-   )?
-}
-
-void Negation() : {}
-{
-   NotExpression()
-}
-
-// ----------------------------------------------------------------
-// Class Member Expressions
-// ----------------------------------------------------------------
-
-void ClassMemberExpression() #void : {}
-{
-   ParenthesisExpression()
-   (
-      (
-         <DOT>
-         MethodCalls("expression")
-         #CallGroup(2)
-      ) | (
-         <OPEN_BRACKETS>
-         Position()
-         #Access(2)
-         <CLOSE_BRACKETS>
-      )
-   )?
-}
-
-void Position() : {}
-{
-   Expression()
-}
-
-void ClassMemberExpressionWithoutIdentifier() #void : {}
-{
-   ParenthesisExpressionWithoutIdentifier()
-   (
-      (
-         <DOT>
-         MethodCalls("expression")
-         #CallGroup(2)
-      ) | (
-         <OPEN_BRACKETS>
-         Expression()
-         <CLOSE_BRACKETS>
-      )
-   )?
-}
-
-void ClassMemberExpressionAfterIdentifier(String identifier) #void : {}
-{
-   (
-      (
-         Variable(identifier)
-         ArrayPosition()
-         #Access(2)
-         ClassMemberExpressionAfterIdentifier("expression")
-      ) | (
-         ClassMemberExpressionWithoutArrayPosition(identifier)
-      )
+      ParenthesisExpression()
    ) | (
-      Variable(identifier)
-   )
-}
-
-void ClassMemberExpressionWithoutArrayPosition(String identifier) #void : {}
-{
-   Variable(identifier)
-   <DOT>
-   MethodCalls(identifier)
-   #CallGroup(2)
-}
-
-void Length() : {}
-{
-   <LENGTH>
-}
-
-// ----------------------------------------------------------------
-// Parenthesis Expressions
-// ----------------------------------------------------------------
-
-void ParenthesisExpression() #void : {}
-{
-   TerminalExpression()
-   | (
-      <OPEN_PARENTHESIS>
-      {this.parenthesisDepth++;}
-      Expression()
-      <CLOSE_PARENTHESIS>
-      {this.parenthesisDepth--;}
-   )
-}
-
-void ParenthesisExpressionWithoutIdentifier() #void : {}
-{
-   TerminalExpressionWithoutIdentifier()
-   | (
-      <OPEN_PARENTHESIS>
-      {this.parenthesisDepth++;}
-      Expression()
-      <CLOSE_PARENTHESIS>
-      {this.parenthesisDepth--;}
+      <NOT>
+      Operator("Negation")
+      ParenthesisExpression()
+      #Operation(2)
    )
 }
 
@@ -1068,21 +698,43 @@ void ParenthesisExpressionWithoutIdentifier() #void : {}
 // Terminal Expressions
 // ----------------------------------------------------------------
 
-void TerminalExpression() #void : {}
+void ParenthesisExpression() #void : {}
 {
    (
-      (
-         TerminalExpressionWithoutIdentifier()
-      ) | (
-         VariableToRead()
-      )
+      TerminalExpression()
+   ) | (
+      OpenParenthesis()
+      Expression()
+      CloseParenthesis()
    )
 }
 
-void VariableToRead() #void : {Token name;}
+void TerminalExpression() #void : {Token t;}
 {
-   name = <IDENTIFIER>
-   Variable(name.image)
+   (
+      t = <INTEGER_LITERAL>
+      Literal(t.image, "int")
+   ) | (
+      t = <BOOLEAN_LITERAL>
+      Literal(t.image, "boolean")
+   ) | (
+      t = <IDENTIFIER>
+      Variable(t.image)
+   ) | (
+      This()
+   )
+}
+
+// ----------------------------------------------------------------
+// Terminal Nodes
+// ----------------------------------------------------------------
+
+void Literal(String value, String type) : {}
+{
+   {
+      jjtThis.put("value", value);
+      jjtThis.put("type", type);
+   }
 }
 
 void Variable(String name) : {}
@@ -1092,118 +744,34 @@ void Variable(String name) : {}
    }
 }
 
-void TerminalExpressionWithoutIdentifier() #void : {}
-{
-   (
-      (
-         Integer()
-      ) | (
-         Boolean()
-      ) | (
-         This()
-      ) | (
-         <NEW>
-         Construction()
-      )
-   )
-}
-
-void Integer() : {Token value;}
-{
-   value = <INTEGER_LITERAL>
-   {jjtThis.put("value", value.image);}
-}
-
-void Boolean() : {Token value;}
-{
-   value = <BOOLEAN_LITERAL>
-   {jjtThis.put("value", value.image);}
-}
-
 void This() : {}
 {
    <THIS>
 }
 
-void Construction() : {Token type; int size = 0; boolean isArray = false;}
+void Operator(String name) : {}
 {
-   (
-      (
-         type = <INT>
-         Size()
-         {isArray = true;}
-      ) | (
-         type = <IDENTIFIER>
-         <OPEN_PARENTHESIS>
-         <CLOSE_PARENTHESIS>
-      )
-   )
-   {jjtThis.put("type", type.image + (isArray ? "[]" : ""));}
-}
-
-void Size() : {}
-{
-   <OPEN_BRACKETS>
-   Expression()
-   <CLOSE_BRACKETS>
+   {
+      jjtThis.put("name", name);
+   }
 }
 
 // ----------------------------------------------------------------
-// Sub Expressions
+// Functional Nodes
 // ----------------------------------------------------------------
 
-void MethodCalls(String identifier) #void : {Token t;}
-{
-   (
-      (
-         MethodCall()
-      ) | (
-         Length()
-      )
-   )
-
-   (
-      <DOT>
-      MethodCalls(identifier)
-      #CallGroup(2)
-   )?
-}
-
-void MethodCall() #void : {Token n;}
-{
-   n = <IDENTIFIER>
-   Method(n.image)
-}
-
-void Method(String name) : {}
-{
-   MethodCallArguments()
-   {jjtThis.put("name", name);}
-}
-
-void MethodCallArguments() #void : {}
+void OpenParenthesis() #void : {}
 {
    <OPEN_PARENTHESIS>
-   {this.parenthesisDepth++;}
-   (
-      CallArgument()
-      (
-         <COMMA>
-         CallArgument()
-      )*
-   )?
+   {
+      this.parenthesisDepth++;
+   }
+}
+
+void CloseParenthesis() #void : {}
+{
    <CLOSE_PARENTHESIS>
-   {this.parenthesisDepth--;}
-}
-
-void CallArgument() : {}
-{
-   Expression()
-}
-
-void ArrayPosition() #void : {}
-{
-   <OPEN_BRACKETS>
-   Position()
-   <CLOSE_BRACKETS>
+   {
+      this.parenthesisDepth--;
+   }
 }

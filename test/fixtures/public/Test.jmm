@@ -1,13 +1,3 @@
-import java.utils.List;
-import python.lib.test;
-
-class Test extends Remote {
-
-    public static void main(String[] args){
-        
-        //a = c[a[i*3]] + 3 + 5;
-        b = c[i].length + 2;
-        //c[i] = 2;
-        //a + b + c[1+i];
-    }
+class H {
+    
 }
