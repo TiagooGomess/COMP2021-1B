@@ -311,11 +311,21 @@ void Argument() : {String type; String identifier;}
 void MainArguments() #void : {}
 {
    OpenParenthesis()
+   MainArgument()
+   CloseParenthesis()
+}
+
+void MainArgument() : {String name;}
+{
    <STRING>
    <OPEN_BRACKETS>
    <CLOSE_BRACKETS>
-   <IDENTIFIER>
-   CloseParenthesis()
+   name = Name()
+
+   {
+      jjtThis.put("name", name);
+      jjtThis.put("type", "String[]");
+   }
 }
 
 void Body(String type) : {}
