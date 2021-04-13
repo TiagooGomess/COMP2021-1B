@@ -1,5 +1,6 @@
 package nodes;
 
+import nodes.expression.Terminal;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
@@ -58,31 +59,31 @@ public class Program {
     // ----------------------------------------------------------------
     private void addOperatorMethods() {
         this.addOperatorMethod("Addition", INT_TYPE,
-                Arrays.asList(new Symbol(INT_TYPE, "left addend"), new Symbol(INT_TYPE, "right addend")));
+                Arrays.asList(new Terminal(INT_TYPE, "left addend"), new Terminal(INT_TYPE, "right addend")));
 
         this.addOperatorMethod("Subtraction", INT_TYPE,
-                Arrays.asList(new Symbol(INT_TYPE, "subtrahend"), new Symbol(INT_TYPE, "minuend")));
+                Arrays.asList(new Terminal(INT_TYPE, "subtrahend"), new Terminal(INT_TYPE, "minuend")));
 
         this.addOperatorMethod("Multiplication", INT_TYPE,
-                Arrays.asList(new Symbol(INT_TYPE, "multiplicand"), new Symbol(INT_TYPE, "multiplier")));
+                Arrays.asList(new Terminal(INT_TYPE, "multiplicand"), new Terminal(INT_TYPE, "multiplier")));
 
         this.addOperatorMethod("Division", INT_TYPE,
-                Arrays.asList(new Symbol(INT_TYPE, "dividend"), new Symbol(INT_TYPE, "divisor")));
+                Arrays.asList(new Terminal(INT_TYPE, "dividend"), new Terminal(INT_TYPE, "divisor")));
 
         this.addOperatorMethod("Comparison", BOOL_TYPE,
-                Arrays.asList(new Symbol(INT_TYPE, "left expression"), new Symbol(INT_TYPE, "right expression")));
+                Arrays.asList(new Terminal(INT_TYPE, "left expression"), new Terminal(INT_TYPE, "right expression")));
 
         this.addOperatorMethod("Conjunction", BOOL_TYPE,
-                Arrays.asList(new Symbol(BOOL_TYPE, "left expression"), new Symbol(BOOL_TYPE, "right expression")));
+                Arrays.asList(new Terminal(BOOL_TYPE, "left expression"), new Terminal(BOOL_TYPE, "right expression")));
 
         this.addOperatorMethod("Not", BOOL_TYPE,
-                Collections.singletonList(new Symbol(BOOL_TYPE, "expression")));
+                Collections.singletonList(new Terminal(BOOL_TYPE, "expression")));
 
         this.addOperatorMethod("Access", INT_TYPE,
-                Arrays.asList(new Symbol(INT_ARRAY_TYPE, "array"), new Symbol(INT_TYPE, "position")));
+                Arrays.asList(new Terminal(INT_ARRAY_TYPE, "array"), new Terminal(INT_TYPE, "position")));
     }
 
-    private void addOperatorMethod(String operatorName, Type returnType, List<Symbol> argumentTypes) {
+    private void addOperatorMethod(String operatorName, Type returnType, List<Terminal> argumentTypes) {
         this.methods.add(new Method("%" + operatorName, returnType, argumentTypes));
     }
 

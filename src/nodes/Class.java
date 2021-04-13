@@ -1,7 +1,7 @@
 package nodes;
 
+import nodes.expression.Terminal;
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.*;
@@ -11,7 +11,7 @@ public class Class {
     private String classPath;
     private final Type classType;
     private final String superClassName;
-    private final List<Symbol> attributes;
+    private final List<Terminal> attributes;
     private final List<Method> methods;
 
     public Class(String className) {
@@ -22,7 +22,7 @@ public class Class {
         this(className, superClassName, new ArrayList<>(), new ArrayList<>());
     }
 
-    public Class(String className, String superClassName, List<Symbol> attributes, List<Method> methods) {
+    public Class(String className, String superClassName, List<Terminal> attributes, List<Method> methods) {
         this.processClassName(className);
         this.className = className;
         this.classType = new Type(this.className, false);
@@ -34,7 +34,7 @@ public class Class {
         this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
 
         // This expression
-        this.attributes.add(new Symbol(this.classType, "this"));
+        this.attributes.add(new Terminal(this.classType, "this"));
     }
 
     // ----------------------------------------------------------------
@@ -53,7 +53,7 @@ public class Class {
         return this.superClassName;
     }
 
-    public List<Symbol> getAttributes() {
+    public List<Terminal> getAttributes() {
         return attributes;
     }
 
@@ -70,7 +70,7 @@ public class Class {
         return null;
     }
 
-    public List<Symbol> getParameters(String methodName) {
+    public List<Terminal> getParameters(String methodName) {
         for (Method method : this.methods) {
             if (method.getName().equals(methodName)) {
                 return method.getParameters();
@@ -79,7 +79,7 @@ public class Class {
         return null;
     }
 
-    public List<Symbol> getLocalVariables(String methodName) {
+    public List<Terminal> getLocalVariables(String methodName) {
         for (Method method : this.methods) {
             if (method.getName().equals(methodName)) {
                 return method.getLocalVariables();
@@ -102,7 +102,7 @@ public class Class {
             return type;
 
         // Search for a field in the class
-        for (Symbol attribute : this.attributes)
+        for (Terminal attribute : this.attributes)
             if (attribute.getName().equals(variableName))
                 return attribute.getType();
 
@@ -113,7 +113,7 @@ public class Class {
     // Adders
     // ----------------------------------------------------------------
 
-    public void addAttribute(Symbol attribute) {
+    public void addAttribute(Terminal attribute) {
         this.attributes.add(attribute);
     }
 
@@ -154,7 +154,7 @@ public class Class {
             result.append(" : ").append(this.superClassName);
 
         result.append("\n").append(padding).append("Attributes");
-        for (Symbol attribute : this.getAttributes()) {
+        for (Terminal attribute : this.getAttributes()) {
             result.append("\n").append(padding).append("  ");
             result.append(attribute.toString());
         }

@@ -38,7 +38,7 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
 
     @Override
     public List<Symbol> getFields() {
-        return this.program.getMainClass().getAttributes();
+        return new ArrayList<>(this.program.getMainClass().getAttributes());
     }
 
     @Override
@@ -57,12 +57,12 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
 
     @Override
     public List<Symbol> getParameters(String methodName) {
-        return this.program.getMainClass().getParameters(methodName);
+        return new ArrayList<>(this.program.getMainClass().getParameters(methodName));
     }
 
     @Override
     public List<Symbol> getLocalVariables(String methodName) {
-        return this.program.getMainClass().getLocalVariables(methodName);
+        return new ArrayList<>(this.program.getMainClass().getLocalVariables(methodName));
     }
 
     public Type getVariableType(String scopeMethodName, String variableName) {
@@ -93,8 +93,8 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         this.program.addExternalClass(externalClass);
     }
 
-    public void addField(Symbol symbol) {
-        this.program.getMainClass().addAttribute(symbol);
+    public void addField(Terminal terminal) {
+        this.program.getMainClass().addAttribute(terminal);
     }
 
     public void addMethod(Method method) {

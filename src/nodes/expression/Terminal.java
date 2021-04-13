@@ -41,7 +41,10 @@ public class Terminal extends Symbol implements Expression {
     // ----------------------------------------------------------------
 
     public String toString(String padding) {
-        return padding + this.getName() + " : " + this.getReturnType();
+        String result = padding + this.getName() + " : " + this.getReturnType().getName();
+        if (this.getReturnType().isArray())
+            result += "[]";
+        return result;
     }
 
     @Override

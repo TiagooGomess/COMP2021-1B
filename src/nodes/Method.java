@@ -3,7 +3,6 @@ package nodes;
 import nodes.expression.Expression;
 import nodes.expression.Terminal;
 import pt.up.fe.comp.jmm.JmmNode;
-import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
@@ -14,8 +13,8 @@ public class Method implements Expression {
     private boolean isStatic;
     private Type returnType;
 
-    private List<Symbol> parameters;
-    private List<Symbol> localVariables;
+    private List<Terminal> parameters;
+    private List<Terminal> localVariables;
 
     public Method(String methodName, Type returnType) {
         this.methodName = methodName;
@@ -25,7 +24,7 @@ public class Method implements Expression {
         this.localVariables = new ArrayList<>();
     }
 
-    public Method(String methodName, Type returnType, List<Symbol> parameters) {
+    public Method(String methodName, Type returnType, List<Terminal> parameters) {
         this.methodName = methodName;
         this.returnType = returnType;
         this.parameters = parameters;
@@ -33,7 +32,7 @@ public class Method implements Expression {
         this.localVariables = new ArrayList<>();
     }
 
-    public Method(String methodName, Type returnType, List<Symbol> parameters, boolean isStatic, List<Symbol> localVariables) {
+    public Method(String methodName, Type returnType, List<Terminal> parameters, boolean isStatic, List<Terminal> localVariables) {
         this.methodName = methodName;
         this.returnType = returnType;
         this.parameters = parameters;
@@ -54,16 +53,16 @@ public class Method implements Expression {
         return this.returnType;
     }
 
-    public List<Symbol> getParameters() {
+    public List<Terminal> getParameters() {
         return this.parameters;
     }
 
-    public List<Symbol> getLocalVariables() {
+    public List<Terminal> getLocalVariables() {
         return this.localVariables;
     }
 
     public Type getVariableType(String variableName) {
-        for (Symbol variable : this.localVariables) {
+        for (Terminal variable : this.localVariables) {
             if (variable.getName().equals(variableName)) {
                 return variable.getType();
             }
@@ -75,11 +74,11 @@ public class Method implements Expression {
     // Adders
     // ----------------------------------------------------------------
 
-    public void addParameter(Symbol parameter) {
+    public void addParameter(Terminal parameter) {
         this.parameters.add(parameter);
     }
 
-    public void addLocalVariable(Symbol localVariable) {
+    public void addLocalVariable(Terminal localVariable) {
         this.localVariables.add(localVariable);
     }
 
@@ -107,7 +106,7 @@ public class Method implements Expression {
         if (this.parameters.size() == 0) {
             result.append("\n").append(padding).append("    none");
         }
-        for (Symbol parameter : this.parameters) {
+        for (Terminal parameter : this.parameters) {
             result.append("\n").append(padding).append("    ");
             result.append(parameter.toString());
         }
@@ -116,7 +115,7 @@ public class Method implements Expression {
         if (this.localVariables.size() == 0) {
             result.append("\n").append(padding).append("    none");
         }
-        for (Symbol variable : this.localVariables) {
+        for (Terminal variable : this.localVariables) {
             result.append("\n").append(padding).append("    ");
             result.append(variable.toString());
         }
