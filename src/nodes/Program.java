@@ -1,7 +1,6 @@
 package nodes;
 
 import nodes.expression.Terminal;
-import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ public class Program {
 
     public Program() {
         this.addOperatorMethods();
+        this.addIntArray();
     }
 
     // ----------------------------------------------------------------
@@ -36,6 +36,29 @@ public class Program {
 
     public Class getMainClass() {
         return mainClass;
+    }
+
+    public Method getMethod(String methodName) {
+        Method method = this.mainClass.getMethod(methodName);
+        if (method != null)
+            return method;
+
+        for (Method operator : this.methods)
+            if (operator.getName().equals(methodName))
+                return operator;
+
+        return null;
+    }
+
+    public Method getMethod(String className, String methodName) {
+        if (className.equals(this.mainClass.getName())) {
+            return this.mainClass.getMethod(methodName);
+        }
+        for (Class externalClass : this.externalClasses)
+            if (externalClass.getName().equals(className))
+                return externalClass.getMethod(methodName);
+
+        return null;
     }
 
     // ----------------------------------------------------------------
@@ -55,8 +78,9 @@ public class Program {
     }
 
     // ----------------------------------------------------------------
-    // Functions for adding the operators as methods
+    // Functions for adding default operators and types
     // ----------------------------------------------------------------
+
     private void addOperatorMethods() {
         this.addOperatorMethod("Addition", INT_TYPE,
                 Arrays.asList(new Terminal(INT_TYPE, "left addend"), new Terminal(INT_TYPE, "right addend")));
@@ -85,6 +109,11 @@ public class Program {
 
     private void addOperatorMethod(String operatorName, Type returnType, List<Terminal> argumentTypes) {
         this.methods.add(new Method("%" + operatorName, returnType, argumentTypes));
+    }
+
+    private void addIntArray() {
+        Class intArray = new Class("int[]");
+        this.externalClasses.add(intArray);
     }
 
     // ----------------------------------------------------------------

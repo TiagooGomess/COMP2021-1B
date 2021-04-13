@@ -31,7 +31,10 @@ public class Class {
         this.methods = methods;
 
         // Constructor method
-        this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
+        if (!this.className.equals("int[]"))
+            this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
+        else
+            this.methods.add(new Method("%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size"))));
 
         // This expression
         this.attributes.add(new Terminal(this.classType, "this"));
@@ -59,6 +62,15 @@ public class Class {
 
     public List<Method> getMethods() {
         return methods;
+    }
+
+    public Method getMethod(String methodName) {
+        for (Method method : this.methods) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        return null;
     }
 
     public Type getReturnType(String methodName) {

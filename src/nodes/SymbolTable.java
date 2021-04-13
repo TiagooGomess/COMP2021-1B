@@ -69,6 +69,14 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         return this.program.getMainClass().getVariableType(scopeMethodName, variableName);
     }
 
+    public Method getMethod(String methodName) {
+        return this.program.getMethod(methodName);
+    }
+
+    public Method getMethod(String className, String methodName) {
+        return this.program.getMethod(className, methodName);
+    }
+
     public List<Report> getReports() {
         return this.reports;
     }

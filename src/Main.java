@@ -70,8 +70,8 @@ public class Main implements JmmParser, JmmAnalysis {
         List<Report> reports = parserResult.getReports();
         reports.addAll(symbolTable.getReports());
 
-        System.out.println(symbolTable);
-        for (Report report: reports) {
+        // System.out.println(symbolTable);
+        for (Report report : reports) {
             System.out.println(report.toString());
         }
 

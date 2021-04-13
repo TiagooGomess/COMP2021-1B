@@ -21,7 +21,7 @@ public class Terminal extends Symbol implements Expression {
     // ----------------------------------------------------------------
 
     public static Terminal fromLiteral(JmmNode node) {
-        return new Terminal(Program.stringToType(node.get("value")), node.get("type"));
+        return new Terminal(Program.stringToType(node.get("type")), node.get("value"));
     }
 
     public static Terminal fromVariable(Method method, JmmNode node) {

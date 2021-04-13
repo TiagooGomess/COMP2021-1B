@@ -2,6 +2,7 @@ package semantics;
 
 import nodes.Class;
 import nodes.Method;
+import nodes.Program;
 import nodes.SymbolTable;
 import nodes.expression.Expression;
 import nodes.expression.Terminal;
@@ -9,6 +10,11 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.specs.util.SpecsCheck;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
 
 // public String[] jjtNodeName = { "skipParenthesis", "Program",
 // "ImportDeclaration", "void", "Class", "Attributes",
@@ -37,10 +43,12 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Expression> {
 
         //addVisit("Operation", this::defaultFunction);
         //addVisit("Method", this::defaultFunction);
-        //addVisit("Construction", this::defaultFunction);
-        //addVisit("Literal", this::dealWithLiteral);
-        //addVisit("Variable", this::dealWithVariable);
-        //addVisit("This", this::dealWithVariable);
+        addVisit("Construction", this::dealWithConstruction);
+        addVisit("Literal", this::dealWithLiteral);
+        addVisit("Variable", this::dealWithVariable);
+        addVisit("This", this::dealWithVariable);
+
+        //setDefaultVisit(this::defaultVisit);
     }
 
     public SymbolTable getSymbolTable() {
@@ -90,6 +98,12 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Expression> {
     // ----------------------------------------------------------------
     // Expressions
     // ----------------------------------------------------------------
+
+    private Expression dealWithConstruction(JmmNode jmmNode, JmmSymbolTable jmmSymbolTable) {
+        Method method = symbolTable.getMethod(jmmNode.get("type"), "%" + jmmNode.getKind());
+        System.out.println(method);
+        return null;
+    }
 
     private Expression dealWithLiteral(JmmNode jmmNode, JmmSymbolTable jmmSymbolTable) {
         return Terminal.fromLiteral(jmmNode);
