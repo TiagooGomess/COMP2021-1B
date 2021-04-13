@@ -7,8 +7,6 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.lang.Void;
-import java.util.Objects;
 
 public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Type> {
     private final JmmSymbolTable symbolTable = new JmmSymbolTable();
@@ -34,6 +32,8 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Type> {
         addVisit("Argument", this::dealWithArgument);
         addVisit("MainArgument", this::dealWithArgument);
         addVisit("VariableDeclaration", this::dealWithLocalVariable);
+
+        addVisit("Body", this::dealWithBody);
 
         addVisit("Operation", this::dealWithOperation);
     }
@@ -139,9 +139,8 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Type> {
         // Inferência de métodos não declarados na própria classe,
         // por exemplo: inteiro = Foo.b()
         // assumimos que  Foo.b() não tem argumentos e retorna um int
-        // Verificar se o número de parêmetros é igual ao número de argumentos
+        // Verificar se o número de parâmetros é igual ao número de argumentos
         // Verificar se o tipo dos parâmetros e dos argumentos é o mesmo
-
 
         // "Block", "If", "Then", "Else", "While", "Assignment", "Condition"
         return null;
@@ -153,16 +152,27 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Type> {
             case "Literal":
                 type = typeFromString(expressionNode.get("type"));
                 break;
-            case "Size":
+            case "Access":
                 type = typeFromString("int");
                 break;
             case "Variable":
                 type = symbolTable.getVariableTypeFromScope(currentMethod, expressionNode.get("name"));
                 break;
-            case "Call":
+            case "Call": // length
                 for (JmmNode child : expressionNode.getChildren())
-                    if (child.getKind().equals("Method"))
-                        type = symbolTable.getMethodReturnType(child.get("name"));
+                    if (child.getKind().equals("Method")) {
+                        String method = child.get("name");
+                        if (method.equals("length")) {
+                            type = typeFromString("int");
+                        } else {
+
+                        }
+                        System.out.println("--------------");
+                        System.out.println(child.toJson());
+                        System.out.println("--------------");
+                        type = symbolTable.getReturnType(child.get("name"));
+                        //break;
+                    }
                 break;
             default:
                 break;
@@ -172,4 +182,47 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Type> {
         }
         return type;
     }
+
+    private Type dealWithBody(JmmNode node, JmmSymbolTable parent) {
+
+
+        for (JmmNode child : node.getChildren()) {
+            if (child.getKind().equals("Call")) {
+                String externalMethodName = null, classNameTypeStr = null;
+                List<Symbol> externalMethodParameters = new ArrayList<>();
+                for (JmmNode child2 : child.getChildren()) {
+                    if (child2.getKind().equals("Variable")) {
+                        String variableName = child2.get("name");
+                        Type variableType = this.symbolTable.getVariableTypeFromScope(currentMethod, variableName);
+
+                        if (variableType != null)
+                            classNameTypeStr = variableType.getName();
+                        else
+                            this.symbolTable.addError(new Exception("Variable \"" + variableName + "\" is not defined in this scope"));
+
+                    } else if (child2.getKind().equals("Method")) {
+                        externalMethodName = child2.get("name");
+                        for (JmmNode child3 : child2.getChildren()) {
+                            if (child3.getKind().equals("Arguments")) {
+                                int i = 0;
+                                for (JmmNode child4 : child3.getChildren()) {
+                                    if (child4.getKind().equals("Variable")) {
+                                        String variableName = child4.get("name");
+                                        Type variableType = this.symbolTable.getVariableTypeFromScope(currentMethod, variableName);
+                                        externalMethodParameters.add(new Symbol(variableType, "argument " + ++i));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (externalMethodName == null || classNameTypeStr == null)
+                    break;
+                this.symbolTable.addExternalMethod(externalMethodName, classNameTypeStr, null, false, externalMethodParameters);
+            }
+        }
+
+        return null;
+    }
 }
+

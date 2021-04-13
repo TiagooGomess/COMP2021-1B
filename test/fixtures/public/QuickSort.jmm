@@ -1,4 +1,5 @@
 import io;
+import pack.Fa;
 
 class QuickSort {
     public static void main(String[] a) {
@@ -18,7 +19,7 @@ class QuickSort {
         q = new QuickSort();
 
         q.quicksort(L);
-        q.printL(L);
+        Fa.printL(L);
     }
 
     public boolean printL(int[] L) {

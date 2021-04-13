@@ -11,6 +11,13 @@
         "children": []
       },
       {
+        "kind": "ImportDeclaration",
+        "attributes": {
+          "name": "pack.Fa"
+        },
+        "children": []
+      },
+      {
         "kind": "Class",
         "attributes": {
           "name": "QuickSort"
@@ -357,7 +364,7 @@
                           {
                             "kind": "Variable",
                             "attributes": {
-                              "name": "q"
+                              "name": "Fa"
                             },
                             "children": []
                           },
@@ -1107,6 +1114,14 @@
                         "kind": "VariableDeclaration",
                         "attributes": {
                           "name": "i",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "name": "j",
                           "type": "int"
                         },
                         "children": []

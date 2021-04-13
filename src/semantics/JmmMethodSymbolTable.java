@@ -8,13 +8,39 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class JmmMethodSymbolTable {
-    private Type returnType;
-    private List<Symbol> parameters = new ArrayList<>();
-    private List<Symbol> localVariables = new ArrayList<>();
+    private final String className;
+    private final String name;
+    private final Type returnType;
+    private final List<Symbol> parameters;
+    private final List<Symbol> localVariables = new ArrayList<>();
+    private final boolean isStatic;
 
-
-    public JmmMethodSymbolTable(Type returnType) {
+    public JmmMethodSymbolTable(String name, String className, Type returnType) {
+        this.name = name;
+        this.className = className;
         this.returnType = returnType;
+        this.isStatic = this.name.equals("main");
+        this.parameters = new ArrayList<>();
+    }
+
+    public JmmMethodSymbolTable(String name, String className, Type returnType, boolean isStatic, List<Symbol> parameters) {
+        this.name = name;
+        this.className = className;
+        this.returnType = returnType;
+        this.isStatic = isStatic;
+        this.parameters = parameters;
+    }
+
+    public String getClassName() {
+        return this.className;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public boolean isStatic() {
+        return this.isStatic;
     }
 
     public Type getReturnType() {

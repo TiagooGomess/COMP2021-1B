@@ -19,10 +19,10 @@ public class JmmSymbolTable implements SymbolTable {
     private final List<String> imports = new ArrayList<>();
     private final List<Symbol> fields = new ArrayList<>();
     private final Map<String, JmmMethodSymbolTable> methods = new HashMap<>();
+    private final Map<String, JmmMethodSymbolTable> externalMethods = new HashMap<>();
     private final List<Report> reports = new ArrayList<>();
 
     public JmmSymbolTable() {
-
     }
 
     public List<Report> getReports() {
@@ -62,17 +62,13 @@ public class JmmSymbolTable implements SymbolTable {
         return new ArrayList<>(this.methods.keySet());
     }
 
-    public Type getMethodReturnType(String methodName) {
+    @Override
+    public Type getReturnType(String methodName) {
         JmmMethodSymbolTable methodSymbolTable = this.methods.get(methodName);
         if (methodSymbolTable == null) {
             return null;
         }
         return methodSymbolTable.getReturnType();
-    }
-
-    @Override
-    public Type getReturnType(String methodName) {
-        return this.methods.get(methodName).getReturnType();
     }
 
     @Override
@@ -122,7 +118,13 @@ public class JmmSymbolTable implements SymbolTable {
             Exception e = new Exception("The method with name \"" + methodName + "\" is already defined in the class scope");
             this.addError(e);
         }
-        this.methods.put(methodName, new JmmMethodSymbolTable(returnType));
+        this.methods.put(methodName, new JmmMethodSymbolTable(methodName, this.className, returnType));
+    }
+
+    public void addExternalMethod(String methodName, String className, Type returnType, boolean isStatic, List<Symbol> parameters) {
+        if (!this.externalMethods.containsKey(methodName)) { // TODO: podem haver external methods com o mesmo nome, se o objeto for de outro tipo
+            this.externalMethods.put(methodName, new JmmMethodSymbolTable(methodName, className, returnType, isStatic, parameters));
+        }
     }
 
     public void addField(Symbol field) {
