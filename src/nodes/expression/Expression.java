@@ -1,4 +1,4 @@
-package nodes;
+package nodes.expression;
 
 import pt.up.fe.comp.jmm.analysis.table.Type;
 

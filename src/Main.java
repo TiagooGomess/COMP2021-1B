@@ -1,3 +1,4 @@
+import nodes.SymbolTable;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParser;
@@ -6,7 +7,6 @@ import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
-import semantics.JmmSymbolTable;
 import semantics.JmmVisitor;
 
 import java.io.StringReader;
@@ -65,7 +65,7 @@ public class Main implements JmmParser, JmmAnalysis {
 
         JmmVisitor visitor = new JmmVisitor();
         visitor.visit(node, null);
-        JmmSymbolTable symbolTable = visitor.getSymbolTable();
+        SymbolTable symbolTable = visitor.getSymbolTable();
 
         List<Report> reports = parserResult.getReports();
         reports.addAll(symbolTable.getReports());
