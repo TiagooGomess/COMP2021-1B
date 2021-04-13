@@ -62,6 +62,14 @@ public class JmmSymbolTable implements SymbolTable {
         return new ArrayList<>(this.methods.keySet());
     }
 
+    public Type getMethodReturnType(String methodName) {
+        JmmMethodSymbolTable methodSymbolTable = this.methods.get(methodName);
+        if (methodSymbolTable == null) {
+            return null;
+        }
+        return methodSymbolTable.getReturnType();
+    }
+
     @Override
     public Type getReturnType(String methodName) {
         return this.methods.get(methodName).getReturnType();
@@ -78,7 +86,7 @@ public class JmmSymbolTable implements SymbolTable {
     }
 
     public void addImport(String importName) {
-        if (this.imports.contains(importName)){
+        if (this.imports.contains(importName)) {
             Exception e = new Exception("The import with name \"" + importName + "\" is already declared");
             this.addWarning(e);
         }
@@ -90,7 +98,7 @@ public class JmmSymbolTable implements SymbolTable {
     }
 
     public void setSuper(String superClassName) {
-        if (superClassName.equals(this.className)){
+        if (superClassName.equals(this.className)) {
             Exception e = new Exception("The class \"" + superClassName + "\" cannot extend itself");
             this.addError(e);
         }
@@ -143,6 +151,21 @@ public class JmmSymbolTable implements SymbolTable {
         }
     }
 
+    public Type getVariableTypeFromScope(String method, String variableName) {
+        Type type;
+        if (this.methods.containsKey(method)) {
+            type = this.methods.get(method).getVariableType(variableName);
+            if (type != null)
+                return type;
+        }
+        for (Symbol field : this.fields) {
+            if (field.getName().equals(variableName))
+                return field.getType();
+        }
+        addError(new Exception("The variable with name \"" + variableName + "\" was not declared"));
+        return null;
+    }
+
     public String toString(String spaces) {
         StringBuilder b = new StringBuilder();
 
@@ -175,7 +198,7 @@ public class JmmSymbolTable implements SymbolTable {
             for (Symbol field : this.fields) {
                 b.append(spaces);
                 b.append("  ");
-                b.append(field.getName() + " -> " + field.getType().toString());
+                b.append(field.getName()).append(" -> ").append(field.getType().toString());
                 b.append("\n");
             }
         }

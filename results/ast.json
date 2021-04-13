@@ -1114,14 +1114,6 @@
                       {
                         "kind": "VariableDeclaration",
                         "attributes": {
-                          "name": "j",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
                           "name": "tmp",
                           "type": "int"
                         },

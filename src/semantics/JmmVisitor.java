@@ -8,8 +8,9 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.Void;
+import java.util.Objects;
 
-public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
+public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Type> {
     private final JmmSymbolTable symbolTable = new JmmSymbolTable();
     private static String currentMethod = null;
 
@@ -33,14 +34,15 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
         addVisit("Argument", this::dealWithArgument);
         addVisit("MainArgument", this::dealWithArgument);
         addVisit("VariableDeclaration", this::dealWithLocalVariable);
-        addVisit("Expression", this::dealWithExpression);
+
+        addVisit("Operation", this::dealWithOperation);
     }
 
     public JmmSymbolTable getSymbolTable() {
         return symbolTable;
     }
 
-    private Type typeFromString(String typeName) {
+    private static Type typeFromString(String typeName) {
         int size = typeName.length();
         boolean isArray = false;
         if (typeName.startsWith("[]", size - 2)) {
@@ -50,12 +52,12 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
         return new Type(typeName, isArray);
     }
 
-    private Void dealWithImport(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithImport(JmmNode node, JmmSymbolTable parent) {
         symbolTable.addImport(node.get("name"));
         return null;
     }
 
-    private Void dealWithClass(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithClass(JmmNode node, JmmSymbolTable parent) {
         String className = node.get("name");
         if (node.getAttributes().contains("extends")) {
             symbolTable.setSuper(node.get("extends"));
@@ -64,12 +66,12 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
         return null;
     }
 
-    private Void dealWithAttribute(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithAttribute(JmmNode node, JmmSymbolTable parent) {
         symbolTable.addField(new Symbol(typeFromString(node.get("type")), node.get("name")));
         return null;
     }
 
-    private Void dealWithMethod(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithMethod(JmmNode node, JmmSymbolTable parent) {
         String methodName = node.get("name");
         currentMethod = methodName;
         Type returnType = new Type(node.get("type"), false);
@@ -77,21 +79,50 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
         return null;
     }
 
-    private Void dealWithArgument(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithArgument(JmmNode node, JmmSymbolTable parent) {
         Type type = typeFromString(node.get("type"));
         Symbol variableSymbol = new Symbol(type, node.get("name"));
         symbolTable.addParameter(currentMethod, variableSymbol);
         return null;
     }
 
-    private Void dealWithLocalVariable(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithLocalVariable(JmmNode node, JmmSymbolTable parent) {
         Type type = typeFromString(node.get("type"));
         Symbol variableSymbol = new Symbol(type, node.get("name"));
         symbolTable.addLocalVariable(currentMethod, variableSymbol);
         return null;
     }
 
-    private Void dealWithExpression(JmmNode node, JmmSymbolTable parent) {
+    private Type dealWithOperation(JmmNode node, JmmSymbolTable parent) {
+        List<JmmNode> operands = new ArrayList<>();
+        String operation = "";
+        for (JmmNode child : node.getChildren()) {
+            if (child.getKind().equals("Operator"))
+                operation = child.get("name");
+            else
+                operands.add(child);
+        }
+
+        Type expectedType;
+        if (operation.equals("Conjunction"))
+            expectedType = new Type("bool", false);
+        else
+            expectedType = new Type("int", false);
+
+
+        for (JmmNode operand : operands) {
+            Type realType = getType(operand);
+            if (!expectedType.equals(realType))
+                this.symbolTable.addError(new Exception("Incompatible type for " + operation + " operand, expected " + expectedType.getName() + ", found " + realType));
+        }
+
+        // Access, Call, NotExpression, Construction, ParenthesisExpression, Literal, Size, Variable, This, Method, Position
+
+        return null;
+    }
+
+
+    private Type dealWithExpression(JmmNode node, JmmSymbolTable parent) {
         // Verificar se os dois lados da operação são do mesmo tipo e são válidos para a operação (! só aceita booleanos, etc)
         // Não é possível fazer operações com arrays, por exemplo: array1 + array2
         // Verificar se o acesso de um array não é feito em uma variável que não é um array, por exemplo: 1[2] or notArray[2]
@@ -101,16 +132,44 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
 
         // METHODS
         // Verificar se o "target" do método existe, e se este contém o metodo (e.g. a.foo, ver se "a" existe
-            // e se tem um metodo "foo")
-                // caso seja do tipo da classe da classe declarada (e.g. a user o this), se nao existir
-                    // declaraçao na propria classe: se nao tiver extends retorna erro, se tiver extends assumir
-                    // que e da classe super.
+        // e se tem um metodo "foo")
+        // caso seja do tipo da classe da classe declarada (e.g. a user o this), se nao existir
+        // declaraçao na propria classe: se nao tiver extends retorna erro, se tiver extends assumir
+        // que e da classe super.
         // Inferência de métodos não declarados na própria classe,
-            // por exemplo: inteiro = Foo.b()
-            // assumimos que  Foo.b() não tem argumentos e retorna um int
+        // por exemplo: inteiro = Foo.b()
+        // assumimos que  Foo.b() não tem argumentos e retorna um int
         // Verificar se o número de parêmetros é igual ao número de argumentos
         // Verificar se o tipo dos parâmetros e dos argumentos é o mesmo
 
+
+        // "Block", "If", "Then", "Else", "While", "Assignment", "Condition"
         return null;
+    }
+
+    Type getType(JmmNode expressionNode) {
+        Type type = null;
+        switch (expressionNode.getKind()) {
+            case "Literal":
+                type = typeFromString(expressionNode.get("type"));
+                break;
+            case "Size":
+                type = typeFromString("int");
+                break;
+            case "Variable":
+                type = symbolTable.getVariableTypeFromScope(currentMethod, expressionNode.get("name"));
+                break;
+            case "Call":
+                for (JmmNode child : expressionNode.getChildren())
+                    if (child.getKind().equals("Method"))
+                        type = symbolTable.getMethodReturnType(child.get("name"));
+                break;
+            default:
+                break;
+        }
+        if (type == null) {
+            System.out.println(expressionNode.getKind());
+        }
+        return type;
     }
 }

@@ -29,6 +29,20 @@ public class JmmMethodSymbolTable {
         return this.localVariables;
     }
 
+    public Type getVariableType(String variableName) {
+        for (Symbol variable : localVariables) {
+            if (variable.getName().equals(variableName)) {
+                return variable.getType();
+            }
+        }
+        for (Symbol parameter : parameters) {
+            if (parameter.getName().equals(variableName)) {
+                return parameter.getType();
+            }
+        }
+        return null;
+    }
+
     public void addParameter(Symbol parameter) throws Exception {
         for (Symbol symbol : this.parameters)
             if (symbol.getName().equals(parameter.getName()))
