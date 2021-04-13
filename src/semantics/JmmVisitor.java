@@ -1,3 +1,5 @@
+package semantics;
+
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
@@ -31,6 +33,7 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
         addVisit("Argument", this::dealWithArgument);
         addVisit("MainArgument", this::dealWithArgument);
         addVisit("VariableDeclaration", this::dealWithLocalVariable);
+        addVisit("Expression", this::dealWithExpression);
     }
 
     public JmmSymbolTable getSymbolTable() {
@@ -40,7 +43,7 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
     private Type typeFromString(String typeName) {
         int size = typeName.length();
         boolean isArray = false;
-        if (typeName.substring(size - 2, size).equals("[]")) {
+        if (typeName.startsWith("[]", size - 2)) {
             isArray = true;
             typeName = typeName.substring(0, size - 2);
         }
@@ -85,6 +88,29 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Void> {
         Type type = typeFromString(node.get("type"));
         Symbol variableSymbol = new Symbol(type, node.get("name"));
         symbolTable.addLocalVariable(currentMethod, variableSymbol);
+        return null;
+    }
+
+    private Void dealWithExpression(JmmNode node, JmmSymbolTable parent) {
+        // Verificar se os dois lados da operação são do mesmo tipo e são válidos para a operação (! só aceita booleanos, etc)
+        // Não é possível fazer operações com arrays, por exemplo: array1 + array2
+        // Verificar se o acesso de um array não é feito em uma variável que não é um array, por exemplo: 1[2] or notArray[2]
+        // Verificar se o índice do acesso do array é um inteiro, por exemplo: 1, 3 + 4 * 5, x + y
+        // Verificar se os valores dos dois lados do assignment são do mesmo tipo
+        // Verificar se a expressão na condição do if e while retorna um boolean
+
+        // METHODS
+        // Verificar se o "target" do método existe, e se este contém o metodo (e.g. a.foo, ver se "a" existe
+            // e se tem um metodo "foo")
+                // caso seja do tipo da classe da classe declarada (e.g. a user o this), se nao existir
+                    // declaraçao na propria classe: se nao tiver extends retorna erro, se tiver extends assumir
+                    // que e da classe super.
+        // Inferência de métodos não declarados na própria classe,
+            // por exemplo: inteiro = Foo.b()
+            // assumimos que  Foo.b() não tem argumentos e retorna um int
+        // Verificar se o número de parêmetros é igual ao número de argumentos
+        // Verificar se o tipo dos parâmetros e dos argumentos é o mesmo
+
         return null;
     }
 }

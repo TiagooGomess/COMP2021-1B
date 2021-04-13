@@ -1,3 +1,5 @@
+package semantics;
+
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -9,6 +11,7 @@ public class JmmMethodSymbolTable {
     private Type returnType;
     private List<Symbol> parameters = new ArrayList<>();
     private List<Symbol> localVariables = new ArrayList<>();
+
 
     public JmmMethodSymbolTable(Type returnType) {
         this.returnType = returnType;
@@ -26,11 +29,22 @@ public class JmmMethodSymbolTable {
         return this.localVariables;
     }
 
-    public void addParameter(Symbol parameter) {
+    public void addParameter(Symbol parameter) throws Exception {
+        for (Symbol symbol : this.parameters)
+            if (symbol.getName().equals(parameter.getName()))
+                throw new Exception("The parameter with name \"" + parameter.getName() + "\" is already defined in the method scope.");
+
         this.parameters.add(parameter);
     }
 
-    public void addLocalVariable(Symbol variable) {
+    public void addLocalVariable(Symbol variable) throws Exception {
+        for (Symbol symbol : this.parameters)
+            if (symbol.getName().equals(variable.getName()))
+                throw new Exception("The local variable with name \"" + variable.getName() + "\" is already defined in the method scope");
+        for (Symbol symbol : this.localVariables)
+            if (symbol.getName().equals(variable.getName()))
+                throw new Exception("The local variable with name \"" + variable.getName() + "\" is already defined in the method scope");
+
         this.localVariables.add(variable);
     }
 

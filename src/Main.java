@@ -4,23 +4,17 @@ import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
-import pt.up.fe.comp.jmm.ast.examples.ExamplePostorderVisitor;
-import pt.up.fe.comp.jmm.ast.examples.ExamplePreorderVisitor;
-import pt.up.fe.comp.jmm.ast.examples.ExampleVisitor;
-import pt.up.fe.comp.jmm.report.*;
-import pt.up.fe.specs.util.SpecsIo;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import semantics.JmmVisitor;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class Main implements JmmParser, JmmAnalysis {
+
 	public static void main(String[] args) {
 		System.out.println("Compiling the code...\n\n");
 
