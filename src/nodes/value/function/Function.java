@@ -11,7 +11,7 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 import java.util.List;
 
 public abstract class Function extends Value {
-    protected SymbolTable symbolTable = null;
+    protected SymbolTable table = null;
     protected JmmNode node = null;
 
     protected String methodClass = null;
@@ -21,6 +21,8 @@ public abstract class Function extends Value {
     // ----------------------------------------------------------------
     // Getters
     // ----------------------------------------------------------------
+
+    protected abstract String getOutputName();
 
     protected abstract List<Value> getArguments();
 
@@ -35,12 +37,14 @@ public abstract class Function extends Value {
     // Setters
     // ----------------------------------------------------------------
 
-    protected void setMethod(SymbolTable table) {
-        if (methodName == null)
+    protected void setMethod() {
+        if (this.methodName == null)
             return;
-        if (methodClass == null)
-            methodClass = table.getClassName();
-        this.method = table.getMethod(methodName, methodName);
+        if (this.methodClass == null)
+            this.method = this.table.getMethod(this.methodName);
+        else
+            this.method = this.table.getMethod(this.methodName, this.methodName);
+        System.out.println(this.methodName + " " + this.methodClass);
     }
 
     // ----------------------------------------------------------------
@@ -60,6 +64,8 @@ public abstract class Function extends Value {
 
         List<Terminal> parameters = function.method.getParameters();
         List<Value> arguments = function.getArguments();
+        //if (parameters.size() != arguments.size())
+        //    throw JmmException.invalidNumberOfArguments(function.getOutputName(), parameters.size(), arguments.size());
         return null;
     }
 }

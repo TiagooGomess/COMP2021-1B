@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Operation extends Function {
     public Operation(SymbolTable table, JmmNode node) {
-        this.symbolTable = table;
+        this.table = table;
         this.node = node;
 
         // Method name
@@ -18,7 +18,12 @@ public class Operation extends Function {
                 break;
             }
         }
-        this.setMethod(table);
+        this.setMethod();
+    }
+
+    @Override
+    protected String getOutputName() {
+        return this.methodName.substring(1).toLowerCase() + " operator";
     }
 
     @Override

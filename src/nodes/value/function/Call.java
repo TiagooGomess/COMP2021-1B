@@ -7,7 +7,6 @@ import nodes.value.exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Call extends Function {
@@ -15,19 +14,27 @@ public class Call extends Function {
     private final Method scopeMethod;
 
     public Call(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
-        this.symbolTable = table;
+        this.table = table;
         this.node = node;
         this.scopeMethod = scopeMethod;
         this.expectedReturn = expectedReturn;
 
         // Method name and class
         for (JmmNode child : node.getChildren()) {
-            if (child.getKind().equals("Method"))
+            if (child.getKind().equals("Method")) {
                 this.methodName = child.get("name");
-            else
-                this.methodClass = Value.fromNode(table, scopeMethod, child, null).getReturnType().getName();
+            } else {
+                Type returnType = Value.fromNode(table, scopeMethod, child, null).getReturnType();
+                String name = returnType.getName();
+                this.methodClass = returnType.isArray() ? name + "[]" : name;
+            }
         }
-        this.setMethod(table);
+        this.setMethod();
+    }
+
+    @Override
+    protected String getOutputName() {
+        return "method \"" + this.methodName + "\" of class \"" + this.methodClass + "\"";
     }
 
     @Override

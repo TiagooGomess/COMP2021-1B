@@ -8,13 +8,18 @@ import java.util.List;
 
 public class Construction extends Function {
     public Construction(SymbolTable table, JmmNode node) {
-        this.symbolTable = table;
+        this.table = table;
         this.node = node;
 
         // Method name and class
         this.methodName = "%" + node.getKind();
         this.methodClass = node.get("type");
-        this.setMethod(table);
+        this.setMethod();
+    }
+
+    @Override
+    protected String getOutputName() {
+        return "constructor of \"" + this.methodClass + "\"";
     }
 
     @Override
