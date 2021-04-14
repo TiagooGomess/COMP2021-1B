@@ -3,6 +3,10 @@ package nodes.value;
 import nodes.Method;
 import nodes.SymbolTable;
 import nodes.value.exception.JmmException;
+import nodes.value.function.Call;
+import nodes.value.function.Construction;
+import nodes.value.function.Function;
+import nodes.value.function.Operation;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
@@ -26,7 +30,10 @@ public abstract class Value {
     public static Value fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
         Value result = switch (node.getKind()) {
             case "Literal" -> Terminal.fromLiteral(node);
-            case "Variable" -> Terminal.fromVariable(table, scopeMethod, node);
+            case "Variable", "This" -> Terminal.fromVariable(table, scopeMethod, node);
+            case "Construction" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
+            case "Operation" -> Operation.fromNode(table, scopeMethod, node, expectedReturn);
+            case "Call" -> Call.fromNode(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
         if (result == null) {

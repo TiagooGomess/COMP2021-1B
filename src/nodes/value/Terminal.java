@@ -51,7 +51,8 @@ public class Terminal extends Value {
     }
 
     public static Value fromVariable(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
-        String variableName = node.get("name");
+        // The this special word is a variable
+        String variableName = node.getKind().equals("This") ? "this" : node.get("name");
         Value variable = table.getVariable(scopeMethod, variableName);
         if (variable == null)
             throw JmmException.undeclaredVariable(variableName);

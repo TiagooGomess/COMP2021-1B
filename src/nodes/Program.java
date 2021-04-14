@@ -39,6 +39,36 @@ public class Program {
         return mainClass;
     }
 
+    public Class getClass(String className) {
+        if (this.mainClass.getName().equals(className))
+            return this.mainClass;
+        for (Class externalClass : this.externalClasses)
+            if (externalClass.getName().equals(className))
+                return externalClass;
+        return null;
+    }
+
+    public Method getMethod(String className, String methodName) {
+        Class requiredClass = this.getClass(className);
+        if (requiredClass == null)
+            return null;
+        return requiredClass.getMethod(methodName);
+    }
+
+    public Method getMethod(String methodName) {
+        // Valid method declared in the file
+        Method method = this.mainClass.getMethod(methodName);
+        if (method != null)
+            return method;
+
+        // Search in the operators methods
+        for (Method operator : this.methods)
+            if (operator.getName().equals(methodName))
+                return operator;
+
+        return null;
+    }
+
     public Value getVariable(Method scopeMethod, String variableName) {
         // Searches for the variable in the class scope
         Value variable = this.mainClass.getVariable(scopeMethod, variableName);

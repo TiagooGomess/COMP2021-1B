@@ -95,6 +95,13 @@ public class Class extends Value {
         return null;
     }
 
+    public Method getMethod(String methodName) {
+        for (Method method : this.methods)
+            if (method.getName().equals(methodName))
+                return method;
+        return null;
+    }
+
     public Value getVariable(Method scopeMethod, String variableName) {
         // First verify if it is a local variable
         Terminal variable = scopeMethod.getVariable(variableName);
