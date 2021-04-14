@@ -1,6 +1,6 @@
 package nodes;
 
-import nodes.expression.Expression;
+import nodes.expression.Value;
 import nodes.expression.Terminal;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -8,7 +8,7 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Method implements Expression {
+public class Method {
     private String methodName;
     private boolean isStatic;
     private Type returnType;
@@ -48,7 +48,6 @@ public class Method implements Expression {
         return this.methodName;
     }
 
-    @Override
     public Type getReturnType() {
         return this.returnType;
     }

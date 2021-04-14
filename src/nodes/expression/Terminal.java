@@ -6,7 +6,7 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-public class Terminal extends Symbol implements Expression {
+public class Terminal extends Symbol implements Value {
     public Terminal(Type type, String name) {
         super(type, name);
     }
