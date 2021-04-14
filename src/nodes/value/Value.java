@@ -31,7 +31,7 @@ public abstract class Value {
         Value result = switch (node.getKind()) {
             case "Literal" -> Terminal.fromLiteral(node);
             case "Variable", "This" -> Terminal.fromVariable(table, scopeMethod, node);
-            case "Call", "Construction", "Operation" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
+            case "Access", "Call", "Construction", "Operation" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
         //if (result == null)

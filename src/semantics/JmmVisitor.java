@@ -35,6 +35,7 @@ public class JmmVisitor extends PreorderJmmVisitor<JmmSymbolTable, Value> {
         addVisit("VariableDeclaration", this::dealWithLocalVariable);
 
         addVisit("Operation", this::dealWithValue);
+        addVisit("Access", this::dealWithValue);
         addVisit("Call", this::dealWithValue);
         addVisit("Construction", this::dealWithValue);
         addVisit("Literal", this::dealWithValue);

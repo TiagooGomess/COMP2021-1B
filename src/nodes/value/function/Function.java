@@ -45,7 +45,6 @@ public abstract class Function extends Value {
             this.method = this.table.getMethod(this.methodName);
         else
             this.method = this.table.getMethod(this.methodClass, this.methodName);
-        System.out.println(this.methodName + " - " + this.methodClass);
     }
 
     // ----------------------------------------------------------------
@@ -55,6 +54,7 @@ public abstract class Function extends Value {
     public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
         // Create respective objects
         Function function = switch (node.getKind()) {
+            case "Access" -> new Access(table, scopeMethod, node);
             case "Construction" -> new Construction(table, scopeMethod, node);
             case "Operation" -> new Operation(table, scopeMethod, node);
             case "Call" -> new Call(table, scopeMethod, node, expectedReturn);
