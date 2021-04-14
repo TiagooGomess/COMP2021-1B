@@ -12,7 +12,6 @@ public class Method extends Value {
     private String methodName;
     private boolean isStatic;
     private Type returnType;
-
     private List<Terminal> parameters;
     private List<Terminal> localVariables;
 

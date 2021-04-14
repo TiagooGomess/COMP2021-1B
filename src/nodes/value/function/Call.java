@@ -42,13 +42,12 @@ public class Call extends Function {
     }
 
     @Override
-    protected List<Value> getArguments() throws JmmException {
-        List<Value> arguments = new ArrayList<>();
-        if (this.argumentsNode == null)
-            return arguments;
-        int i = 0;
-        for (JmmNode child : this.argumentsNode.getChildren())
-            arguments.add(Value.fromNode(this.table, this.scopeMethod, child, getParameterType(i++)));
-        return arguments;
+    protected List<JmmNode> getArguments() {
+        if (this.argumentsNode != null) {
+            List<JmmNode> arguments = this.argumentsNode.getChildren();
+            if (arguments != null)
+                return arguments;
+        }
+        return new ArrayList<>();
     }
 }

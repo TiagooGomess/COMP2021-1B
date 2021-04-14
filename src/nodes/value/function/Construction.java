@@ -2,8 +2,6 @@ package nodes.value.function;
 
 import nodes.Method;
 import nodes.SymbolTable;
-import nodes.value.Value;
-import nodes.value.exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.ArrayList;
@@ -27,10 +25,10 @@ public class Construction extends Function {
     }
 
     @Override
-    protected List<Value> getArguments() throws JmmException {
-        List<Value> arguments = new ArrayList<>();
+    protected List<JmmNode> getArguments() {
         for (JmmNode child : this.node.getChildren())
-            arguments.add(Value.fromNode(this.table, this.scopeMethod, child, null));
-        return arguments;
+            if (child.getKind().equals("Size"))
+                return child.getChildren();
+        return new ArrayList<>();
     }
 }

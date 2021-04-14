@@ -25,11 +25,7 @@ public abstract class Function extends Value {
 
     protected abstract String getOutputName();
 
-    protected abstract List<Value> getArguments() throws JmmException;
-
-    protected Type getParameterType(int position) {
-        return this.method.getParameters().get(position).getType();
-    }
+    protected abstract List<JmmNode> getArguments();
 
     @Override
     public Type getReturnType() {
@@ -49,9 +45,7 @@ public abstract class Function extends Value {
             this.method = this.table.getMethod(this.methodName);
         else
             this.method = this.table.getMethod(this.methodClass, this.methodName);
-        if (this.method == null) {
-            System.out.println(this.methodName + " - " + this.methodClass);
-        }
+        System.out.println(this.methodName + " - " + this.methodClass);
     }
 
     // ----------------------------------------------------------------
@@ -66,13 +60,24 @@ public abstract class Function extends Value {
             case "Call" -> new Call(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
-        if (function == null || function.method == null)
+        if (function == null || function.method == null) {
             return null;
+        }
 
+        List<JmmNode> arguments = function.getArguments();
         List<Terminal> parameters = function.method.getParameters();
-        List<Value> arguments = function.getArguments();
         if (parameters.size() != arguments.size())
             throw JmmException.invalidNumberOfArguments(function.getOutputName(), parameters.size(), arguments.size());
-        return null;
+        for (int i = 0; i < arguments.size(); i++) {
+            Terminal parameter = parameters.get(i);
+            Value argument = Value.fromNode(table, scopeMethod, arguments.get(i), parameter.getReturnType());
+            if (argument == null) {
+                System.out.println(arguments.get(i));
+            }
+            if (!parameter.getReturnType().equals(argument.getReturnType()))
+                throw JmmException.invalidTypeForArgument(function.methodName, parameter.getName(), parameter.getReturnType(), argument.getReturnType());
+        }
+
+        return function;
     }
 }

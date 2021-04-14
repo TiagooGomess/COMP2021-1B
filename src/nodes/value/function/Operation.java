@@ -31,12 +31,11 @@ public class Operation extends Function {
     }
 
     @Override
-    protected List<Value> getArguments() throws JmmException {
-        List<Value> arguments = new ArrayList<>();
-        int i = 0;
+    protected List<JmmNode> getArguments() {
+        List<JmmNode> arguments = new ArrayList<>();
         for (JmmNode child : node.getChildren())
             if (!child.getKind().equals("Operator"))
-                arguments.add(Value.fromNode(this.table, this.scopeMethod, child, this.getParameterType(i++)));
+                arguments.add(child);
         return arguments;
     }
 }

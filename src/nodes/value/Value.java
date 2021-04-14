@@ -31,17 +31,11 @@ public abstract class Value {
         Value result = switch (node.getKind()) {
             case "Literal" -> Terminal.fromLiteral(node);
             case "Variable", "This" -> Terminal.fromVariable(table, scopeMethod, node);
-            case "Construction" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
-            case "Operation" -> Operation.fromNode(table, scopeMethod, node, expectedReturn);
-            case "Call" -> Call.fromNode(table, scopeMethod, node, expectedReturn);
+            case "Call", "Construction", "Operation" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
         //if (result == null)
         //    System.out.println(node.getKind());
         return result;
-    }
-
-    protected boolean notEquals(Value value) {
-        return !this.equals(value);
     }
 }

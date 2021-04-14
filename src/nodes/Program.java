@@ -137,6 +137,8 @@ public class Program {
 
     private void addIntArray() {
         Class intArray = new Class("int[]");
+        Method length = new Method("length", INT_TYPE);
+        intArray.addMethod(length);
         this.externalClasses.add(intArray);
     }
 
