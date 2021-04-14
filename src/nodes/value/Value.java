@@ -1,12 +1,9 @@
 package nodes.value;
 
-import nodes.Method;
+import nodes.method.Method;
 import nodes.SymbolTable;
 import nodes.value.exception.JmmException;
-import nodes.value.function.Call;
 import nodes.value.function.Construction;
-import nodes.value.function.Function;
-import nodes.value.function.Operation;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 

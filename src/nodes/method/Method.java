@@ -1,5 +1,6 @@
-package nodes;
+package nodes.method;
 
+import nodes.Program;
 import nodes.value.Terminal;
 import nodes.value.Value;
 import pt.up.fe.comp.jmm.JmmNode;

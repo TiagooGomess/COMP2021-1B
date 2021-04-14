@@ -1,6 +1,6 @@
 package nodes.value.function;
 
-import nodes.Method;
+import nodes.method.Method;
 import nodes.SymbolTable;
 import pt.up.fe.comp.jmm.JmmNode;
 

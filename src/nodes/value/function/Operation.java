@@ -1,9 +1,7 @@
 package nodes.value.function;
 
-import nodes.Method;
+import nodes.method.Method;
 import nodes.SymbolTable;
-import nodes.value.Value;
-import nodes.value.exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.ArrayList;

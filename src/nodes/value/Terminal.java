@@ -1,6 +1,6 @@
 package nodes.value;
 
-import nodes.Method;
+import nodes.method.Method;
 import nodes.Program;
 import nodes.SymbolTable;
 import nodes.value.exception.JmmException;

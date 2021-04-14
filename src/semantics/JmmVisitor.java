@@ -1,7 +1,7 @@
 package semantics;
 
 import nodes.Class;
-import nodes.Method;
+import nodes.method.Method;
 import nodes.SymbolTable;
 import nodes.value.exception.JmmException;
 import nodes.value.Value;

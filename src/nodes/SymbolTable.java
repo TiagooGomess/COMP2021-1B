@@ -1,5 +1,6 @@
 package nodes;
 
+import nodes.method.Method;
 import nodes.value.Terminal;
 import nodes.value.Value;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
