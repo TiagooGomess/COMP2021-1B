@@ -36,9 +36,8 @@ public abstract class Value {
             case "Call" -> Call.fromNode(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
-        if (result == null) {
-            System.out.println(node.getKind());
-        }
+        //if (result == null)
+        //    System.out.println(node.getKind());
         return result;
     }
 

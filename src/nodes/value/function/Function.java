@@ -12,6 +12,7 @@ import java.util.List;
 
 public abstract class Function extends Value {
     protected SymbolTable table = null;
+    protected Method scopeMethod = null;
     protected JmmNode node = null;
 
     protected String methodClass = null;
@@ -24,7 +25,11 @@ public abstract class Function extends Value {
 
     protected abstract String getOutputName();
 
-    protected abstract List<Value> getArguments();
+    protected abstract List<Value> getArguments() throws JmmException;
+
+    protected Type getParameterType(int position) {
+        return this.method.getParameters().get(position).getType();
+    }
 
     @Override
     public Type getReturnType() {
@@ -43,8 +48,10 @@ public abstract class Function extends Value {
         if (this.methodClass == null)
             this.method = this.table.getMethod(this.methodName);
         else
-            this.method = this.table.getMethod(this.methodName, this.methodName);
-        System.out.println(this.methodName + " " + this.methodClass);
+            this.method = this.table.getMethod(this.methodClass, this.methodName);
+        if (this.method == null) {
+            System.out.println(this.methodName + " - " + this.methodClass);
+        }
     }
 
     // ----------------------------------------------------------------
@@ -54,8 +61,8 @@ public abstract class Function extends Value {
     public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
         // Create respective objects
         Function function = switch (node.getKind()) {
-            case "Construction" -> new Construction(table, node);
-            case "Operation" -> new Operation(table, node);
+            case "Construction" -> new Construction(table, scopeMethod, node);
+            case "Operation" -> new Operation(table, scopeMethod, node);
             case "Call" -> new Call(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
@@ -64,8 +71,8 @@ public abstract class Function extends Value {
 
         List<Terminal> parameters = function.method.getParameters();
         List<Value> arguments = function.getArguments();
-        //if (parameters.size() != arguments.size())
-        //    throw JmmException.invalidNumberOfArguments(function.getOutputName(), parameters.size(), arguments.size());
+        if (parameters.size() != arguments.size())
+            throw JmmException.invalidNumberOfArguments(function.getOutputName(), parameters.size(), arguments.size());
         return null;
     }
 }
