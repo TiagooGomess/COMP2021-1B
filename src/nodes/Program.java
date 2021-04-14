@@ -1,6 +1,7 @@
 package nodes;
 
-import nodes.expression.Terminal;
+import nodes.value.Terminal;
+import nodes.value.Value;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
@@ -38,26 +39,19 @@ public class Program {
         return mainClass;
     }
 
-    public Method getMethod(String methodName) {
-        Method method = this.mainClass.getMethod(methodName);
-        if (method != null)
-            return method;
+    public Value getVariable(Method scopeMethod, String variableName) {
+        // Searches for the variable in the class scope
+        Value variable = this.mainClass.getVariable(scopeMethod, variableName);
+        if (variable != null)
+            return variable;
 
-        for (Method operator : this.methods)
-            if (operator.getName().equals(methodName))
-                return operator;
-
-        return null;
-    }
-
-    public Method getMethod(String className, String methodName) {
-        if (className.equals(this.mainClass.getName())) {
-            return this.mainClass.getMethod(methodName);
+        // Searches for class references in imports
+        for (Class externalClass : this.externalClasses) {
+            if (externalClass.getName().equals(variableName))
+                return externalClass;
         }
-        for (Class externalClass : this.externalClasses)
-            if (externalClass.getName().equals(className))
-                return externalClass.getMethod(methodName);
 
+        // Variable could not be found
         return null;
     }
 

@@ -1,14 +1,14 @@
 package nodes;
 
-import nodes.expression.Value;
-import nodes.expression.Terminal;
+import nodes.value.Terminal;
+import nodes.value.Value;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Method {
+public class Method extends Value {
     private String methodName;
     private boolean isStatic;
     private Type returnType;
@@ -48,6 +48,7 @@ public class Method {
         return this.methodName;
     }
 
+    @Override
     public Type getReturnType() {
         return this.returnType;
     }
@@ -60,12 +61,17 @@ public class Method {
         return this.localVariables;
     }
 
-    public Type getVariableType(String variableName) {
-        for (Terminal variable : this.localVariables) {
-            if (variable.getName().equals(variableName)) {
-                return variable.getType();
-            }
-        }
+    public Terminal getVariable(String variableName) {
+        // Search in local variables
+        for (Terminal variable : this.localVariables)
+            if (variable.getName().equals(variableName))
+                return variable;
+
+        // Search in parameters
+        for (Terminal variable : this.parameters)
+            if (variable.getName().equals(variableName))
+                return variable;
+
         return null;
     }
 
@@ -85,7 +91,7 @@ public class Method {
     // Creating from node
     // ----------------------------------------------------------------
 
-    public static Method fromNode(JmmNode node) {
+    public static Method fromDeclaration(JmmNode node) {
         String methodName = node.get("name");
         Type returnType = Program.stringToType(node.get("type"));
         return new Method(methodName, returnType);

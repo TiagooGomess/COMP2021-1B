@@ -1,15 +1,16 @@
 package nodes;
 
-import nodes.expression.Terminal;
+import nodes.value.Terminal;
+import nodes.value.Value;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.*;
 
-public class Class {
+public class Class extends Value {
     private String className;
     private String classPath;
-    private final Type classType;
+    private Type classType;
     private final String superClassName;
     private final List<Terminal> attributes;
     private final List<Method> methods;
@@ -24,18 +25,17 @@ public class Class {
 
     public Class(String className, String superClassName, List<Terminal> attributes, List<Method> methods) {
         this.processClassName(className);
-        this.className = className;
-        this.classType = new Type(this.className, false);
         this.superClassName = superClassName;
         this.attributes = attributes;
         this.methods = methods;
+
+        this.classType = new Type(this.className, false);
 
         // Constructor method
         if (!this.className.equals("int[]"))
             this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
         else
             this.methods.add(new Method("%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size"))));
-
         // This expression
         this.attributes.add(new Terminal(this.classType, "this"));
     }
@@ -64,15 +64,6 @@ public class Class {
         return methods;
     }
 
-    public Method getMethod(String methodName) {
-        for (Method method : this.methods) {
-            if (method.getName().equals(methodName)) {
-                return method;
-            }
-        }
-        return null;
-    }
-
     public Type getReturnType(String methodName) {
         for (Method method : this.methods) {
             if (method.getName().equals(methodName)) {
@@ -80,6 +71,10 @@ public class Class {
             }
         }
         return null;
+    }
+
+    public Type getReturnType() {
+        return this.classType;
     }
 
     public List<Terminal> getParameters(String methodName) {
@@ -100,23 +95,20 @@ public class Class {
         return null;
     }
 
-    public Type getVariableType(String methodName, String variableName) {
-        Type type = null;
+    public Value getVariable(Method scopeMethod, String variableName) {
+        // First verify if it is a local variable
+        Terminal variable = scopeMethod.getVariable(variableName);
+        if (variable != null)
+            return variable;
 
-        // Search for method and find the local variable
-        for (Method method : this.methods) {
-            if (method.getName().equals(methodName)) {
-                type = method.getVariableType(variableName);
-                break;
-            }
-        }
-        if (type != null)
-            return type;
+        // If it is not a local variable search in class fields
+        for (Terminal terminal : this.attributes)
+            if (terminal.getName().equals(variableName))
+                return terminal;
 
-        // Search for a field in the class
-        for (Terminal attribute : this.attributes)
-            if (attribute.getName().equals(variableName))
-                return attribute.getType();
+        // Maybe it is a reference to the class itself
+        if (this.className.equals(variableName))
+            return this;
 
         return null;
     }

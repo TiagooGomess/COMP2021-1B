@@ -1,14 +1,34 @@
-package nodes.expression;
+package nodes.value;
 
 import nodes.Method;
 import nodes.Program;
+import nodes.SymbolTable;
+import nodes.value.exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-public class Terminal extends Symbol implements Value {
+public class Terminal extends Value {
+    private final Symbol symbol;
+
     public Terminal(Type type, String name) {
-        super(type, name);
+        this.symbol = new Symbol(type, name);
+    }
+
+    // ----------------------------------------------------------------
+    // Getters
+    // ----------------------------------------------------------------
+
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public Type getType() {
+        return this.symbol.getType();
+    }
+
+    public String getName() {
+        return this.symbol.getName();
     }
 
     @Override
@@ -20,20 +40,22 @@ public class Terminal extends Symbol implements Value {
     // Creating from node
     // ----------------------------------------------------------------
 
+    // Creating of a terminal that represents a literal in the code
+    // valid literals are integers and booleans
     public static Terminal fromLiteral(JmmNode node) {
         return new Terminal(Program.stringToType(node.get("type")), node.get("value"));
     }
 
-    public static Terminal fromVariable(Method method, JmmNode node) {
-        String name = node.getKind().equals("This") ? "this" : node.get("name");
-        Type type = method.getVariableType(name);
-        if (type == null)
-            return null;
-        return new Terminal(type, name);
-    }
-
     public static Terminal fromDeclaration(JmmNode node) {
         return new Terminal(Program.stringToType(node.get("type")), node.get("name"));
+    }
+
+    public static Value fromVariable(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
+        String variableName = node.get("name");
+        Value variable = table.getVariable(scopeMethod, variableName);
+        if (variable == null)
+            throw JmmException.undeclaredVariable(variableName);
+        return variable;
     }
 
     // ----------------------------------------------------------------

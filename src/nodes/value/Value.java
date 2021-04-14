@@ -1,0 +1,41 @@
+package nodes.value;
+
+import nodes.Method;
+import nodes.SymbolTable;
+import nodes.value.exception.JmmException;
+import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.comp.jmm.analysis.table.Type;
+
+// public String[] jjtNodeName = { "skipParenthesis", "Program",
+// "ImportDeclaration", "void", "Class", "Attributes",
+// "Methods", "MethodDeclaration", "Arguments", "Argument", "Body", "Return",
+// "VariableDeclaration",
+// "AttributeDeclaration", "Block", "If", "Then", "Else", "While", "Assignment",
+// "Condition", "Operation",
+// "Position", "Access", "Call", "Method", "Construction", "Size", "Literal",
+// "Variable", "This",
+// "Operator", };
+
+public abstract class Value {
+    public abstract Type getReturnType();
+
+    // ----------------------------------------------------------------
+    // Static functions for value creation
+    // ----------------------------------------------------------------
+
+    public static Value fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
+        Value result = switch (node.getKind()) {
+            case "Literal" -> Terminal.fromLiteral(node);
+            case "Variable" -> Terminal.fromVariable(table, scopeMethod, node);
+            default -> null;
+        };
+        if (result == null) {
+            System.out.println(node.getKind());
+        }
+        return result;
+    }
+
+    protected boolean notEquals(Value value) {
+        return !this.equals(value);
+    }
+}
