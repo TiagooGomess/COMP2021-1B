@@ -103,6 +103,102 @@ public class SemanticTests {
 
     @Test
     public void test10() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/Fac.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test11() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/FindMaximum.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test12() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/HelloWorld.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test13() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/Lazysort.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test14() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/Life.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test15() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/MonteCarloPi.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test16() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/QuickSort.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test17() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/Simple.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test18() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/Test.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test19() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/TicTacToe.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test20() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/WhileAndIF.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void test21() {
+        String jmmCode = SpecsIo.getResource("fixtures/private/Turing.jmm");
+        JmmParserResult parseResult = TestUtils.parse(jmmCode);
+        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
+        TestUtils.noErrors(semanticsResult.getReports());
+    }
+
+    @Test
+    public void testX() {
         // NOT DONE YET
         /*
         String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/varNotInit.jmm");
