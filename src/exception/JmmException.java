@@ -3,7 +3,6 @@ package exception;
 import analysis.value.Terminal;
 import analysis.value.Value;
 import analysis.value.function.Access;
-import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.List;
@@ -31,6 +30,10 @@ public class JmmException extends Exception {
         for (Type type : arguments)
             types.add("\"" + getOutputType(type) + "\"");
         return new JmmException("Invalid call for " + methodName + ", no implementation with (" + String.join(", ", types) + ") parameters found");
+    }
+
+    public static JmmException invalidAssignmentVariable() {
+        return new JmmException("Invalid left operand for assignment, was expecting a variable found expression");
     }
 
     public static JmmException invalidAssignment(Value variable, Type found) {

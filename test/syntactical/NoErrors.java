@@ -1,3 +1,5 @@
+package syntactical;
+
 import org.junit.Test;
 
 import pt.up.fe.comp.TestUtils;

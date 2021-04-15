@@ -135,7 +135,7 @@ void skipParenthesis() {
 
    while(this.parenthesisDepth != 0) {
       t = getToken(1);
-      System.out.println(t.image);
+      // System.out.println(t.image);
       switch (t.kind) {
          case OPEN_PARENTHESIS:
             this.parenthesisDepth++;

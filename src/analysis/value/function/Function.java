@@ -95,8 +95,7 @@ public abstract class Function extends Value {
     // Static functions for expression creation
     // ----------------------------------------------------------------
 
-    public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws
-            JmmException {
+    public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
         // Create respective objects
         Function function = switch (node.getKind()) {
             case "Access" -> new Access(table, scopeMethod, node);

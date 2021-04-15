@@ -3,9 +3,12 @@ package analysis.symbol;
 import analysis.method.Method;
 import analysis.value.Terminal;
 import analysis.value.Value;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,6 +110,10 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
     // ----------------------------------------------------------------
     // Adders
     // ----------------------------------------------------------------
+
+    public void addReport(JmmException exception) {
+        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, exception.getStackTrace()[0].getLineNumber(), exception.getMessage()));
+    }
 
     public void addImport(Class externalClass) {
         this.program.addExternalClass(externalClass);

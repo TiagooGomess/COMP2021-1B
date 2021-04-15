@@ -152,7 +152,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 try {
                     Value value = Value.fromNode(this.symbolTable, method, valueNode, null);
                 } catch (JmmException e) {
-                    System.out.println(e.getMessage());
+                    this.symbolTable.addReport(e);
                 }
             }
         }
@@ -165,13 +165,13 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 try {
                     value = Value.fromNode(this.symbolTable, method, conditionNode, Program.BOOL_TYPE);
                 } catch (JmmException e) {
-                    System.out.println(e.getMessage());
+                    this.symbolTable.addReport(e);
                     continue;
                 }
 
                 if (!value.getReturnType().equals(Program.BOOL_TYPE)) {
                     JmmException e = JmmException.invalidCondition(value.getReturnType());
-                    System.out.println(e.getMessage());
+                    this.symbolTable.addReport(e);
                 }
             }
         }
@@ -190,10 +190,11 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                     else
                         variable = Terminal.fromVariable(this.symbolTable, method, variableNode);
                 } catch (JmmException e) {
-                    System.out.println(e.getMessage());
+                    this.symbolTable.addReport(e);
                     continue;
-                } catch (java.lang.NullPointerException e) {
-                    System.out.println("Invalid assignment, left side is not a variable");
+                } catch (java.lang.NullPointerException exception) {
+                    JmmException e = JmmException.invalidAssignmentVariable();
+                    this.symbolTable.addReport(e);
                     continue;
                 }
 
@@ -201,13 +202,13 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 try {
                     value = Value.fromNode(this.symbolTable, method, operators.get(1), variable.getReturnType());
                 } catch (JmmException e) {
-                    System.out.println(e.getMessage());
+                    this.symbolTable.addReport(e);
                     continue;
                 }
 
                 if (!variable.getReturnType().equals(value.getReturnType())) {
                     JmmException e = JmmException.invalidAssignment(variable, value.getReturnType());
-                    System.out.println(e.getMessage());
+                    this.symbolTable.addReport(e);
                 }
             }
         }
@@ -220,13 +221,13 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             try {
                 value = Value.fromNode(this.symbolTable, method, returnNode, method.getReturnType());
             } catch (JmmException e) {
-                System.out.println(e.getMessage());
+                this.symbolTable.addReport(e);
                 continue;
             }
 
             if (!value.getReturnType().equals(method.getReturnType())) {
                 JmmException e = JmmException.invalidReturn(method.getName(), method.getReturnType(), value.getReturnType());
-                System.out.println(e.getMessage());
+                this.symbolTable.addReport(e);
             }
         }
     }
