@@ -31,8 +31,8 @@ public abstract class Value {
             case "Access", "Call", "Construction", "Operation" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
-        //if (result == null)
-        //    System.out.println(node.getKind());
+        if (result == null)
+            System.out.println(node.getKind());
         return result;
     }
 }

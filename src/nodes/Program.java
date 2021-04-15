@@ -125,11 +125,11 @@ public class Program {
         this.addOperatorMethod("Conjunction", BOOL_TYPE,
                 Arrays.asList(new Terminal(BOOL_TYPE, "left expression"), new Terminal(BOOL_TYPE, "right expression")));
 
-        this.addOperatorMethod("Not", BOOL_TYPE,
+        this.addOperatorMethod("Negation", BOOL_TYPE,
                 Collections.singletonList(new Terminal(BOOL_TYPE, "expression")));
 
         this.addOperatorMethod("Access", INT_TYPE,
-                Arrays.asList(new Terminal(INT_ARRAY_TYPE, "array"), new Terminal(INT_TYPE, "position")));
+                Arrays.asList(new Terminal(INT_ARRAY_TYPE, "container"), new Terminal(INT_TYPE, "position")));
     }
 
     private void addOperatorMethod(String operatorName, Type returnType, List<Terminal> argumentTypes) {

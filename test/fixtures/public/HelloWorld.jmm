@@ -2,16 +2,18 @@ import ioPlus.deiedhdei.jdeijeod;
 import java.util.Map;
 
 class HelloWorld extends Hello {
-	int x;
-	String result;
-	TestObject obj;
 	public static void main(String[] args) {
 		ioPlus.printHelloWorld();
 	}
-	public int functionF(int x, String yu) {
-		int x;
-		String a;
-		x = 1 + 2;
-		return 0;
+
+	public int function(){
+	    int[] a;
+	    int i;
+	    boolean b;
+
+        if(i){
+            i = 2;
+        } else {}
+	    return 1;
 	}
 }

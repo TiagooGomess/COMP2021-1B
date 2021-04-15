@@ -21,7 +21,7 @@ public class Access extends Function {
 
     @Override
     protected String getOutputName() {
-        return "element access of \"" + this.methodClass + "\"";
+        return "\"array access\" operator";
     }
 
     @Override

@@ -60,9 +60,8 @@ public abstract class Function extends Value {
             case "Call" -> new Call(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
-        if (function == null || function.method == null) {
+        if (function == null || function.method == null)
             return null;
-        }
 
         List<JmmNode> arguments = function.getArguments();
         List<Terminal> parameters = function.method.getParameters();
@@ -71,11 +70,8 @@ public abstract class Function extends Value {
         for (int i = 0; i < arguments.size(); i++) {
             Terminal parameter = parameters.get(i);
             Value argument = Value.fromNode(table, scopeMethod, arguments.get(i), parameter.getReturnType());
-            if (argument == null) {
-                System.out.println(arguments.get(i));
-            }
             if (!parameter.getReturnType().equals(argument.getReturnType()))
-                throw JmmException.invalidTypeForArgument(function.methodName, parameter.getName(), parameter.getReturnType(), argument.getReturnType());
+                throw JmmException.invalidTypeForArgument(function.getOutputName(), parameter.getName(), parameter.getReturnType(), argument.getReturnType());
         }
 
         return function;

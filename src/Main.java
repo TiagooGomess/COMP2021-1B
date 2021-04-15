@@ -66,6 +66,7 @@ public class Main implements JmmParser, JmmAnalysis {
         JmmVisitor visitor = new JmmVisitor();
         visitor.visit(node, null);
         SymbolTable symbolTable = visitor.getSymbolTable();
+        visitor.analyseMethodValues();
 
         List<Report> reports = parserResult.getReports();
         reports.addAll(symbolTable.getReports());

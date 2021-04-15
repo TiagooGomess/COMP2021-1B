@@ -25,7 +25,7 @@ public class Operation extends Function {
 
     @Override
     protected String getOutputName() {
-        return this.methodName.substring(1).toLowerCase() + " operator";
+        return "\"" + this.methodName.substring(1).toLowerCase() + "\" operator";
     }
 
     @Override

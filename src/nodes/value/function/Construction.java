@@ -21,7 +21,7 @@ public class Construction extends Function {
 
     @Override
     protected String getOutputName() {
-        return "constructor of \"" + this.methodClass + "\"";
+        return "\"constructor\" of \"" + this.methodClass + "\"";
     }
 
     @Override
