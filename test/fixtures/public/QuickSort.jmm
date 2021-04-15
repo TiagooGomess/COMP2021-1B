@@ -33,7 +33,7 @@ class QuickSort {
         return true;
     }
 
-    public int quicksort(int[] L) {
+    public boolean quicksort(int[] L) {
         return this.quicksort(L, 0, L.length - 1);
     }
 

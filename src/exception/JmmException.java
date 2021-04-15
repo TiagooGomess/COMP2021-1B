@@ -39,7 +39,11 @@ public class JmmException extends Exception {
     }
 
     public static JmmException invalidCondition(Type found) {
-        return new JmmException("Invalid condition expression, was expecting a \"boolean\" and found \"" + getOutputType(found) + "\"");
+        return new JmmException("Invalid condition expression, was expecting \"boolean\" and found \"" + getOutputType(found) + "\"");
+    }
+
+    public static JmmException invalidReturn(String methodName, Type expected, Type found) {
+        return new JmmException("Invalid return expression for method \"" + methodName + "\", was expecting \"" + getOutputType(expected) + "\" and found \"" + getOutputType(found) + "\"");
     }
 
     public static JmmException invalidMethod(String methodName) {

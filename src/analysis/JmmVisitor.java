@@ -26,10 +26,11 @@ import java.util.*;
 
 public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     private final SymbolTable symbolTable = new SymbolTable();
-    private final static List<String> statementTypes = Arrays.asList("Body", "Return", "Block", "If", "Then", "Else", "While");
+    private final static List<String> statementTypes = Arrays.asList("Body", "Block", "If", "Then", "Else", "While");
     private final static List<String> valueTypes = Arrays.asList("Operation", "Access", "Call", "Construction", "Literal", "Variable", "This");
     private Method currentMethod = null;
 
+    private final Map<Method, JmmNode> methodReturn = new HashMap<>();
     private final Map<Method, List<JmmNode>> methodConditions = new HashMap<>();
     private final Map<Method, List<JmmNode>> methodValues = new HashMap<>();
     private final Map<Method, List<JmmNode>> methodAssignments = new HashMap<>();
@@ -47,6 +48,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
 
         addVisit("Condition", this::dealWithCondition);
         addVisit("Assignment", this::dealWithAssignment);
+        addVisit("Return", this::dealWithReturn);
 
         for (String valueParent : statementTypes)
             addVisit(valueParent, this::dealWithValueParent);
@@ -119,6 +121,12 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
         return null;
     }
 
+    private Value dealWithReturn(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
+        JmmNode expressionNode = jmmNode.getChildren().get(0);
+        methodReturn.put(currentMethod, expressionNode);
+        return null;
+    }
+
     private Value dealWithValueParent(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
         List<JmmNode> valueNodes = new ArrayList<>();
         for (JmmNode child : jmmNode.getChildren())
@@ -137,6 +145,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     public void analyseMethodValues() {
+        // Analyse expressions
         for (Map.Entry<Method, List<JmmNode>> entry : this.methodValues.entrySet()) {
             Method method = entry.getKey();
             for (JmmNode valueNode : entry.getValue()) {
@@ -148,6 +157,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             }
         }
 
+        // Analyse conditions
         for (Map.Entry<Method, List<JmmNode>> entry : this.methodConditions.entrySet()) {
             Method method = entry.getKey();
             for (JmmNode conditionNode : entry.getValue()) {
@@ -166,6 +176,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             }
         }
 
+        // Analyse method assignments
         for (Map.Entry<Method, List<JmmNode>> entry : this.methodAssignments.entrySet()) {
             Method method = entry.getKey();
             for (JmmNode child : entry.getValue()) {
@@ -198,6 +209,24 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                     JmmException e = JmmException.invalidAssignment(variable, value.getReturnType());
                     System.out.println(e.getMessage());
                 }
+            }
+        }
+
+        // Analyse return
+        for (Map.Entry<Method, JmmNode> entry : this.methodReturn.entrySet()) {
+            Method method = entry.getKey();
+            JmmNode returnNode = entry.getValue();
+            Value value;
+            try {
+                value = Value.fromNode(this.symbolTable, method, returnNode, method.getReturnType());
+            } catch (JmmException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+
+            if (!value.getReturnType().equals(method.getReturnType())) {
+                JmmException e = JmmException.invalidReturn(method.getName(), method.getReturnType(), value.getReturnType());
+                System.out.println(e.getMessage());
             }
         }
     }

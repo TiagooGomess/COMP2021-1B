@@ -852,14 +852,6 @@
                                             "children": []
                                           }
                                         ]
-                                      },
-                                      {
-                                        "kind": "Literal",
-                                        "attributes": {
-                                          "type": "int",
-                                          "value": "1"
-                                        },
-                                        "children": []
                                       }
                                     ]
                                   }
