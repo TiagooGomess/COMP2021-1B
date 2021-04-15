@@ -1,3 +1,12 @@
-class H {
-    
+import io;
+
+class QuickSort {
+    public static void main(String[] a) {
+            int[] L;
+            int i;
+            QuickSort q;
+
+            io.getInt();
+            q = io.getInt();
+        }
 }
