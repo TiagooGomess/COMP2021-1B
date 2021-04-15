@@ -11,28 +11,24 @@ import java.util.List;
 
 public class Method extends Value {
     private MethodSignature signature;
-    private boolean isStatic;
     private Type returnType;
     private List<Terminal> localVariables;
 
     public Method(String methodName, Type returnType) {
         this.signature = new MethodSignature(methodName);
         this.returnType = returnType;
-        this.isStatic = false;
         this.localVariables = new ArrayList<>();
     }
 
     public Method(String methodName, Type returnType, List<Terminal> parameters) {
         this.signature = new MethodSignature(methodName, parameters);
         this.returnType = returnType;
-        this.isStatic = true;
         this.localVariables = new ArrayList<>();
     }
 
     public Method(String methodName, Type returnType, List<Terminal> parameters, boolean isStatic, List<Terminal> localVariables) {
-        this.signature = new MethodSignature(methodName, parameters);
+        this.signature = new MethodSignature(methodName, parameters, isStatic);
         this.returnType = returnType;
-        this.isStatic = isStatic;
         this.localVariables = localVariables;
     }
 
@@ -69,6 +65,10 @@ public class Method extends Value {
                 return variable;
 
         return null;
+    }
+
+    public MethodSignature getSignature() {
+        return this.signature;
     }
 
     // ----------------------------------------------------------------

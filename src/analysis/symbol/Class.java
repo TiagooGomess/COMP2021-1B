@@ -1,6 +1,7 @@
 package analysis.symbol;
 
 import analysis.method.Method;
+import analysis.method.MethodSignature;
 import analysis.value.Terminal;
 import analysis.value.Value;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -14,30 +15,35 @@ public class Class extends Value {
     private Type classType;
     private final String superClassName;
     private final List<Terminal> attributes;
-    private final List<Method> methods;
+
+    private final Map<MethodSignature, Method> methods;
+    // private final List<Method> methods;
 
     public Class(String className) {
-        this(className, null, new ArrayList<>(), new ArrayList<>());
+        this(className, null, new ArrayList<>(), new HashMap<>());
     }
 
     public Class(String className, String superClassName) {
-        this(className, superClassName, new ArrayList<>(), new ArrayList<>());
+        this(className, superClassName, new ArrayList<>(), new HashMap<>());
     }
 
-    public Class(String className, String superClassName, List<Terminal> attributes, List<Method> methods) {
+    public Class(String className, String superClassName, List<Terminal> attributes, Map<MethodSignature, Method> methods) {
         this.processClassName(className);
         this.superClassName = superClassName;
         this.attributes = attributes;
         this.methods = methods;
 
         // Constructor method
+        Method constructor;
         if (this.className.equals("int[]")) {
             this.classType = new Type("int", true);
-            this.methods.add(new Method("%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size"))));
+            constructor = new Method("%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size")));
         } else {
             this.classType = new Type(this.className, false);
-            this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
+            constructor = new Method("%Construction", this.classType, Collections.emptyList());
         }
+        this.methods.put(constructor.getSignature(), constructor);
+
         // This expression
         this.attributes.add(new Terminal(this.classType, "this"));
     }
@@ -63,11 +69,11 @@ public class Class extends Value {
     }
 
     public List<Method> getMethods() {
-        return methods;
+        return new ArrayList<>(this.methods.values());
     }
 
     public Type getReturnType(String methodName) {
-        for (Method method : this.methods) {
+        for (Method method : this.getMethods()) {
             if (method.getName().equals(methodName)) {
                 return method.getReturnType();
             }
@@ -80,7 +86,7 @@ public class Class extends Value {
     }
 
     public List<Terminal> getParameters(String methodName) {
-        for (Method method : this.methods) {
+        for (Method method : this.getMethods()) {
             if (method.getName().equals(methodName)) {
                 return method.getParameters();
             }
@@ -89,7 +95,7 @@ public class Class extends Value {
     }
 
     public List<Terminal> getLocalVariables(String methodName) {
-        for (Method method : this.methods) {
+        for (Method method : this.getMethods()) {
             if (method.getName().equals(methodName)) {
                 return method.getLocalVariables();
             }
@@ -97,11 +103,12 @@ public class Class extends Value {
         return null;
     }
 
-    public Method getMethod(String methodName) {
-        for (Method method : this.methods)
+    public List<Method> getMethod(String methodName) {
+        List<Method> result = new ArrayList<>();
+        for (Method method : this.getMethods())
             if (method.getName().equals(methodName))
-                return method;
-        return null;
+                result.add(method);
+        return result;
     }
 
     public Value getVariable(Method scopeMethod, String variableName) {
@@ -131,7 +138,7 @@ public class Class extends Value {
     }
 
     public void addMethod(Method method) {
-        this.methods.add(method);
+        this.methods.put(method.getSignature(), method);
     }
 
     // ----------------------------------------------------------------

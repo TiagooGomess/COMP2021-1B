@@ -48,23 +48,23 @@ public class Program {
         return null;
     }
 
-    public Method getMethod(String className, String methodName) {
+    public List<Method> getMethod(String className, String methodName) {
         Class requiredClass = this.getClass(className);
         if (requiredClass == null)
             return null;
         return requiredClass.getMethod(methodName);
     }
 
-    public Method getMethod(String methodName) {
+    public List<Method> getMethod(String methodName) {
         // Valid method declared in the file
-        Method method = this.mainClass.getMethod(methodName);
-        if (method != null)
-            return method;
+        List<Method> methods = this.mainClass.getMethod(methodName);
+        if (!methods.isEmpty())
+            return methods;
 
         // Search in the operators methods
         for (Method operator : this.methods)
             if (operator.getName().equals(methodName))
-                return operator;
+                return Collections.singletonList(operator);
 
         return null;
     }

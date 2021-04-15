@@ -3,7 +3,10 @@ package exception;
 import analysis.value.Terminal;
 import analysis.value.Value;
 import analysis.value.function.Access;
+import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+
+import java.util.List;
 
 public class JmmException extends Exception {
     private JmmException(String message) {
@@ -18,12 +21,12 @@ public class JmmException extends Exception {
         return new JmmException("Variable \"" + variableName + "\" was not declared in the scope");
     }
 
-    public static JmmException invalidNumberOfArguments(String methodName, int expected, int found) {
-        return new JmmException("Invalid number of arguments for " + methodName + ", was expecting " + expected + " and found " + found);
+    public static JmmException invalidNumberOfArguments(String methodName, int found) {
+        return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found");
     }
 
-    public static JmmException invalidTypeForArgument(String methodName, String parameterName, Type expecting, Type found) {
-        return new JmmException("Invalid type for parameter \"" + parameterName + "\" of " + methodName + ", was expecting \"" + getOutputType(expecting) + "\" and found \"" + getOutputType(found) + "\"");
+    public static JmmException invalidTypeForArguments(String methodName, List<JmmNode> arguments) {
+        return new JmmException("Invalid call for method " + methodName + ", not implementation with (TODO) parameters found");
     }
 
     public static JmmException invalidAssignment(Value variable, Type found) {

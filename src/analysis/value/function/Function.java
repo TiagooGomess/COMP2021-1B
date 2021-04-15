@@ -10,7 +10,10 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Function extends Value {
     protected SymbolTable table = null;
@@ -19,6 +22,7 @@ public abstract class Function extends Value {
 
     protected String methodClassName = null;
     protected String methodName = null;
+    private List<Method> methods = null;
     private Method method = null;
 
     // ----------------------------------------------------------------
@@ -58,12 +62,12 @@ public abstract class Function extends Value {
             return;
 
         if (this.methodClassName == null)
-            this.method = this.table.getMethod(this.methodName);
+            this.methods = this.table.getMethod(this.methodName);
         else
-            this.method = this.table.getMethod(this.methodClassName, this.methodName);
+            this.methods = this.table.getMethod(this.methodClassName, this.methodName);
 
         // If the method is not found anywhere in the symbol table
-        if (this.method == null) {
+        if (this.methods == null || this.methods.isEmpty()) {
             // The only type of function node that can not be found is a call
             Call call = (Call) this;
             Class methodClass = this.table.getClass(this.methodClassName);
@@ -77,13 +81,15 @@ public abstract class Function extends Value {
             // Create new method by inference
             Method toAdd = new Method(call.methodName, call.expectedReturn, getNewParameters());
             methodClass.addMethod(toAdd);
-            this.method = toAdd;
-        } else if (this.method.getReturnType() == null) {
+            this.methods = Collections.singletonList(toAdd);
+        }
+
+        /*else if (this.methods.getReturnType() == null) {
             if (this instanceof Call) {
                 Call call = (Call) this;
-                this.method.setReturnType(call.expectedReturn);
+                this.methods.setReturnType(call.expectedReturn);
             }
-        }
+        }*/
     }
 
     // ----------------------------------------------------------------
@@ -100,19 +106,45 @@ public abstract class Function extends Value {
             case "Call" -> new Call(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
-        if (function == null || function.method == null)
+        if (function == null || function.methods == null)
             return null;
 
         List<JmmNode> arguments = function.getArguments();
-        List<Terminal> parameters = function.method.getParameters();
-        if (parameters.size() != arguments.size())
-            throw JmmException.invalidNumberOfArguments(function.getOutputName(), parameters.size(), arguments.size());
+
+        // Get list of possible parameters
+        Map<Method, List<Terminal>> possibleParameterLists = new HashMap<>();
+        for (Method method : function.methods)
+            if (method.getParameters().size() == arguments.size())
+                possibleParameterLists.put(method, method.getParameters());
+
+        // If no method has the same number of arguments
+        if (possibleParameterLists.isEmpty())
+            throw JmmException.invalidNumberOfArguments(function.getOutputName(), arguments.size());
+
         for (int i = 0; i < arguments.size(); i++) {
-            Terminal parameter = parameters.get(i);
-            Value argument = Value.fromNode(table, scopeMethod, arguments.get(i), parameter.getReturnType());
-            if (!parameter.getReturnType().equals(argument.getReturnType()))
-                throw JmmException.invalidTypeForArgument(function.getOutputName(), parameter.getName(), parameter.getReturnType(), argument.getReturnType());
+            Map<Method, List<Terminal>> newParameterLists = new HashMap<>();
+            for (Method method : possibleParameterLists.keySet()) {
+                List<Terminal> possibleParameterList = possibleParameterLists.get(method);
+                Terminal parameter = possibleParameterList.get(i);
+                Value value;
+                try {
+                    value = Value.fromNode(table, scopeMethod, arguments.get(i), possibleParameterList.get(i).getReturnType());
+                } catch (JmmException e) {
+                    continue;
+                }
+                if (parameter.getReturnType().equals(value.getReturnType()))
+                    newParameterLists.put(method, possibleParameterList);
+            }
+            possibleParameterLists = newParameterLists;
+            if (possibleParameterLists.isEmpty())
+                break;
         }
+
+        if (possibleParameterLists.keySet().size() != 1)
+            throw JmmException.invalidTypeForArguments(function.getOutputName(), arguments);
+
+        for (Method method : possibleParameterLists.keySet())
+            function.method = method;
 
         return function;
     }

@@ -145,43 +145,43 @@
                                 "attributes": {},
                                 "children": [
                                   {
-                                    "kind": "Call",
+                                    "kind": "Operation",
                                     "attributes": {},
                                     "children": [
                                       {
-                                        "kind": "Operation",
+                                        "kind": "Operator",
+                                        "attributes": {
+                                          "name": "Negation"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Call",
                                         "attributes": {},
                                         "children": [
-                                          {
-                                            "kind": "Operator",
-                                            "attributes": {
-                                              "name": "Negation"
-                                            },
-                                            "children": []
-                                          },
                                           {
                                             "kind": "This",
                                             "attributes": {},
                                             "children": []
-                                          }
-                                        ]
-                                      },
-                                      {
-                                        "kind": "Method",
-                                        "attributes": {
-                                          "name": "printL"
-                                        },
-                                        "children": [
+                                          },
                                           {
-                                            "kind": "Arguments",
-                                            "attributes": {},
+                                            "kind": "Method",
+                                            "attributes": {
+                                              "name": "printL"
+                                            },
                                             "children": [
                                               {
-                                                "kind": "Variable",
-                                                "attributes": {
-                                                  "name": "L"
-                                                },
-                                                "children": []
+                                                "kind": "Arguments",
+                                                "attributes": {},
+                                                "children": [
+                                                  {
+                                                    "kind": "Variable",
+                                                    "attributes": {
+                                                      "name": "L"
+                                                    },
+                                                    "children": []
+                                                  }
+                                                ]
                                               }
                                             ]
                                           }
@@ -852,6 +852,14 @@
                                             "children": []
                                           }
                                         ]
+                                      },
+                                      {
+                                        "kind": "Literal",
+                                        "attributes": {
+                                          "type": "int",
+                                          "value": "1"
+                                        },
+                                        "children": []
                                       }
                                     ]
                                   }

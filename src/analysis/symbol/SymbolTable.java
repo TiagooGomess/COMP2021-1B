@@ -78,7 +78,7 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         return this.reports;
     }
 
-    public Method getMethod(String className, String methodName) {
+    public List<Method> getMethod(String className, String methodName) {
         return this.program.getMethod(className, methodName);
     }
 
@@ -88,7 +88,7 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         return this.program.getClass(className);
     }
 
-    public Method getMethod(String methodName) {
+    public List<Method> getMethod(String methodName) {
         return this.program.getMethod(methodName);
     }
 
