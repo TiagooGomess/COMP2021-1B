@@ -29,7 +29,8 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     private final static List<String> statementTypes = Arrays.asList("Body", "Return", "Block", "If", "Then", "Else", "While");
     private final static List<String> valueTypes = Arrays.asList("Operation", "Access", "Call", "Construction", "Literal", "Variable", "This");
     private Method currentMethod = null;
-    private Map<Method, List<JmmNode>> methodValues = new HashMap<>();
+    private final Map<Method, List<JmmNode>> methodValues = new HashMap<>();
+    private final Map<Method, List<JmmNode>> methodAssignments = new HashMap<>();
 
     public JmmVisitor() {
         super();
@@ -99,31 +100,10 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     private Value dealWithAssignment(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
-        List<JmmNode> operators = jmmNode.getChildren();
+        if (!methodAssignments.containsKey(currentMethod))
+            methodAssignments.put(currentMethod, new ArrayList<>());
+        methodAssignments.get(currentMethod).add(jmmNode);
 
-        Terminal variable;
-        try {
-            variable = (Terminal) Terminal.fromVariable(this.symbolTable, this.currentMethod, operators.get(0));
-        } catch (JmmException e) {
-            System.out.println(e.getMessage());
-            return null;
-        } catch (java.lang.NullPointerException e) {
-            System.out.println("Invalid assignment, left side is not a variable");
-            return null;
-        }
-
-        Value value;
-        try {
-            value = Value.fromNode(this.symbolTable, this.currentMethod, operators.get(1), variable.getReturnType());
-        } catch (JmmException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-
-        if (!variable.getReturnType().equals(value.getReturnType())) {
-            JmmException e = JmmException.invalidAssignment(variable.getName(), variable.getType(), value.getReturnType());
-            System.out.println(e.getMessage());
-        }
 
         return null;
     }
@@ -170,6 +150,41 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 try {
                     Value value = Value.fromNode(this.symbolTable, method, valueNode, null);
                 } catch (JmmException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+
+        for (Map.Entry<Method, List<JmmNode>> entry : this.methodAssignments.entrySet()) {
+            Method method = entry.getKey();
+            for (JmmNode child : entry.getValue()) {
+                List<JmmNode> operators = child.getChildren();
+
+                Value variable;
+                try {
+                    JmmNode variableNode = operators.get(0);
+                    if (variableNode.getKind().equals("Access"))
+                        variable = Value.fromNode(this.symbolTable, method, variableNode, null);
+                    else
+                        variable = Terminal.fromVariable(this.symbolTable, method, variableNode);
+                } catch (JmmException e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                } catch (java.lang.NullPointerException e) {
+                    System.out.println("Invalid assignment, left side is not a variable");
+                    continue;
+                }
+
+                Value value;
+                try {
+                    value = Value.fromNode(this.symbolTable, method, operators.get(1), variable.getReturnType());
+                } catch (JmmException e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                if (!variable.getReturnType().equals(value.getReturnType())) {
+                    JmmException e = JmmException.invalidAssignment(variable, value.getReturnType());
                     System.out.println(e.getMessage());
                 }
             }
