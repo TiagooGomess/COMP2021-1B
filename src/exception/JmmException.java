@@ -38,4 +38,8 @@ public class JmmException extends Exception {
     public static JmmException invalidCondition(Type found) {
         return new JmmException("Invalid condition expression, was expecting a \"boolean\" and found \"" + getOutputType(found) + "\"");
     }
+
+    public static JmmException invalidMethod(String methodName) {
+        return new JmmException("Method \"" + methodName + "\" could not be found");
+    }
 }

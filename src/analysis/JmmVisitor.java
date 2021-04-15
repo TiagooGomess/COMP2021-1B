@@ -29,6 +29,8 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     private final static List<String> statementTypes = Arrays.asList("Body", "Return", "Block", "If", "Then", "Else", "While");
     private final static List<String> valueTypes = Arrays.asList("Operation", "Access", "Call", "Construction", "Literal", "Variable", "This");
     private Method currentMethod = null;
+
+    private final Map<Method, List<JmmNode>> methodConditions = new HashMap<>();
     private final Map<Method, List<JmmNode>> methodValues = new HashMap<>();
     private final Map<Method, List<JmmNode>> methodAssignments = new HashMap<>();
 
@@ -47,7 +49,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
         addVisit("Assignment", this::dealWithAssignment);
 
         for (String valueParent : statementTypes)
-            addVisit(valueParent, this::dealWithValue);
+            addVisit(valueParent, this::dealWithValueParent);
 
         //setDefaultVisit(this::defaultVisit);
     }
@@ -104,29 +106,20 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             methodAssignments.put(currentMethod, new ArrayList<>());
         methodAssignments.get(currentMethod).add(jmmNode);
 
-
         return null;
     }
 
     private Value dealWithCondition(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
         JmmNode expressionNode = jmmNode.getChildren().get(0);
-        Value value;
-        try {
-            value = Value.fromNode(this.symbolTable, this.currentMethod, expressionNode, Program.BOOL_TYPE);
-        } catch (JmmException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
 
-        if (!value.getReturnType().equals(Program.BOOL_TYPE)) {
-            JmmException e = JmmException.invalidCondition(value.getReturnType());
-            System.out.println(e.getMessage());
-        }
+        if (!methodConditions.containsKey(currentMethod))
+            methodConditions.put(currentMethod, new ArrayList<>());
+        methodConditions.get(currentMethod).add(expressionNode);
 
         return null;
     }
 
-    private Value dealWithValue(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
+    private Value dealWithValueParent(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
         List<JmmNode> valueNodes = new ArrayList<>();
         for (JmmNode child : jmmNode.getChildren())
             if (JmmVisitor.valueTypes.contains(child.getKind()))
@@ -150,6 +143,24 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 try {
                     Value value = Value.fromNode(this.symbolTable, method, valueNode, null);
                 } catch (JmmException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+
+        for (Map.Entry<Method, List<JmmNode>> entry : this.methodConditions.entrySet()) {
+            Method method = entry.getKey();
+            for (JmmNode conditionNode : entry.getValue()) {
+                Value value;
+                try {
+                    value = Value.fromNode(this.symbolTable, method, conditionNode, Program.BOOL_TYPE);
+                } catch (JmmException e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                if (!value.getReturnType().equals(Program.BOOL_TYPE)) {
+                    JmmException e = JmmException.invalidCondition(value.getReturnType());
                     System.out.println(e.getMessage());
                 }
             }

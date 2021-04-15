@@ -29,7 +29,7 @@ public class Access extends Function {
         List<JmmNode> arguments = new ArrayList<>();
         for (JmmNode child : this.node.getChildren())
             if (child.getKind().equals("Position"))
-                arguments.addAll(child.getChildren());
+                arguments.add(child.getChildren().get(0));
             else
                 arguments.add(child);
         return arguments;

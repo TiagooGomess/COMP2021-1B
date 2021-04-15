@@ -584,13 +584,29 @@ void MultiplicationExpression() #void : {}
 
 void DivisionExpression() #void : {}
 {
-   AccessExpression()
-   (
-      <DIV>
-      Operator("Division")
-      DivisionExpression()
-      #Operation(3)
-   )?
+    (
+        NotExpression()
+    ) | (
+       AccessExpression()
+       (
+          <DIV>
+          Operator("Division")
+          DivisionExpression()
+          #Operation(3)
+       )?
+   )
+}
+
+// ----------------------------------------------------------------
+// Logical Expressions
+// ----------------------------------------------------------------
+
+void NotExpression() #void : {}
+{
+    <NOT>
+    Operator("Negation")
+    AccessExpression()
+    #Operation(2)
 }
 
 // ----------------------------------------------------------------
@@ -620,7 +636,7 @@ void AccessExpression() #void : {}
 void ConstructionExpression() #void : {}
 {
    (
-      NotExpression() 
+      ParenthesisExpression()
    ) | (
       <NEW>
       Construction()
@@ -686,22 +702,6 @@ void Construction() : {Token t; boolean isArray = false;}
    {
       jjtThis.put("type", t.image + (isArray ? "[]" : ""));
    }
-}
-
-// ----------------------------------------------------------------
-// Logical Expressions
-// ----------------------------------------------------------------
-
-void NotExpression() #void : {}
-{
-   (
-      ParenthesisExpression()
-   ) | (
-      <NOT>
-      Operator("Negation")
-      ParenthesisExpression()
-      #Operation(2)
-   )
 }
 
 // ----------------------------------------------------------------

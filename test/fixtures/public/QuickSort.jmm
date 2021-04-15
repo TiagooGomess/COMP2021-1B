@@ -10,7 +10,7 @@ class QuickSort {
         L = new int[10];
 
         i = 0;
-        while (i < L.length) {
+        while ((!this.printL(L)) && (i < 10) && i < (i*2+3)) {
             L[i] = L.length - i;
 
             i = i + 1;
@@ -31,7 +31,6 @@ class QuickSort {
         }
 
         return true;
-
     }
 
     public boolean quicksort(int[] L) {

@@ -62,9 +62,17 @@ public abstract class Function extends Value {
         else
             this.method = this.table.getMethod(this.methodClassName, this.methodName);
 
+        // If the method is not found anywhere in the symbol table
         if (this.method == null) {
+            // The only type of function node that can not be found is a call
             Call call = (Call) this;
             Class methodClass = this.table.getClass(this.methodClassName);
+
+            // If its the main class of the Jmm file we are parsing
+            if (this.table.getClassName().equals(methodClass.getName())) {
+                if (this.table.getSuper() == null)
+                    throw JmmException.invalidMethod(this.methodName);
+            }
 
             // Create new method by inference
             Method toAdd = new Method(call.methodName, call.expectedReturn, getNewParameters());
@@ -82,7 +90,8 @@ public abstract class Function extends Value {
     // Static functions for expression creation
     // ----------------------------------------------------------------
 
-    public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
+    public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws
+            JmmException {
         // Create respective objects
         Function function = switch (node.getKind()) {
             case "Access" -> new Access(table, scopeMethod, node);
