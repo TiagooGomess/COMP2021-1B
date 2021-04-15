@@ -338,17 +338,19 @@ void Body(String type) : {}
 
 void MethodBody() #void : {String name; String type;}
 {
-   LOOKAHEAD(2)
-   (
-      type = Type()
-      name = Name()
-      <SEMICOLON>
-      VariableDeclaration(type, name)
-      MethodBody()
-   ) | (
-      Statement()
-      MethodStatements()
-   )
+    LOOKAHEAD(2)
+    (
+        type = Type()
+        name = Name()
+        <SEMICOLON>
+        VariableDeclaration(type, name)
+        (
+            MethodBody()
+        )?
+    ) | (
+        Statement()
+        MethodStatements()
+    )
 }
 
 void MethodStatements() #void : {}

@@ -73,9 +73,8 @@ public abstract class Function extends Value {
             Class methodClass = this.table.getClass(this.methodClassName);
 
             // If its the main class of the Jmm file we are parsing
-            if (this.table.getClassName().equals(methodClass.getName())) {
-                if (this.table.getSuper() == null)
-                    throw JmmException.invalidMethod(this.methodName);
+            if (methodClass == null || (this.table.getClassName().equals(methodClass.getName()) && this.table.getSuper() == null)) {
+                throw JmmException.invalidMethod(this.methodName);
             }
 
             // Create new method by inference
@@ -121,8 +120,10 @@ public abstract class Function extends Value {
         if (possibleParameterLists.isEmpty())
             throw JmmException.invalidNumberOfArguments(function.getOutputName(), arguments.size());
 
+        List<Type> typeList = new ArrayList<>();
         for (int i = 0; i < arguments.size(); i++) {
             Map<Method, List<Terminal>> newParameterLists = new HashMap<>();
+
             for (Method method : possibleParameterLists.keySet()) {
                 List<Terminal> possibleParameterList = possibleParameterLists.get(method);
                 Terminal parameter = possibleParameterList.get(i);
@@ -132,6 +133,12 @@ public abstract class Function extends Value {
                 } catch (JmmException e) {
                     continue;
                 }
+
+                if (typeList.size() < i + 1)
+                    typeList.add(value.getReturnType());
+                else
+                    typeList.set(i, value.getReturnType());
+
                 if (parameter.getReturnType().equals(value.getReturnType()))
                     newParameterLists.put(method, possibleParameterList);
             }
@@ -140,8 +147,10 @@ public abstract class Function extends Value {
                 break;
         }
 
+        // TODO: add method by inference
         if (possibleParameterLists.keySet().size() != 1)
-            throw JmmException.invalidTypeForArguments(function.getOutputName(), arguments);
+            throw JmmException.invalidTypeForArguments(function.getOutputName(), typeList);
+
 
         for (Method method : possibleParameterLists.keySet())
             function.method = method;

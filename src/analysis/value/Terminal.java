@@ -47,6 +47,7 @@ public class Terminal extends Value {
     }
 
     public static Terminal fromDeclaration(JmmNode node) {
+        // TODO: verify if type exists instead of creating it
         return new Terminal(Program.stringToType(node.get("type")), node.get("name"));
     }
 

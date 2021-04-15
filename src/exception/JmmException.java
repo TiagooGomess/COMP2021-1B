@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class JmmException extends Exception {
     private JmmException(String message) {
@@ -25,8 +26,11 @@ public class JmmException extends Exception {
         return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found");
     }
 
-    public static JmmException invalidTypeForArguments(String methodName, List<JmmNode> arguments) {
-        return new JmmException("Invalid call for method " + methodName + ", not implementation with (TODO) parameters found");
+    public static JmmException invalidTypeForArguments(String methodName, List<Type> arguments) {
+        List<String> types = new ArrayList<>();
+        for (Type type : arguments)
+            types.add("\"" + getOutputType(type) + "\"");
+        return new JmmException("Invalid call for " + methodName + ", no implementation with (" + String.join(", ", types) + ") parameters found");
     }
 
     public static JmmException invalidAssignment(Value variable, Type found) {
