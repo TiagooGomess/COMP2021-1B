@@ -1,8 +1,8 @@
-package nodes.value.function;
+package analysis.value.function;
 
-import nodes.method.Method;
-import nodes.SymbolTable;
-import nodes.value.exception.JmmException;
+import analysis.method.Method;
+import analysis.symbol.SymbolTable;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.ArrayList;

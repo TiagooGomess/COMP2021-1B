@@ -1,4 +1,4 @@
-package nodes.value.exception;
+package exception;
 
 import pt.up.fe.comp.jmm.analysis.table.Type;
 

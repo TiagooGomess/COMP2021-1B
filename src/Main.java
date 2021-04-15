@@ -1,4 +1,4 @@
-import nodes.SymbolTable;
+import analysis.symbol.SymbolTable;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParser;
@@ -7,7 +7,7 @@ import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
-import semantics.JmmVisitor;
+import analysis.JmmVisitor;
 
 import java.io.StringReader;
 import java.nio.file.Files;

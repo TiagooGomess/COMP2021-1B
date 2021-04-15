@@ -1,8 +1,8 @@
-package nodes;
+package analysis.symbol;
 
-import nodes.method.Method;
-import nodes.value.Terminal;
-import nodes.value.Value;
+import analysis.method.Method;
+import analysis.value.Terminal;
+import analysis.value.Value;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.report.Report;

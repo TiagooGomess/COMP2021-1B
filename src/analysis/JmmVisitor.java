@@ -1,12 +1,12 @@
-package semantics;
+package analysis;
 
-import nodes.Class;
-import nodes.Program;
-import nodes.method.Method;
-import nodes.SymbolTable;
-import nodes.value.exception.JmmException;
-import nodes.value.Value;
-import nodes.value.Terminal;
+import analysis.symbol.Class;
+import analysis.symbol.Program;
+import analysis.method.Method;
+import analysis.symbol.SymbolTable;
+import exception.JmmException;
+import analysis.value.Value;
+import analysis.value.Terminal;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.JmmNode;
 
