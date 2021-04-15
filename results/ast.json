@@ -70,35 +70,22 @@
                         "children": []
                       },
                       {
-                        "kind": "Assignment",
+                        "kind": "Call",
                         "attributes": {},
                         "children": [
                           {
                             "kind": "Variable",
                             "attributes": {
-                              "name": "i"
+                              "name": "io"
                             },
                             "children": []
                           },
                           {
-                            "kind": "Call",
-                            "attributes": {},
-                            "children": [
-                              {
-                                "kind": "Variable",
-                                "attributes": {
-                                  "name": "io"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Method",
-                                "attributes": {
-                                  "name": "getInt"
-                                },
-                                "children": []
-                              }
-                            ]
+                            "kind": "Method",
+                            "attributes": {
+                              "name": "getInt"
+                            },
+                            "children": []
                           }
                         ]
                       },

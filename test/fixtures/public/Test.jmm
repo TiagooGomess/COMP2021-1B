@@ -6,7 +6,7 @@ class QuickSort {
             int i;
             QuickSort q;
 
-            i = io.getInt();
+            io.getInt();
             q = io.getInt();
         }
 }

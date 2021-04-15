@@ -70,6 +70,11 @@ public abstract class Function extends Value {
             Method toAdd = new Method(call.methodName, call.expectedReturn, getNewParameters());
             methodClass.addMethod(toAdd);
             this.method = toAdd;
+        } else if (this.method.getReturnType() == null) {
+            if (this instanceof Call) {
+                Call call = (Call) this;
+                this.method.setReturnType(call.expectedReturn);
+            }
         }
     }
 
