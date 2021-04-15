@@ -190,6 +190,5 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             }
         }
     }
-
 }
 

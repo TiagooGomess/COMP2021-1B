@@ -2,13 +2,14 @@ package analysis.value.function;
 
 import analysis.method.Method;
 import analysis.symbol.SymbolTable;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Operation extends Function {
-    public Operation(SymbolTable table, Method scopeMethod, JmmNode node) {
+    public Operation(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
         this.table = table;
         this.node = node;
         this.scopeMethod = scopeMethod;

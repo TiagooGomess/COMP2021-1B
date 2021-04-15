@@ -1,6 +1,7 @@
 package analysis.value.function;
 
 import analysis.method.Method;
+import analysis.symbol.Class;
 import analysis.symbol.SymbolTable;
 import analysis.value.Terminal;
 import analysis.value.Value;
@@ -8,6 +9,7 @@ import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Function extends Value {
@@ -15,7 +17,7 @@ public abstract class Function extends Value {
     protected Method scopeMethod = null;
     protected JmmNode node = null;
 
-    protected String methodClass = null;
+    protected String methodClassName = null;
     protected String methodName = null;
     private Method method = null;
 
@@ -26,6 +28,19 @@ public abstract class Function extends Value {
     protected abstract String getOutputName();
 
     protected abstract List<JmmNode> getArguments();
+
+    private List<Terminal> getNewParameters() throws JmmException {
+        List<Terminal> result = new ArrayList<>();
+
+        var arguments = getArguments();
+        int i = 0;
+        for (var argument : arguments) {
+            Value value = Value.fromNode(this.table, this.scopeMethod, argument, null);
+            result.add(new Terminal(value.getReturnType(), "argument " + i++));
+        }
+
+        return result;
+    }
 
     @Override
     public Type getReturnType() {
@@ -38,13 +53,24 @@ public abstract class Function extends Value {
     // Setters
     // ----------------------------------------------------------------
 
-    protected void setMethod() {
+    protected void setMethod() throws JmmException {
         if (this.methodName == null)
             return;
-        if (this.methodClass == null)
+
+        if (this.methodClassName == null)
             this.method = this.table.getMethod(this.methodName);
         else
-            this.method = this.table.getMethod(this.methodClass, this.methodName);
+            this.method = this.table.getMethod(this.methodClassName, this.methodName);
+
+        if (this.method == null) {
+            Call call = (Call) this;
+            Class methodClass = this.table.getClass(this.methodClassName);
+
+            // Create new method by inference
+            Method toAdd = new Method(call.methodName, call.expectedReturn, getNewParameters());
+            methodClass.addMethod(toAdd);
+            this.method = toAdd;
+        }
     }
 
     // ----------------------------------------------------------------

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Call extends Function {
-    private final Type expectedReturn;
+    protected final Type expectedReturn;
     private JmmNode argumentsNode = null;
 
     public Call(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
@@ -30,7 +30,7 @@ public class Call extends Function {
             } else {
                 Type returnType = Value.fromNode(table, scopeMethod, child, null).getReturnType();
                 String name = returnType.getName();
-                this.methodClass = returnType.isArray() ? name + "[]" : name;
+                this.methodClassName = returnType.isArray() ? name + "[]" : name;
             }
         }
         this.setMethod();
@@ -38,7 +38,7 @@ public class Call extends Function {
 
     @Override
     protected String getOutputName() {
-        return "method \"" + this.methodName + "\" of class \"" + this.methodClass + "\"";
+        return "method \"" + this.methodName + "\" of class \"" + this.methodClassName + "\"";
     }
 
     @Override

@@ -2,26 +2,27 @@ package analysis.value.function;
 
 import analysis.method.Method;
 import analysis.symbol.SymbolTable;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Construction extends Function {
-    public Construction(SymbolTable table, Method scopeMethod, JmmNode node) {
+    public Construction(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
         this.table = table;
         this.node = node;
         this.scopeMethod = scopeMethod;
 
         // Method name and class
         this.methodName = "%" + node.getKind();
-        this.methodClass = node.get("type");
+        this.methodClassName = node.get("type");
         this.setMethod();
     }
 
     @Override
     protected String getOutputName() {
-        return "\"constructor\" of \"" + this.methodClass + "\"";
+        return "\"constructor\" of \"" + this.methodClassName + "\"";
     }
 
     @Override
