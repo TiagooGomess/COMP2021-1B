@@ -30,13 +30,14 @@ public class Class extends Value {
         this.attributes = attributes;
         this.methods = methods;
 
-        this.classType = new Type(this.className, false);
-
         // Constructor method
-        if (!this.className.equals("int[]"))
-            this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
-        else
+        if (this.className.equals("int[]")) {
+            this.classType = new Type("int", true);
             this.methods.add(new Method("%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size"))));
+        } else {
+            this.classType = new Type(this.className, false);
+            this.methods.add(new Method("%Construction", this.classType, Collections.emptyList()));
+        }
         // This expression
         this.attributes.add(new Terminal(this.classType, "this"));
     }

@@ -17,7 +17,6 @@ public class Program {
 
     // Global methods
     private final List<Method> methods = new ArrayList<>();
-    // TODO int array constructor
 
     // Classes
     private final List<Class> externalClasses = new ArrayList<>();

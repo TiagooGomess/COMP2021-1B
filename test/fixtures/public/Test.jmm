@@ -1,3 +1,9 @@
-class H {
-    
+class QuickSort {
+    public static void main(String[] a) {
+            int[] L;
+            int i;
+            QuickSort q;
+
+            L = new int[10];
+        }
 }
