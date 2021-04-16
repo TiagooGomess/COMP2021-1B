@@ -37,4 +37,9 @@ public class Operation extends Function {
                 arguments.add(child);
         return arguments;
     }
+
+    @Override
+    public String getOllir() {
+        return "a = 2;\nc = 3;";
+    }
 }

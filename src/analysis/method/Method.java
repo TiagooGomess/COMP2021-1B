@@ -49,6 +49,10 @@ public class Method extends Value {
         return this.signature.getParameters();
     }
 
+    public boolean isStatic() {
+        return this.signature.isStatic();
+    }
+
     public List<Terminal> getLocalVariables() {
         return this.localVariables;
     }
@@ -107,9 +111,13 @@ public class Method extends Value {
 
     public String toString(String padding) {
         StringBuilder result = new StringBuilder(padding);
-        result.append(this.getName()).append(" : ").append(this.returnType.getName());
-        if (this.returnType.isArray())
-            result.append("[]");
+        String type = "?";
+        if (this.returnType != null) {
+            type = this.returnType.getName();
+            if (this.returnType.isArray())
+                type += "[]";
+        }
+        result.append(this.getName()).append(" : ").append(type);
 
         result.append("\n").append(padding).append("  ").append("Parameters");
         if (this.getParameters().size() == 0) {
@@ -134,5 +142,31 @@ public class Method extends Value {
     @Override
     public String toString() {
         return this.toString("");
+    }
+
+    @Override
+    public String getOllir() {
+        StringBuilder builder = new StringBuilder();
+        if (this.getName().equals("%Construction")) {
+            builder.append(".construct ").append(this.getReturnType().getName()).append("().V");
+        } else {
+            builder.append(".method public ");
+            if (this.isStatic())
+                builder.append("static ");
+            builder.append(this.signature.getMethodName());
+            builder.append("(");
+
+            // Arguments
+            List<String> argumentOllir = new ArrayList<>();
+            for (Terminal terminal : this.signature.getParameters())
+                argumentOllir.add(terminal.getOllir());
+            builder.append(String.join(", ", argumentOllir));
+
+            builder.append(")");
+            Terminal terminalReturn = new Terminal(this.returnType, "");
+            builder.append(terminalReturn.getOllir());
+        }
+
+        return builder.toString();
     }
 }

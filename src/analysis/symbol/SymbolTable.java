@@ -135,4 +135,6 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
     public String toString() {
         return this.program.toString();
     }
+
+
 }

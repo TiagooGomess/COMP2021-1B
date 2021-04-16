@@ -50,4 +50,9 @@ public class Call extends Function {
         }
         return new ArrayList<>();
     }
+
+    @Override
+    public String getOllir() {
+        return null;
+    }
 }

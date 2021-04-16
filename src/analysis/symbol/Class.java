@@ -192,4 +192,9 @@ public class Class extends Value {
     public String toString() {
         return this.toString("");
     }
+
+    @Override
+    public String getOllir() {
+        return null;
+    }
 }

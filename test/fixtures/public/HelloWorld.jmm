@@ -1,19 +1,8 @@
-import ioPlus.deiedhdei.jdeijeod;
+import java.utils.ioPlus;
 import java.util.Map;
 
 class HelloWorld extends Hello {
 	public static void main(String[] args) {
 		ioPlus.printHelloWorld();
-	}
-
-	public int function(){
-	    int[] a;
-	    int i;
-	    boolean b;
-
-        if(i){
-            i = 2;
-        } else {}
-	    return 1;
 	}
 }

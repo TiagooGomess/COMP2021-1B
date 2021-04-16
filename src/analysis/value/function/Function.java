@@ -24,6 +24,7 @@ public abstract class Function extends Value {
     protected String methodName = null;
     private List<Method> methods = null;
     private Method method = null;
+    private List<Value> argumentValues = null;
 
     // ----------------------------------------------------------------
     // Getters
@@ -82,13 +83,6 @@ public abstract class Function extends Value {
             methodClass.addMethod(toAdd);
             this.methods = Collections.singletonList(toAdd);
         }
-
-        /*else if (this.methods.getReturnType() == null) {
-            if (this instanceof Call) {
-                Call call = (Call) this;
-                this.methods.setReturnType(call.expectedReturn);
-            }
-        }*/
     }
 
     // ----------------------------------------------------------------
@@ -119,11 +113,14 @@ public abstract class Function extends Value {
         if (possibleParameterLists.isEmpty())
             throw JmmException.invalidNumberOfArguments(function.getOutputName(), arguments.size());
 
-        List<Type> typeList = new ArrayList<>();
+        Map<Method, List<Value>> methodTypeList = new HashMap<>();
         for (int i = 0; i < arguments.size(); i++) {
+
             Map<Method, List<Terminal>> newParameterLists = new HashMap<>();
 
             for (Method method : possibleParameterLists.keySet()) {
+                List<Value> typeList = new ArrayList<>();
+
                 List<Terminal> possibleParameterList = possibleParameterLists.get(method);
                 Terminal parameter = possibleParameterList.get(i);
                 Value value;
@@ -133,27 +130,34 @@ public abstract class Function extends Value {
                     continue;
                 }
 
-                if (typeList.size() < i + 1)
-                    typeList.add(value.getReturnType());
-                else
-                    typeList.set(i, value.getReturnType());
+                typeList.add(value);
 
                 if (parameter.getReturnType().equals(value.getReturnType()))
                     newParameterLists.put(method, possibleParameterList);
+
+                methodTypeList.put(method, typeList);
             }
+
             possibleParameterLists = newParameterLists;
             if (possibleParameterLists.isEmpty())
                 break;
         }
 
-        // TODO: add method by inference
+        // TODO: add method by inference and update method after new information
         if (possibleParameterLists.keySet().size() != 1)
-            throw JmmException.invalidTypeForArguments(function.getOutputName(), typeList);
-
+            for (Method method : methodTypeList.keySet())
+                throw JmmException.invalidTypeForArguments(function.getOutputName(), methodTypeList.get(method));
 
         for (Method method : possibleParameterLists.keySet())
             function.method = method;
 
+        function.argumentValues = methodTypeList.get(function.method);
+
+        // Update method if found the type of it
+        if (function.getReturnType() == null && function instanceof Call) {
+            Call call = (Call) function;
+            function.method.setReturnType(call.expectedReturn);
+        }
         return function;
     }
 }

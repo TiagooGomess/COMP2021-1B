@@ -35,6 +35,8 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     private final Map<Method, List<JmmNode>> methodValues = new HashMap<>();
     private final Map<Method, List<JmmNode>> methodAssignments = new HashMap<>();
 
+    private final Map<JmmNode, Value> valueNode = new HashMap<>();
+
     public JmmVisitor() {
         super();
 
@@ -86,6 +88,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     private Value dealWithMethod(JmmNode node, SymbolTable jmmSymbolTable) {
         currentMethod = Method.fromDeclaration(node);
         symbolTable.addMethod(currentMethod);
+        methodAssignments.put(currentMethod, new ArrayList<>());
         return null;
     }
 
@@ -104,10 +107,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     private Value dealWithAssignment(JmmNode jmmNode, SymbolTable jmmSymbolTable) {
-        if (!methodAssignments.containsKey(currentMethod))
-            methodAssignments.put(currentMethod, new ArrayList<>());
         methodAssignments.get(currentMethod).add(jmmNode);
-
         return null;
     }
 
@@ -151,6 +151,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             for (JmmNode valueNode : entry.getValue()) {
                 try {
                     Value value = Value.fromNode(this.symbolTable, method, valueNode, null);
+                    this.valueNode.put(valueNode, value);
                 } catch (JmmException e) {
                     this.symbolTable.addReport(e);
                 }
@@ -164,6 +165,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 Value value;
                 try {
                     value = Value.fromNode(this.symbolTable, method, conditionNode, Program.BOOL_TYPE);
+                    this.valueNode.put(conditionNode, value);
                 } catch (JmmException e) {
                     this.symbolTable.addReport(e);
                     continue;
@@ -189,6 +191,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                         variable = Value.fromNode(this.symbolTable, method, variableNode, null);
                     else
                         variable = Terminal.fromVariable(this.symbolTable, method, variableNode);
+                    this.valueNode.put(variableNode, variable);
                 } catch (JmmException e) {
                     this.symbolTable.addReport(e);
                     continue;
@@ -201,6 +204,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 Value value;
                 try {
                     value = Value.fromNode(this.symbolTable, method, operators.get(1), variable.getReturnType());
+                    this.valueNode.put(operators.get(1), value);
                 } catch (JmmException e) {
                     this.symbolTable.addReport(e);
                     continue;
@@ -220,6 +224,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
             Value value;
             try {
                 value = Value.fromNode(this.symbolTable, method, returnNode, method.getReturnType());
+                this.valueNode.put(returnNode, value);
             } catch (JmmException e) {
                 this.symbolTable.addReport(e);
                 continue;
@@ -230,6 +235,34 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 this.symbolTable.addReport(e);
             }
         }
+    }
+
+    public void printOllir() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Method method : this.symbolTable.getClass(null).getMethods()) {
+            StringBuilder declaration = new StringBuilder(method.getOllir() + " {\n");
+            boolean specialCase = !methodValues.containsKey(method);
+
+            if (specialCase) {
+                declaration.append("  invokespecial(this, \"<init>\").V;");
+            } else {
+                for (JmmNode node : this.methodValues.get(method))
+                    if (valueNode.containsKey(node)) {
+                        String ollir = valueNode.get(node).getOllir();
+                        if (ollir != null)
+                            declaration.append(ollir.replace("\n", "\n  ")).append("\n");
+                    }
+            }
+            declaration.append("\n}\n");
+
+            if (specialCase)
+                builder.insert(0, declaration);
+            else
+                builder.append(declaration);
+        }
+
+        System.out.println(builder.toString());
     }
 }
 

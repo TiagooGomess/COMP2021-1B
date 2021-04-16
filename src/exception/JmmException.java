@@ -25,10 +25,10 @@ public class JmmException extends Exception {
         return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found");
     }
 
-    public static JmmException invalidTypeForArguments(String methodName, List<Type> arguments) {
+    public static JmmException invalidTypeForArguments(String methodName, List<Value> arguments) {
         List<String> types = new ArrayList<>();
-        for (Type type : arguments)
-            types.add("\"" + getOutputType(type) + "\"");
+        for (Value value : arguments)
+            types.add("\"" + getOutputType(value.getReturnType()) + "\"");
         return new JmmException("Invalid call for " + methodName + ", no implementation with (" + String.join(", ", types) + ") parameters found");
     }
 

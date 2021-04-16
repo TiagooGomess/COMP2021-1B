@@ -32,4 +32,9 @@ public class Construction extends Function {
                 return child.getChildren();
         return new ArrayList<>();
     }
+
+    @Override
+    public String getOllir() {
+        return null;
+    }
 }

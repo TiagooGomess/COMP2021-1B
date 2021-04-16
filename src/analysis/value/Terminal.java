@@ -36,6 +36,28 @@ public class Terminal extends Value {
         return getType();
     }
 
+    public String getOllir() {
+        if (symbol.getName().equals("this"))
+            return "this";
+
+        StringBuilder builder = new StringBuilder(symbol.getName());
+
+        // Is array?
+        if (symbol.getType().isArray())
+            builder.append(".array");
+
+        // Name of type
+        String type = symbol.getType().getName();
+        switch (type) {
+            case "int" -> builder.append(".i32");
+            case "boolean" -> builder.append(".bool");
+            case "void" -> builder.append(".V");
+            default -> builder.append(".").append(type);
+        }
+
+        return builder.toString();
+    }
+
     // ----------------------------------------------------------------
     // Creating from node
     // ----------------------------------------------------------------

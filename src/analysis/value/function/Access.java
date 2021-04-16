@@ -38,4 +38,9 @@ public class Access extends Function {
     public String getVariableName() {
         return getArguments().get(0).get("name");
     }
+
+    @Override
+    public String getOllir() {
+        return null;
+    }
 }

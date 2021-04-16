@@ -20,6 +20,8 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 public abstract class Value {
     public abstract Type getReturnType();
 
+    public abstract String getOllir();
+
     // ----------------------------------------------------------------
     // Static functions for value creation
     // ----------------------------------------------------------------

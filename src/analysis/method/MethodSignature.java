@@ -41,6 +41,10 @@ public class MethodSignature {
         return parameters;
     }
 
+    public boolean isStatic() {
+        return this.isStatic;
+    }
+
     private List<Type> getParameterTypes() {
         List<Type> parameterTypes = new ArrayList<>();
         for (var parameter : this.parameters)
