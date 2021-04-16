@@ -1,12 +1,17 @@
-import io;
 
-class QuickSort {
+class Test {
+
+    public int randomFunction(int a, int b, boolean c) {
+        a + b;
+        return 1;
+    }
+
     public static void main(String[] a) {
         int[] L;
         int i;
         int j;
         boolean b;
-        QuickSort q;
+        Test q;
 
         3 + 2 / 4 - 3 * i + 2 + 4 * 2;
         1 - 2;
@@ -17,8 +22,16 @@ class QuickSort {
         !b;
 
 
-        L[i];
+        L[i * j] = 1;
 
-        q = new QuickSort();
+        /*// io.getArray()[i];
+
+        j = L.length + 2;
+
+        1 + this.randomFunction(L[1 + i], 2 * i + 3, b);
+
+        new Test();
+
+        new int[L.length];*/
     }
 }

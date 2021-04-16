@@ -1,7 +1,9 @@
 package analysis.value.function;
 
 import analysis.method.Method;
+import analysis.symbol.Class;
 import analysis.symbol.SymbolTable;
+import analysis.value.Value;
 import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Construction extends Function {
+    private final Class classObject;
+
     public Construction(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
         this.table = table;
         this.node = node;
@@ -17,6 +21,7 @@ public class Construction extends Function {
         // Method name and class
         this.methodName = "%" + node.getKind();
         this.methodClassName = node.get("type");
+        this.classObject = table.getClass(methodClassName);
         this.setMethod();
     }
 
@@ -35,6 +40,35 @@ public class Construction extends Function {
 
     @Override
     public String getOllir() {
-        return null;
+
+        boolean isArray = false;
+        if (!argumentValues.isEmpty())
+            isArray = true;
+
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("new").append("(");
+        String typeOllir = typeToOllir(this.classObject.getReturnType());
+
+        if (isArray) {
+            builder.append("array, ");
+            Value.addValueToBuilder(builder, argumentValues.get(0), this.scopeMethod);
+        } else {
+            builder.append(typeOllir.substring(1));
+        }
+
+        builder.append(")");
+        builder.append(typeOllir);
+        builder.append(";\n");
+
+        if (!isArray) {
+            builder.append("invokespecial");
+            builder.append("(");
+            builder.append("A").append(typeOllir); // TODO: change A to variable name
+            builder.append(", \"<init>\").V");
+        }
+
+        return builder.toString();
     }
 }

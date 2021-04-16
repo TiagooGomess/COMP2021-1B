@@ -49,6 +49,11 @@ public class Method extends Value {
         return this.signature.getParameters();
     }
 
+    public int getArgumentNumber(Terminal argument) {
+        // Returns 0 if not found
+        return this.getParameters().indexOf(argument) + 1;
+    }
+
     public boolean isStatic() {
         return this.signature.isStatic();
     }

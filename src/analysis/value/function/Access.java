@@ -2,6 +2,7 @@ package analysis.value.function;
 
 import analysis.method.Method;
 import analysis.symbol.SymbolTable;
+import analysis.value.*;
 import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 
@@ -41,6 +42,16 @@ public class Access extends Function {
 
     @Override
     public String getOllir() {
-        return null;
+        Value position = argumentValues.get(1);
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(getVariableName());
+        builder.append("[");
+        Value.addValueToBuilder(builder, position, this.scopeMethod);
+        builder.append("]");
+        builder.append(".i32");
+
+        return builder.toString();
     }
 }

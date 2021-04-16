@@ -7,6 +7,9 @@ import analysis.value.function.Construction;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 // public String[] jjtNodeName = { "skipParenthesis", "Program",
 // "ImportDeclaration", "void", "Class", "Attributes",
 // "Methods", "MethodDeclaration", "Arguments", "Argument", "Body", "Return",
@@ -18,6 +21,33 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 // "Operator", };
 
 public abstract class Value {
+
+    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method) {
+        String ollir = operand.getOllir();
+
+        if (operand instanceof Terminal) {
+            int argumentNumber = method.getArgumentNumber((Terminal) operand);
+            if (argumentNumber != 0)
+                result.append("$").append(argumentNumber).append(".");
+            result.append(ollir);
+            return null;
+        }
+
+        Terminal terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+        if (ollir == null)
+            ollir = "";
+        ArrayList<String> childLines = new ArrayList<>(Arrays.asList(ollir.split("\n")));
+        String lastLine = childLines.get(childLines.size() - 1);
+        childLines.remove(childLines.size() - 1);
+        String assignmentType = Value.typeToOllir(operand.getReturnType());
+        result.insert(0, terminal.getOllir() + " :=" + assignmentType + " " + lastLine + ";\n");
+        if (!childLines.isEmpty())
+            result.insert(0, String.join("\n", childLines) + "\n");
+        result.append(terminal.getOllir());
+
+        return terminal;
+    }
+
     public abstract Type getReturnType();
 
     public abstract String getOllir();

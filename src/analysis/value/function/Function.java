@@ -23,8 +23,8 @@ public abstract class Function extends Value {
     protected String methodClassName = null;
     protected String methodName = null;
     private List<Method> methods = null;
-    private Method method = null;
-    protected List<Value> argumentValues = null;
+    protected Method method = null;
+    protected List<Value> argumentValues = new ArrayList<>();
 
     // ----------------------------------------------------------------
     // Getters
@@ -151,6 +151,8 @@ public abstract class Function extends Value {
             function.method = method;
 
         function.argumentValues = methodTypeList.get(function.method);
+        if (function.argumentValues == null)
+            function.argumentValues = new ArrayList<>();
 
         // Update method if found the type of it
         if (function.getReturnType() == null && function instanceof Call) {

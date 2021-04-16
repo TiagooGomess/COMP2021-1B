@@ -4,16 +4,9 @@
     "attributes": {},
     "children": [
       {
-        "kind": "ImportDeclaration",
-        "attributes": {
-          "name": "io"
-        },
-        "children": []
-      },
-      {
         "kind": "Class",
         "attributes": {
-          "name": "QuickSort"
+          "name": "Test"
         },
         "children": [
           {
@@ -25,6 +18,93 @@
             "kind": "Methods",
             "attributes": {},
             "children": [
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "isStatic": "false",
+                  "name": "randomFunction",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "name": "a",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "name": "b",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "name": "c",
+                          "type": "boolean"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Operation",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "name": "a"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Operator",
+                            "attributes": {
+                              "name": "Addition"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "name": "b"
+                            },
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Return",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "kind": "Literal",
+                            "attributes": {
+                              "type": "int",
+                              "value": "1"
+                            },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
               {
                 "kind": "MethodDeclaration",
                 "attributes": {
@@ -81,7 +161,7 @@
                         "kind": "VariableDeclaration",
                         "attributes": {
                           "name": "q",
-                          "type": "QuickSort"
+                          "type": "Test"
                         },
                         "children": []
                       },
@@ -397,46 +477,60 @@
                         ]
                       },
                       {
-                        "kind": "Access",
+                        "kind": "Assignment",
                         "attributes": {},
                         "children": [
                           {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "L"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Position",
+                            "kind": "Access",
                             "attributes": {},
                             "children": [
                               {
                                 "kind": "Variable",
                                 "attributes": {
-                                  "name": "i"
+                                  "name": "L"
                                 },
                                 "children": []
+                              },
+                              {
+                                "kind": "Position",
+                                "attributes": {},
+                                "children": [
+                                  {
+                                    "kind": "Operation",
+                                    "attributes": {},
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "name": "i"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Operator",
+                                        "attributes": {
+                                          "name": "Multiplication"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "name": "j"
+                                        },
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
                               }
                             ]
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Assignment",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "q"
-                            },
-                            "children": []
                           },
                           {
-                            "kind": "Construction",
+                            "kind": "Literal",
                             "attributes": {
-                              "type": "QuickSort"
+                              "type": "int",
+                              "value": "1"
                             },
                             "children": []
                           }

@@ -12,6 +12,7 @@ import java.util.List;
 
 public class Call extends Function {
     protected final Type expectedReturn;
+    private Value objectCalling;
     private JmmNode argumentsNode = null;
 
     public Call(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
@@ -28,9 +29,9 @@ public class Call extends Function {
                     if (grandchild.getKind().equals("Arguments"))
                         this.argumentsNode = grandchild;
             } else {
-                Type returnType = Value.fromNode(table, scopeMethod, child, null).getReturnType();
-                String name = returnType.getName();
-                this.methodClassName = returnType.isArray() ? name + "[]" : name;
+                objectCalling = Value.fromNode(table, scopeMethod, child, null);
+                String name = objectCalling.getReturnType().getName();
+                this.methodClassName = objectCalling.getReturnType().isArray() ? name + "[]" : name;
             }
         }
         this.setMethod();
@@ -53,6 +54,31 @@ public class Call extends Function {
 
     @Override
     public String getOllir() {
-        return null;
+        StringBuilder result = new StringBuilder();
+        boolean length = false;
+
+        if (this.methodName.equals("length")) {
+            result.append("arraylength");
+            length = true;
+        } else if (this.method.isStatic())
+            result.append("invokestatic");
+        else
+            result.append("invokevirtual");
+
+        result.append("(");
+
+        addValueToBuilder(result, objectCalling, this.scopeMethod);
+        if (!length) {
+            addValueToBuilder(result, objectCalling, this.scopeMethod);
+            result.append(", \"").append(this.methodName).append("\"");
+            for (Value argument : this.argumentValues) {
+                result.append(", ");
+                addValueToBuilder(result, argument, this.scopeMethod);
+            }
+        }
+
+        result.append(")");
+
+        return result.toString();
     }
 }
