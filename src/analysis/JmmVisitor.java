@@ -241,17 +241,17 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
         StringBuilder builder = new StringBuilder();
 
         for (Method method : this.symbolTable.getClass(null).getMethods()) {
-            StringBuilder declaration = new StringBuilder(method.getOllir() + " {\n");
+            StringBuilder declaration = new StringBuilder(method.getOllir() + " {");
             boolean specialCase = !methodValues.containsKey(method);
 
             if (specialCase) {
-                declaration.append("  invokespecial(this, \"<init>\").V;");
+                declaration.append("\n  invokespecial(this, \"<init>\").V;");
             } else {
                 for (JmmNode node : this.methodValues.get(method))
                     if (valueNode.containsKey(node)) {
                         String ollir = valueNode.get(node).getOllir();
                         if (ollir != null)
-                            declaration.append(ollir.replace("\n", "\n  ")).append("\n");
+                            declaration.append("\n  ").append(ollir.replace("\n", "\n  "));
                     }
             }
             declaration.append("\n}\n");

@@ -2,11 +2,23 @@ import io;
 
 class QuickSort {
     public static void main(String[] a) {
-            int[] L;
-            int i;
-            QuickSort q;
+        int[] L;
+        int i;
+        int j;
+        boolean b;
+        QuickSort q;
 
-            io.getInt();
-            q = io.getInt();
-        }
+        3 + 2 / 4 - 3 * i + 2 + 4 * 2;
+        1 - 2;
+        i * i;
+        i / j;
+        b && b;
+        i<j ;
+        !b;
+
+
+        L[i];
+
+        q = new QuickSort();
+    }
 }

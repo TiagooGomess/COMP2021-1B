@@ -16,6 +16,7 @@ import java.util.List;
 public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable {
     private final Program program = new Program();
     private final List<Report> reports = new ArrayList<>();
+    public static int auxiliaryVariableNumber = 1;
 
     // ----------------------------------------------------------------
     // Getters

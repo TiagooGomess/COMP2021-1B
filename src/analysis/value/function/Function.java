@@ -24,7 +24,7 @@ public abstract class Function extends Value {
     protected String methodName = null;
     private List<Method> methods = null;
     private Method method = null;
-    private List<Value> argumentValues = null;
+    protected List<Value> argumentValues = null;
 
     // ----------------------------------------------------------------
     // Getters
@@ -119,7 +119,6 @@ public abstract class Function extends Value {
             Map<Method, List<Terminal>> newParameterLists = new HashMap<>();
 
             for (Method method : possibleParameterLists.keySet()) {
-                List<Value> typeList = new ArrayList<>();
 
                 List<Terminal> possibleParameterList = possibleParameterLists.get(method);
                 Terminal parameter = possibleParameterList.get(i);
@@ -130,12 +129,12 @@ public abstract class Function extends Value {
                     continue;
                 }
 
-                typeList.add(value);
-
                 if (parameter.getReturnType().equals(value.getReturnType()))
                     newParameterLists.put(method, possibleParameterList);
 
-                methodTypeList.put(method, typeList);
+                if (!methodTypeList.containsKey(method))
+                    methodTypeList.put(method, new ArrayList<>());
+                methodTypeList.get(method).add(value);
             }
 
             possibleParameterLists = newParameterLists;

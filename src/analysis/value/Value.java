@@ -22,6 +22,25 @@ public abstract class Value {
 
     public abstract String getOllir();
 
+    public static String typeToOllir(Type type) {
+        StringBuilder builder = new StringBuilder();
+
+        // Is array?
+        if (type.isArray())
+            builder.append(".array");
+
+        // Name of type
+        String typeName = type.getName();
+        switch (typeName) {
+            case "int" -> builder.append(".i32");
+            case "boolean" -> builder.append(".bool");
+            case "void" -> builder.append(".V");
+            default -> builder.append(".").append(typeName);
+        }
+
+        return builder.toString();
+    }
+
     // ----------------------------------------------------------------
     // Static functions for value creation
     // ----------------------------------------------------------------
