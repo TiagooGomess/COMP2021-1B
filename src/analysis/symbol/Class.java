@@ -195,6 +195,6 @@ public class Class extends Value {
 
     @Override
     public String getOllir() {
-        return null;
+        return "";
     }
 }

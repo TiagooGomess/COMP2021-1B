@@ -4,9 +4,16 @@
     "attributes": {},
     "children": [
       {
+        "kind": "ImportDeclaration",
+        "attributes": {
+          "name": "io"
+        },
+        "children": []
+      },
+      {
         "kind": "Class",
         "attributes": {
-          "name": "Test"
+          "name": "Fac"
         },
         "children": [
           {
@@ -22,7 +29,7 @@
                 "kind": "MethodDeclaration",
                 "attributes": {
                   "isStatic": "false",
-                  "name": "randomFunction",
+                  "name": "ComputeFac",
                   "type": "int"
                 },
                 "children": [
@@ -33,24 +40,8 @@
                       {
                         "kind": "Argument",
                         "attributes": {
-                          "name": "a",
+                          "name": "num",
                           "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "Argument",
-                        "attributes": {
-                          "name": "b",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "Argument",
-                        "attributes": {
-                          "name": "c",
-                          "type": "boolean"
                         },
                         "children": []
                       }
@@ -61,29 +52,169 @@
                     "attributes": {},
                     "children": [
                       {
-                        "kind": "Operation",
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "name": "num_aux",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "If",
                         "attributes": {},
                         "children": [
                           {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "a"
-                            },
-                            "children": []
+                            "kind": "Condition",
+                            "attributes": {},
+                            "children": [
+                              {
+                                "kind": "Operation",
+                                "attributes": {},
+                                "children": [
+                                  {
+                                    "kind": "Variable",
+                                    "attributes": {
+                                      "name": "num"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "Operator",
+                                    "attributes": {
+                                      "name": "Comparison"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "Literal",
+                                    "attributes": {
+                                      "type": "int",
+                                      "value": "1"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
                           },
                           {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Addition"
-                            },
-                            "children": []
+                            "kind": "Then",
+                            "attributes": {},
+                            "children": [
+                              {
+                                "kind": "Assignment",
+                                "attributes": {},
+                                "children": [
+                                  {
+                                    "kind": "Variable",
+                                    "attributes": {
+                                      "name": "num_aux"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "Literal",
+                                    "attributes": {
+                                      "type": "int",
+                                      "value": "1"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
                           },
                           {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "b"
-                            },
-                            "children": []
+                            "kind": "Else",
+                            "attributes": {},
+                            "children": [
+                              {
+                                "kind": "Assignment",
+                                "attributes": {},
+                                "children": [
+                                  {
+                                    "kind": "Variable",
+                                    "attributes": {
+                                      "name": "num_aux"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "Operation",
+                                    "attributes": {},
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "name": "num"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Operator",
+                                        "attributes": {
+                                          "name": "Multiplication"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Call",
+                                        "attributes": {},
+                                        "children": [
+                                          {
+                                            "kind": "This",
+                                            "attributes": {},
+                                            "children": []
+                                          },
+                                          {
+                                            "kind": "Method",
+                                            "attributes": {
+                                              "name": "ComputeFac"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "Arguments",
+                                                "attributes": {},
+                                                "children": [
+                                                  {
+                                                    "kind": "Operation",
+                                                    "attributes": {},
+                                                    "children": [
+                                                      {
+                                                        "kind": "Variable",
+                                                        "attributes": {
+                                                          "name": "num"
+                                                        },
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "kind": "Operator",
+                                                        "attributes": {
+                                                          "name": "Subtraction"
+                                                        },
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "kind": "Literal",
+                                                        "attributes": {
+                                                          "type": "int",
+                                                          "value": "1"
+                                                        },
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
                           }
                         ]
                       },
@@ -92,10 +223,9 @@
                         "attributes": {},
                         "children": [
                           {
-                            "kind": "Literal",
+                            "kind": "Variable",
                             "attributes": {
-                              "type": "int",
-                              "value": "1"
+                              "name": "num_aux"
                             },
                             "children": []
                           }
@@ -116,7 +246,7 @@
                   {
                     "kind": "MainArgument",
                     "attributes": {
-                      "name": "a",
+                      "name": "args",
                       "type": "String[]"
                     },
                     "children": []
@@ -126,413 +256,64 @@
                     "attributes": {},
                     "children": [
                       {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "L",
-                          "type": "int[]"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "i",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "j",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "b",
-                          "type": "boolean"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "q",
-                          "type": "Test"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "Operation",
+                        "kind": "Call",
                         "attributes": {},
                         "children": [
                           {
-                            "kind": "Literal",
+                            "kind": "Variable",
                             "attributes": {
-                              "type": "int",
-                              "value": "3"
+                              "name": "io"
                             },
                             "children": []
                           },
                           {
-                            "kind": "Operator",
+                            "kind": "Method",
                             "attributes": {
-                              "name": "Addition"
+                              "name": "println"
                             },
-                            "children": []
-                          },
-                          {
-                            "kind": "Operation",
-                            "attributes": {},
                             "children": [
                               {
-                                "kind": "Operation",
+                                "kind": "Arguments",
                                 "attributes": {},
                                 "children": [
                                   {
-                                    "kind": "Operation",
+                                    "kind": "Call",
                                     "attributes": {},
                                     "children": [
                                       {
-                                        "kind": "Literal",
+                                        "kind": "Construction",
                                         "attributes": {
-                                          "type": "int",
-                                          "value": "2"
+                                          "type": "Fac"
                                         },
                                         "children": []
                                       },
                                       {
-                                        "kind": "Operator",
+                                        "kind": "Method",
                                         "attributes": {
-                                          "name": "Division"
+                                          "name": "ComputeFac"
                                         },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Literal",
-                                        "attributes": {
-                                          "type": "int",
-                                          "value": "4"
-                                        },
-                                        "children": []
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "kind": "Operator",
-                                    "attributes": {
-                                      "name": "Subtraction"
-                                    },
-                                    "children": []
-                                  },
-                                  {
-                                    "kind": "Operation",
-                                    "attributes": {},
-                                    "children": [
-                                      {
-                                        "kind": "Literal",
-                                        "attributes": {
-                                          "type": "int",
-                                          "value": "3"
-                                        },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Operator",
-                                        "attributes": {
-                                          "name": "Multiplication"
-                                        },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Variable",
-                                        "attributes": {
-                                          "name": "i"
-                                        },
-                                        "children": []
-                                      }
-                                    ]
-                                  }
-                                ]
-                              },
-                              {
-                                "kind": "Operator",
-                                "attributes": {
-                                  "name": "Addition"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Operation",
-                                "attributes": {},
-                                "children": [
-                                  {
-                                    "kind": "Literal",
-                                    "attributes": {
-                                      "type": "int",
-                                      "value": "2"
-                                    },
-                                    "children": []
-                                  },
-                                  {
-                                    "kind": "Operator",
-                                    "attributes": {
-                                      "name": "Addition"
-                                    },
-                                    "children": []
-                                  },
-                                  {
-                                    "kind": "Operation",
-                                    "attributes": {},
-                                    "children": [
-                                      {
-                                        "kind": "Literal",
-                                        "attributes": {
-                                          "type": "int",
-                                          "value": "4"
-                                        },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Operator",
-                                        "attributes": {
-                                          "name": "Multiplication"
-                                        },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Literal",
-                                        "attributes": {
-                                          "type": "int",
-                                          "value": "2"
-                                        },
-                                        "children": []
+                                        "children": [
+                                          {
+                                            "kind": "Arguments",
+                                            "attributes": {},
+                                            "children": [
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "type": "int",
+                                                  "value": "10"
+                                                },
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
                                       }
                                     ]
                                   }
                                 ]
                               }
                             ]
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Operation",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Literal",
-                            "attributes": {
-                              "type": "int",
-                              "value": "1"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Subtraction"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Literal",
-                            "attributes": {
-                              "type": "int",
-                              "value": "2"
-                            },
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Operation",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "i"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Multiplication"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "i"
-                            },
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Operation",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "i"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Division"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "j"
-                            },
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Operation",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "b"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Conjunction"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "b"
-                            },
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Operation",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "i"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Comparison"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "j"
-                            },
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Operation",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Operator",
-                            "attributes": {
-                              "name": "Negation"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "b"
-                            },
-                            "children": []
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Assignment",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Access",
-                            "attributes": {},
-                            "children": [
-                              {
-                                "kind": "Variable",
-                                "attributes": {
-                                  "name": "L"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Position",
-                                "attributes": {},
-                                "children": [
-                                  {
-                                    "kind": "Operation",
-                                    "attributes": {},
-                                    "children": [
-                                      {
-                                        "kind": "Variable",
-                                        "attributes": {
-                                          "name": "i"
-                                        },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Operator",
-                                        "attributes": {
-                                          "name": "Multiplication"
-                                        },
-                                        "children": []
-                                      },
-                                      {
-                                        "kind": "Variable",
-                                        "attributes": {
-                                          "name": "j"
-                                        },
-                                        "children": []
-                                      }
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            "kind": "Literal",
-                            "attributes": {
-                              "type": "int",
-                              "value": "1"
-                            },
-                            "children": []
                           }
                         ]
                       }

@@ -34,8 +34,6 @@ public abstract class Value {
         }
 
         Terminal terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
-        if (ollir == null)
-            ollir = "";
         ArrayList<String> childLines = new ArrayList<>(Arrays.asList(ollir.split("\n")));
         String lastLine = childLines.get(childLines.size() - 1);
         childLines.remove(childLines.size() - 1);
@@ -54,6 +52,9 @@ public abstract class Value {
 
     public static String typeToOllir(Type type) {
         StringBuilder builder = new StringBuilder();
+
+        if (type == null)
+            return ".V";
 
         // Is array?
         if (type.isArray())
@@ -83,7 +84,7 @@ public abstract class Value {
             default -> null;
         };
         if (result == null)
-            System.out.println(node.getKind());
+            System.out.println("null value result: " + node.getKind());
         return result;
     }
 }
