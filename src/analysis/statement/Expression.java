@@ -17,7 +17,7 @@ public class Expression extends Statement {
 
     public String getOllir() {
         StringBuilder result = new StringBuilder();
-        Value.addValueToBuilder(result, this.expression, this.method);
+        result.append(this.expression.getOllir());
         result.append(";");
         return result.toString();
     }

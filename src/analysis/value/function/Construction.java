@@ -60,7 +60,7 @@ public class Construction extends Function {
 
         builder.append(")");
         builder.append(typeOllir);
-        builder.append(";\n");
+        builder.append("; ");
 
         if (!isArray) {
             builder.append("invokespecial");

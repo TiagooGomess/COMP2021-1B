@@ -60,16 +60,19 @@ public class Call extends Function {
         if (this.methodName.equals("length")) {
             result.append("arraylength");
             length = true;
-        } else if (this.method.isStatic())
+        } else if (this.method.isStatic()) {
             result.append("invokestatic");
-        else
+        } else {
             result.append("invokevirtual");
+        }
 
         result.append("(");
 
-        addValueToBuilder(result, objectCalling, this.scopeMethod);
         if (!length) {
-            addValueToBuilder(result, objectCalling, this.scopeMethod);
+            if (this.method.isStatic())
+                result.append(Value.typeToOllir(this.objectCalling.getReturnType()).substring(1));
+            else
+                addValueToBuilder(result, objectCalling, this.scopeMethod);
             result.append(", \"").append(this.methodName).append("\"");
             for (Value argument : this.argumentValues) {
                 result.append(", ");
@@ -78,6 +81,7 @@ public class Call extends Function {
         }
 
         result.append(")");
+        result.append(Value.typeToOllir(this.method.getReturnType()));
 
         return result.toString();
     }
