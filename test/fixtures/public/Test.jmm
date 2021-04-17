@@ -1,10 +1,13 @@
 
 class Test {
 
-    public int randomFunction(int a, int b, boolean c) {
+    int integerField;
+    int[] arrayOfIntegers;
+
+    /*public int randomFunction(int a, int b, boolean c) {
         a + b;
         return a + b;
-    }
+    }*/
 
     public static void main(String[] a) {
         int a;
@@ -26,12 +29,10 @@ class Test {
             if(c){
                 b = 2;
             } else {
-
+                b = 3;
             }
         } else {
             b = b * 2;
         }
-
-
     }
 }

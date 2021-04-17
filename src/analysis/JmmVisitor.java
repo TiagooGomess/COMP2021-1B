@@ -91,7 +91,6 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     public void analyseMethodValues() {
-        // Analyse Statements
         for (Map.Entry<Method, List<JmmNode>> entry : this.methodStatements.entrySet()) {
             Method method = entry.getKey();
             for (JmmNode statementNode : entry.getValue()) {
@@ -105,7 +104,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
         }
     }
 
-    public void printOllir() {
+    public String getOllir() {
         StringBuilder builder = new StringBuilder();
 
         for (Method method : this.symbolTable.getClass(null).getMethods()) {
@@ -124,6 +123,8 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                         if (ollir != null)
                             declaration.append("\n  ").append(ollir.replace("\n", "\n  "));
                     }
+                if (method.getReturnType().getName().equals("void"))
+                    declaration.append("\n  ret.V;");
             }
             declaration.append("\n}\n");
 
@@ -133,7 +134,14 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                 builder.append(declaration);
         }
 
-        System.out.println(builder);
+        for (Terminal attribute : symbolTable.getClass(null).getAttributes())
+            if (!attribute.getName().equals("this"))
+                builder.insert(0, ".field private " + attribute.getOllir() + ";\n");
+
+        builder.insert(0, symbolTable.getClassName() + " {\n");
+        String result = builder.toString().strip().replace("\n", "\n  ");
+        result += "\n}";
+        return result;
     }
 }
 

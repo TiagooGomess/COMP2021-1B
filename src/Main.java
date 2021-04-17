@@ -5,6 +5,7 @@ import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import analysis.JmmVisitor;
@@ -38,6 +39,9 @@ public class Main implements JmmParser, JmmAnalysis {
         }
 
         JmmSemanticsResult semanticResult = m.semanticAnalysis(parserResult);
+
+        OptimizationStage optimizationStage = new OptimizationStage();
+        OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
     }
 
     @Override
@@ -67,7 +71,6 @@ public class Main implements JmmParser, JmmAnalysis {
         visitor.visit(node, null);
         SymbolTable symbolTable = visitor.getSymbolTable();
         visitor.analyseMethodValues();
-        visitor.printOllir();
 
         List<Report> reports = parserResult.getReports();
         reports.addAll(symbolTable.getReports());

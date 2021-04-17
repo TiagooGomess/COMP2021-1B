@@ -3,6 +3,7 @@ package analysis.statement;
 import analysis.method.Method;
 import analysis.symbol.Program;
 import analysis.symbol.SymbolTable;
+import analysis.value.Terminal;
 import analysis.value.Value;
 import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -27,7 +28,9 @@ public class If extends Statement {
 
         StringBuilder builder = new StringBuilder();
         builder.append("if (");
-        Value.addValueToBuilder(builder, this.condition, this.method);
+        Terminal t = Value.addValueToBuilder(builder, this.condition, this.method);
+        if (t != null || this.condition instanceof Terminal)
+            builder.append(" &&.bool true.bool");
         builder.append(") goto ").append(thenLabel).append(";");
         builder.append(("\n" + this.elseStatement.getOllir()).replace("\n", "\n  "));
         builder.append("goto ").append(endifLabel).append(";\n").append(thenLabel).append(":");

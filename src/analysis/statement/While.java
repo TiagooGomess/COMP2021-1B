@@ -3,6 +3,7 @@ package analysis.statement;
 import analysis.method.Method;
 import analysis.symbol.Program;
 import analysis.symbol.SymbolTable;
+import analysis.value.Terminal;
 import analysis.value.Value;
 import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -31,7 +32,9 @@ public class While extends Statement {
         // Condition
         StringBuilder conditionBuilder = new StringBuilder();
         conditionBuilder.append("if (");
-        Value.addValueToBuilder(conditionBuilder, this.condition, this.method);
+        Terminal t = Value.addValueToBuilder(conditionBuilder, this.condition, this.method);
+        if (t != null || this.condition instanceof Terminal)
+            conditionBuilder.append(" &&.bool true.bool");
         conditionBuilder.append(") goto ").append(bodyLabel).append(";\ngoto ").append(endLoopLabel).append(";\n");
 
         StringBuilder bodyBuilder = new StringBuilder();
