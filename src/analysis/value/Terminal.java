@@ -2,6 +2,7 @@ package analysis.value;
 
 import analysis.method.Method;
 import analysis.symbol.Program;
+import analysis.symbol.Class;
 import analysis.symbol.SymbolTable;
 import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -9,7 +10,7 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 public class Terminal extends Value {
-    private final Symbol symbol;
+    private Symbol symbol;
 
     public Terminal(Type type, String name) {
         this.symbol = new Symbol(type, name);
@@ -43,6 +44,14 @@ public class Terminal extends Value {
     }
 
     // ----------------------------------------------------------------
+    // Setters
+    // ----------------------------------------------------------------
+
+    public void setType(Type type) {
+        this.symbol = new Symbol(type, this.getName());
+    }
+
+    // ----------------------------------------------------------------
     // Creating from node
     // ----------------------------------------------------------------
 
@@ -57,12 +66,18 @@ public class Terminal extends Value {
         return new Terminal(Program.stringToType(node.get("type")), node.get("name"));
     }
 
-    public static Value fromVariable(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
+    public static Value fromVariable(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedType) throws JmmException {
         // The this special word is a variable
         String variableName = node.getKind().equals("This") ? "this" : node.get("name");
         Value variable = table.getVariable(scopeMethod, variableName);
-        if (variable == null)
-            throw JmmException.undeclaredVariable(variableName);
+        if (variable == null) {
+            Class parentClass = scopeMethod.getParentClass();
+            if (parentClass.getSuperName() == null)
+                throw JmmException.undeclaredVariable(variableName);
+            Terminal terminalVariable = new Terminal(expectedType, variableName);
+            parentClass.addAttribute(terminalVariable);
+            variable = terminalVariable;
+        }
         return variable;
     }
 

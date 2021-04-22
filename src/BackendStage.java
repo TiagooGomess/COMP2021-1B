@@ -1,16 +1,14 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.OllirErrorException;
+import analysis.symbol.SymbolTable;
+import org.specs.comp.ollir.*;
 
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
-import pt.up.fe.specs.util.SpecsIo;
 
 /**
  * Copyright 2021 SPeCS.
@@ -26,34 +24,118 @@ import pt.up.fe.specs.util.SpecsIo;
  */
 
 public class BackendStage implements JasminBackend {
+    ClassUnit classUnit;
+    SymbolTable symbolTable;
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
-        ClassUnit ollirClass = ollirResult.getOllirClass();
+        this.classUnit = ollirResult.getOllirClass();
+        this.symbolTable = (SymbolTable) ollirResult.getSymbolTable();
 
         try {
 
             // Example of what you can do with the OLLIR class
-            ollirClass.checkMethodLabels(); // check the use of labels in the OLLIR loaded
-            ollirClass.buildCFGs(); // build the CFG of each method
-            ollirClass.outputCFGs(); // output to .dot files the CFGs, one per method
-            ollirClass.buildVarTables(); // build the table of variables for each method
-            ollirClass.show(); // print to console main information about the input OLLIR
-
+            this.classUnit.checkMethodLabels(); // check the use of labels in the OLLIR loaded
+            this.classUnit.buildCFGs(); // build the CFG of each method
+            this.classUnit.outputCFGs(); // output to .dot files the CFGs, one per method
+            this.classUnit.buildVarTables(); // build the table of variables for each method
+            // this.classUnit.show(); // print to console main information about the input OLLIR
             // Convert the OLLIR to a String containing the equivalent Jasmin code
-            System.out.println(ollirClass);
-            String jasminCode = ""; // Convert node ...
+            String jasminCode = this.getJasminCode(); // Convert node ...
 
             // More reports from this stage
-            List<Report> reports = new ArrayList<>();
+            List<Report> reports = ollirResult.getReports();
 
             return new JasminResult(ollirResult, jasminCode, reports);
 
         } catch (OllirErrorException e) {
-            return new JasminResult(ollirClass.getClassName(), null,
+            return new JasminResult(this.classUnit.getClassName(), null,
                     Arrays.asList(Report.newError(Stage.GENERATION, -1, -1, "Exception during Jasmin generation", e)));
         }
+    }
 
+    private String getJasminReturnType(Type type) {
+        return switch (type.getTypeOfElement()) {
+            case INT32 -> "I";
+            case BOOLEAN -> "Z";
+            case ARRAYREF -> "[I";
+            case THIS -> "this;";
+            case STRING -> "Ljava/lang/String;";
+            case VOID -> "V";
+            case OBJECTREF, CLASS -> type + ";";
+        };
+    }
+
+    private String getJasminInstruction(Instruction instruction) {
+        return "INSTRUCTION\n";
+    }
+
+    private String getJasminCode() {
+        StringBuilder jasminCode = new StringBuilder();
+
+        jasminCode.append(".class public ");
+        jasminCode.append(this.classUnit.getClassName()).append("\n");
+
+        String superClassName = this.symbolTable.getSuper();
+        jasminCode.append(".super ");
+        if (superClassName != null) {
+            jasminCode.append(this.symbolTable.getClass(superClassName).getImportName().replace(".", "/"));
+        } else
+            jasminCode.append("java/lang/Object");
+        jasminCode.append("\n\n");
+
+        for (Field field : this.classUnit.getFields()) {
+            jasminCode.append(".field ");
+            jasminCode.append(field.getFieldName()).append(" ");
+            jasminCode.append(this.getJasminReturnType(field.getFieldType())).append(" ");
+            if (field.isInitialized())
+                jasminCode.append(" = ").append(field.getInitialValue());
+            jasminCode.append("\n");
+        }
+
+        jasminCode.append("method public <init>()V\n");
+        jasminCode.append("  aload_0\n");
+        jasminCode.append("  invokenonvirtual java/lang/Object/<init>()V\n");
+        jasminCode.append("  return\n");
+        jasminCode.append(".end method\n\n");
+
+        List<Method> methods = this.classUnit.getMethods();
+
+        for (Method method : methods) {
+            if (method.isConstructMethod()) // already defined
+                continue;
+
+            jasminCode.append(".method public ");
+            if (method.isStaticMethod())
+                jasminCode.append("static ");
+
+            jasminCode.append(method.getMethodName()).append("(");
+
+            for (Element parameter : method.getParams())
+                jasminCode.append(this.getJasminReturnType(parameter.getType()));
+
+            jasminCode.append(")");
+            Type returnType = method.getReturnType();
+            jasminCode.append(this.getJasminReturnType(returnType));
+            jasminCode.append("\n  ");
+
+            StringBuilder methodBuilder = new StringBuilder();
+
+            for (Instruction instruction : method.getInstructions())
+                methodBuilder.append(getJasminInstruction(instruction));
+
+            // TODO: calculate stackLimit and locals
+            int stackLimit = 1;
+            int locals = 1;
+            methodBuilder.insert(0, ".limit locals " + locals + "\n\n");
+            methodBuilder.insert(0, ".limit stack " + stackLimit + "\n");
+
+            jasminCode.append(methodBuilder.toString().trim().replace("\n", "\n  "));
+            jasminCode.append("\n.end method\n");
+        }
+
+        System.out.println(jasminCode);
+        return jasminCode.toString();
     }
 
 }

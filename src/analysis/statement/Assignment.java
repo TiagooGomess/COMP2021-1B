@@ -60,12 +60,14 @@ public class Assignment extends Statement {
         if (variableNode.getKind().equals("Access"))
             variable = Access.fromNode(table, currentMethod, variableNode, null);
         else
-            variable = Terminal.fromVariable(table, currentMethod, variableNode);
+            variable = Terminal.fromVariable(table, currentMethod, variableNode, null);
 
         assert variable != null;
         Value expression = Value.fromNode(table, currentMethod, expressionNode, variable.getReturnType());
 
-        if (!variable.getReturnType().equals(expression.getReturnType()))
+        if (variable instanceof Terminal && variable.getReturnType() == null)
+            ((Terminal) variable).setType(expression.getReturnType());
+        else if (!variable.getReturnType().equals(expression.getReturnType()))
             throw JmmException.invalidAssignment(variable, expression.getReturnType());
 
         return new Assignment(table, currentMethod, variable, expression);

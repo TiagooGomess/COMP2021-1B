@@ -123,8 +123,6 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                         if (ollir != null)
                             declaration.append("\n  ").append(ollir.replace("\n", "\n  "));
                     }
-                if (method.getReturnType().getName().equals("void"))
-                    declaration.append("\n  ret.V;");
             }
             declaration.append("\n}\n");
 

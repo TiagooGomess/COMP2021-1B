@@ -88,7 +88,7 @@ public abstract class Value {
     public static Value fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
         Value result = switch (node.getKind()) {
             case "Literal" -> Terminal.fromLiteral(node);
-            case "Variable", "This" -> Terminal.fromVariable(table, scopeMethod, node);
+            case "Variable", "This" -> Terminal.fromVariable(table, scopeMethod, node, expectedReturn);
             case "Access", "Call", "Construction", "Operation" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
             default -> null;
         };
