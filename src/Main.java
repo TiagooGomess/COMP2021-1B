@@ -1,3 +1,4 @@
+import analysis.AnalysisStage;
 import analysis.symbol.SymbolTable;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -15,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class Main implements JmmParser, JmmAnalysis {
+public class Main implements JmmParser {
 
     public static void main(String[] args) {
         System.out.println("Compiling the code...\n\n");
@@ -38,7 +39,9 @@ public class Main implements JmmParser, JmmAnalysis {
             return;
         }
 
-        JmmSemanticsResult semanticResult = m.semanticAnalysis(parserResult);
+        AnalysisStage analysisStage = new AnalysisStage();
+
+        JmmSemanticsResult semanticResult = analysisStage.semanticAnalysis(parserResult);
 
         OptimizationStage optimizationStage = new OptimizationStage();
         OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
@@ -55,31 +58,4 @@ public class Main implements JmmParser, JmmAnalysis {
             return null;
         }
     }
-
-    @Override
-    public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
-        if (TestUtils.getNumReports(parserResult.getReports(), ReportType.ERROR) > 0) {
-            return null;
-        }
-        if (parserResult.getRootNode() == null) {
-            return null;
-        }
-
-        JmmNode node = parserResult.getRootNode().sanitize();
-
-        JmmVisitor visitor = new JmmVisitor();
-        visitor.visit(node, null);
-        SymbolTable symbolTable = visitor.getSymbolTable();
-        visitor.analyseMethodValues();
-
-        List<Report> reports = parserResult.getReports();
-        reports.addAll(symbolTable.getReports());
-
-        for (Report report : reports) {
-            System.out.println(report.toString());
-        }
-
-        return new JmmSemanticsResult(node, symbolTable, reports);
-    }
-
 }
