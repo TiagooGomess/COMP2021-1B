@@ -127,10 +127,10 @@ public class SemanticTests {
 
     @Test
     public void test13() {
-        /*String jmmCode = SpecsIo.getResource("fixtures/public/Lazysort.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/public/Lazysort.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
+        TestUtils.noErrors(semanticsResult.getReports());
     }
 
     @Test
@@ -167,14 +167,6 @@ public class SemanticTests {
 
     @Test
     public void test18() {
-        /*String jmmCode = SpecsIo.getResource("fixtures/public/Test.jmm");
-        JmmParserResult parseResult = TestUtils.parse(jmmCode);
-        JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
-    }
-
-    @Test
-    public void test19() {
         String jmmCode = SpecsIo.getResource("fixtures/public/TicTacToe.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
@@ -182,7 +174,7 @@ public class SemanticTests {
     }
 
     @Test
-    public void test20() {
+    public void test19() {
         String jmmCode = SpecsIo.getResource("fixtures/public/WhileAndIF.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
@@ -190,8 +182,8 @@ public class SemanticTests {
     }
 
     @Test
-    public void test21() {
-        /*String jmmCode = SpecsIo.getResource("fixtures/private/Turing.jmm");
+    public void test20() {
+        /*String jmmCode = SpecsIo.getResource("fixture/private/Turing.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
         TestUtils.noErrors(semanticsResult.getReports());*/
@@ -212,13 +204,12 @@ public class SemanticTests {
     @Test
     public void extra() {
         // NOT DONE YET
-        /*
         String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/extra/miss_type.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
         TestUtils.mustFail(semanticsResult.getReports());
         long numErrors = TestUtils.getNumErrors(semanticsResult.getReports());
-        assertEquals(1, numErrors);*/
+        assertEquals(1, numErrors);
     }
 
 

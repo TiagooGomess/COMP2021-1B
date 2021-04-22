@@ -22,6 +22,7 @@ public abstract class Function extends Value {
 
     protected String methodClassName = null;
     protected String methodName = null;
+    private Class methodClass = null;
     private List<Method> methods = null;
     protected Method method = null;
     protected List<Value> argumentValues = new ArrayList<>();
@@ -71,7 +72,7 @@ public abstract class Function extends Value {
         if (this.methods == null || this.methods.isEmpty()) {
             // The only type of function node that can not be found is a call
             Call call = (Call) this;
-            Class methodClass = this.table.getClass(this.methodClassName);
+            methodClass = this.table.getClass(this.methodClassName);
 
             // If its the main class of the Jmm file we are parsing
             if (methodClass == null || (this.table.getClassName().equals(methodClass.getName()) && this.table.getSuper() == null)) {
@@ -79,15 +80,21 @@ public abstract class Function extends Value {
             }
 
             // Create new method by inference
-            Method toAdd = new Method(methodClass, call.methodName, call.expectedReturn, getNewParameters());
-            methodClass.addMethod(toAdd);
-            this.methods = Collections.singletonList(toAdd);
+            this.methods = Collections.singletonList(createMethodByInference(table, methodClass, call, getNewParameters()));
         }
     }
 
     // ----------------------------------------------------------------
     // Static functions for expression creation
     // ----------------------------------------------------------------
+
+    public static Method createMethodByInference(SymbolTable table, Class methodClass, Call call, List<Terminal> types) {
+        Method inferred = new Method(methodClass, call.methodName, call.expectedReturn, types);
+        if (methodClass == null)
+            methodClass = table.getClass(null);
+        methodClass.addMethod(inferred);
+        return inferred;
+    }
 
     public static Function fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
         // Create respective objects
@@ -110,8 +117,9 @@ public abstract class Function extends Value {
                 possibleParameterLists.put(method, method.getParameters());
 
         // If no method has the same number of arguments
-        if (possibleParameterLists.isEmpty())
+        if (possibleParameterLists.isEmpty() && table.getSuper() == null) {
             throw JmmException.invalidNumberOfArguments(function.getOutputName(), arguments.size());
+        }
 
         Map<Method, List<Value>> methodTypeList = new HashMap<>();
         for (int i = 0; i < arguments.size(); i++) {
@@ -142,10 +150,17 @@ public abstract class Function extends Value {
                 break;
         }
 
-        // TODO: add method by inference and update method after new information
-        if (possibleParameterLists.keySet().size() != 1)
+
+        if (possibleParameterLists.keySet().size() != 1) {
+            if (possibleParameterLists.keySet().isEmpty() && function instanceof Call) {
+                List<Terminal> parameters = function.getNewParameters();
+                Method inferredMethod = createMethodByInference(table, function.methodClass, (Call) function, parameters);
+                possibleParameterLists.put(inferredMethod, null);
+            }
+
             for (Method method : methodTypeList.keySet())
                 throw JmmException.invalidTypeForArguments(function.getOutputName(), methodTypeList.get(method));
+        }
 
         for (Method method : possibleParameterLists.keySet())
             function.method = method;

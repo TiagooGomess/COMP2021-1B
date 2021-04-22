@@ -1,5 +1,7 @@
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import analysis.symbol.SymbolTable;
 import org.specs.comp.ollir.*;
@@ -24,8 +26,30 @@ import pt.up.fe.comp.jmm.report.Stage;
  */
 
 public class BackendStage implements JasminBackend {
+    private class MethodLimits {
+        int stackLimit = 99;
+        int locals = 99;
+
+        public int getStackLimit() {
+            return stackLimit;
+        }
+
+        public void addStackLimit() {
+            this.stackLimit++;
+        }
+
+        public int getLocals() {
+            return locals;
+        }
+
+        public void addLocals() {
+            this.locals++;
+        }
+    }
+
     ClassUnit classUnit;
     SymbolTable symbolTable;
+    final Map<Method, MethodLimits> methodLimits = new HashMap<>();
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -67,7 +91,10 @@ public class BackendStage implements JasminBackend {
     }
 
     private String getJasminInstruction(Instruction instruction) {
-        return "INSTRUCTION\n";
+        // TODO: update stackLimit and locals
+        // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
+
+        return instruction.toString() + "\n";
     }
 
     private String getJasminCode() {
@@ -102,6 +129,8 @@ public class BackendStage implements JasminBackend {
         List<Method> methods = this.classUnit.getMethods();
 
         for (Method method : methods) {
+            this.methodLimits.put(method, new MethodLimits());
+
             if (method.isConstructMethod()) // already defined
                 continue;
 
@@ -121,14 +150,12 @@ public class BackendStage implements JasminBackend {
 
             StringBuilder methodBuilder = new StringBuilder();
 
-            for (Instruction instruction : method.getInstructions())
+            for (Instruction instruction : method.getInstructions()) {
                 methodBuilder.append(getJasminInstruction(instruction));
+            }
 
-            // TODO: calculate stackLimit and locals
-            int stackLimit = 1;
-            int locals = 1;
-            methodBuilder.insert(0, ".limit locals " + locals + "\n\n");
-            methodBuilder.insert(0, ".limit stack " + stackLimit + "\n");
+            methodBuilder.insert(0, ".limit locals " + this.methodLimits.get(method).getLocals() + "\n\n");
+            methodBuilder.insert(0, ".limit stack " + this.methodLimits.get(method).getStackLimit() + "\n");
 
             jasminCode.append(methodBuilder.toString().trim().replace("\n", "\n  "));
             jasminCode.append("\n.end method\n");

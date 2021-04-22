@@ -1,5 +1,6 @@
+import test.Test0;
 
-class Test {
+class Test extends Test0 {
 
     int integerField;
     int[] arrayOfIntegers;
