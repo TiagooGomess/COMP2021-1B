@@ -1,5 +1,6 @@
 package analysis.method;
 
+import analysis.symbol.Class;
 import analysis.symbol.Program;
 import analysis.value.Terminal;
 import analysis.value.Value;
@@ -10,23 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Method extends Value {
+    private Class parentClass;
     private MethodSignature signature;
     private Type returnType;
     private List<Terminal> localVariables;
 
-    public Method(String methodName, Type returnType) {
+    public Method(Class parentClass, String methodName, Type returnType) {
+        this.parentClass = parentClass;
         this.signature = new MethodSignature(methodName);
         this.returnType = returnType;
         this.localVariables = new ArrayList<>();
     }
 
-    public Method(String methodName, Type returnType, List<Terminal> parameters) {
+    public Method(Class parentClass, String methodName, Type returnType, List<Terminal> parameters) {
+        this.parentClass = parentClass;
         this.signature = new MethodSignature(methodName, parameters);
         this.returnType = returnType;
         this.localVariables = new ArrayList<>();
     }
 
-    public Method(String methodName, Type returnType, List<Terminal> parameters, boolean isStatic, List<Terminal> localVariables) {
+    public Method(Class parentClass, String methodName, Type returnType, List<Terminal> parameters, boolean isStatic, List<Terminal> localVariables) {
+        this.parentClass = parentClass;
         this.signature = new MethodSignature(methodName, parameters, isStatic);
         this.returnType = returnType;
         this.localVariables = localVariables;
@@ -35,6 +40,10 @@ public class Method extends Value {
     // ----------------------------------------------------------------
     // Getters
     // ----------------------------------------------------------------
+
+    public Class getParentClass() {
+        return this.parentClass;
+    }
 
     public String getName() {
         return this.signature.getMethodName();
@@ -73,6 +82,11 @@ public class Method extends Value {
             if (variable.getName().equals(variableName))
                 return variable;
 
+        // Search in class fields
+        for (Terminal variable : this.parentClass.getAttributes())
+            if (variable.getName().equals(variableName))
+                return variable;
+
         return null;
     }
 
@@ -104,10 +118,10 @@ public class Method extends Value {
     // Creating from node
     // ----------------------------------------------------------------
 
-    public static Method fromDeclaration(JmmNode node) {
+    public static Method fromDeclaration(Class parentClass, JmmNode node) {
         String methodName = node.get("name");
         Type returnType = Program.stringToType(node.get("type"));
-        return new Method(methodName, returnType);
+        return new Method(parentClass, methodName, returnType);
     }
 
     // ----------------------------------------------------------------
@@ -168,8 +182,7 @@ public class Method extends Value {
             builder.append(String.join(", ", argumentOllir));
 
             builder.append(")");
-            Terminal terminalReturn = new Terminal(this.returnType, "");
-            builder.append(terminalReturn.getOllir());
+            builder.append(Value.typeToOllir(this.returnType));
         }
 
         return builder.toString();

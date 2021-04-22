@@ -1,8 +1,9 @@
 package analysis.statement;
 
-import analysis.value.function.Access;
 import analysis.method.Method;
+import analysis.symbol.Class;
 import analysis.symbol.SymbolTable;
+import analysis.value.function.Access;
 import analysis.value.Terminal;
 import analysis.value.Value;
 import exception.JmmException;
@@ -21,16 +22,33 @@ public class Assignment extends Statement {
     }
 
     public String getOllir() {
+        Class mainClass = this.table.getClass(null);
+        boolean isField;
+        if (variable instanceof Terminal)
+            isField = mainClass.isField((Terminal) variable);
+        else
+            isField = mainClass.isField(this.method.getVariable(((Access) variable).getVariableName()));
+
         StringBuilder builder = new StringBuilder();
+        if (isField)
+            builder.append("putfield(this, ");
 
-        Value.addValueToBuilder(builder, variable, this.method);
-        Type assignmentType = variable.getReturnType();
-        Terminal assignmentTerminal = new Terminal(assignmentType, "");
-        builder.append(" :=");
-        builder.append(assignmentTerminal.getOllir()).append(" ");
+        Value.addValueToBuilder(builder, variable, this.method, isField);
+
+        if (isField) {
+            builder.append(", ");
+        } else {
+            Type assignmentType = variable.getReturnType();
+            builder.append(" :=");
+            builder.append(Value.typeToOllir(assignmentType)).append(" ");
+        }
+
         Value.addValueToBuilder(builder, expression, this.method);
-        builder.append(";");
 
+        if (isField)
+            builder.append(").V");
+
+        builder.append(";");
         return builder.toString();
     }
 

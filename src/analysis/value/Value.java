@@ -13,18 +13,32 @@ import java.util.Arrays;
 
 public abstract class Value {
 
-    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method) {
+    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method, boolean fromPutField) {
         String ollir = operand.getOllir();
 
+        Terminal terminal = null;
+        Terminal terminalOperand = null;
         if (operand instanceof Terminal) {
-            int argumentNumber = method.getArgumentNumber((Terminal) operand);
+            terminalOperand = (Terminal) operand;
+            int argumentNumber = method.getArgumentNumber(terminalOperand);
             if (argumentNumber != 0)
                 result.append("$").append(argumentNumber).append(".");
-            result.append(ollir);
-            return null;
+            else if (!fromPutField && method.getParentClass().isField(terminalOperand))
+                terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+
+            if (terminal == null) {
+                result.append(ollir);
+                return null;
+            }
         }
 
-        Terminal terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+        if (terminal == null)
+            terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+        else {
+            String typeOllir = Value.typeToOllir(terminalOperand.getReturnType());
+            ollir = "getfield(this, " + terminalOperand.getName() + typeOllir + ")" + typeOllir + "\n";
+        }
+
         ArrayList<String> childLines = new ArrayList<>(Arrays.asList(ollir.split("\n")));
         String lastLine = childLines.get(childLines.size() - 1);
         childLines.remove(childLines.size() - 1);
@@ -35,6 +49,10 @@ public abstract class Value {
         result.append(terminal.getOllir());
 
         return terminal;
+    }
+
+    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method) {
+        return addValueToBuilder(result, operand, method, false);
     }
 
     public abstract Type getReturnType();

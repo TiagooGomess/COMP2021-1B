@@ -37,10 +37,10 @@ public class Class extends Value {
         Method constructor;
         if (this.className.equals("int[]")) {
             this.classType = new Type("int", true);
-            constructor = new Method("%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size")));
+            constructor = new Method(this, "%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size")));
         } else {
             this.classType = new Type(this.className, false);
-            constructor = new Method("%Construction", this.classType, Collections.emptyList());
+            constructor = new Method(this, "%Construction", this.classType, Collections.emptyList());
         }
         this.methods.put(constructor.getSignature(), constructor);
 
@@ -127,6 +127,10 @@ public class Class extends Value {
             return this;
 
         return null;
+    }
+
+    public boolean isField(Terminal argument) {
+        return this.getAttributes().contains(argument);
     }
 
     // ----------------------------------------------------------------

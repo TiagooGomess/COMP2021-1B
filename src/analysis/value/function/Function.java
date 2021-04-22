@@ -79,7 +79,7 @@ public abstract class Function extends Value {
             }
 
             // Create new method by inference
-            Method toAdd = new Method(call.methodName, call.expectedReturn, getNewParameters());
+            Method toAdd = new Method(methodClass, call.methodName, call.expectedReturn, getNewParameters());
             methodClass.addMethod(toAdd);
             this.methods = Collections.singletonList(toAdd);
         }

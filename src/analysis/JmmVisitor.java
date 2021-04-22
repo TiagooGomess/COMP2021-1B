@@ -59,7 +59,7 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     private Value dealWithMethod(JmmNode node, SymbolTable jmmSymbolTable) {
-        currentMethod = Method.fromDeclaration(node);
+        currentMethod = Method.fromDeclaration(symbolTable.getClass(null), node);
         symbolTable.addMethod(currentMethod);
         methodStatements.put(currentMethod, new ArrayList<>());
         return null;

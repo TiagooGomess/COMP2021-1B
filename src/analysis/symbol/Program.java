@@ -132,12 +132,12 @@ public class Program {
     }
 
     private void addOperatorMethod(String operatorName, Type returnType, List<Terminal> argumentTypes) {
-        this.methods.add(new Method("%" + operatorName, returnType, argumentTypes));
+        this.methods.add(new Method(null, "%" + operatorName, returnType, argumentTypes));
     }
 
     private void addIntArray() {
         Class intArray = new Class("int[]");
-        Method length = new Method("length", INT_TYPE);
+        Method length = new Method(intArray, "length", INT_TYPE);
         intArray.addMethod(length);
         this.externalClasses.add(intArray);
     }
