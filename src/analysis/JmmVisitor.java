@@ -19,6 +19,21 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     private final Map<Method, List<JmmNode>> methodStatements = new HashMap<>();
     private final Map<JmmNode, Statement> statementNode = new HashMap<>();
 
+    public Value noVisit(JmmNode jmmNode, SymbolTable data) {
+        return null;
+    }
+
+    private void stopVisiting() {
+        addVisit("ImportDeclaration", this::noVisit);
+        addVisit("Class", this::noVisit);
+        addVisit("MethodDeclaration", this::noVisit);
+        addVisit("AttributeDeclaration", this::noVisit);
+        addVisit("Argument", this::noVisit);
+        addVisit("MainArgument", this::noVisit);
+        addVisit("VariableDeclaration", this::noVisit);
+        addVisit("Body", this::noVisit);
+    }
+
     public JmmVisitor() {
         addVisit("ImportDeclaration", this::dealWithImport);
         addVisit("Class", this::dealWithClass);
@@ -31,6 +46,11 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
         addVisit("Body", this::dealWithBody);
     }
 
+    private void addReport(JmmException e) {
+        this.symbolTable.addReport(e);
+        stopVisiting();
+    }
+
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }
@@ -40,17 +60,29 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     private Value dealWithImport(JmmNode node, SymbolTable jmmSymbolTable) {
-        symbolTable.addImport(Class.fromNode(node));
+        try {
+            symbolTable.addImport(Class.fromNode(this.symbolTable, node));
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
         return null;
     }
 
     private Value dealWithClass(JmmNode node, SymbolTable jmmSymbolTable) {
-        symbolTable.setMainClass(Class.fromNode(node));
+        try {
+            symbolTable.setMainClass(Class.fromNode(this.symbolTable, node));
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
         return null;
     }
 
     private Value dealWithAttribute(JmmNode node, SymbolTable jmmSymbolTable) {
-        symbolTable.addField(Terminal.fromDeclaration(node));
+        try {
+            symbolTable.addField(Terminal.fromDeclaration(this.symbolTable, node));
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
         return null;
     }
 
@@ -59,19 +91,31 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     private Value dealWithMethod(JmmNode node, SymbolTable jmmSymbolTable) {
-        currentMethod = Method.fromDeclaration(symbolTable.getClass(null), node);
-        symbolTable.addMethod(currentMethod);
-        methodStatements.put(currentMethod, new ArrayList<>());
+        try {
+            currentMethod = Method.fromDeclaration(symbolTable, symbolTable.getClass(null), node);
+            symbolTable.addMethod(currentMethod);
+            methodStatements.put(currentMethod, new ArrayList<>());
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
         return null;
     }
 
     private Value dealWithArgument(JmmNode node, SymbolTable jmmSymbolTable) {
-        currentMethod.addParameter(Terminal.fromDeclaration(node));
+        try {
+            currentMethod.addParameter(Terminal.fromDeclaration(this.symbolTable, node));
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
         return null;
     }
 
     private Value dealWithLocalVariable(JmmNode node, SymbolTable jmmSymbolTable) {
-        currentMethod.addLocalVariable(Terminal.fromDeclaration(node));
+        try {
+            currentMethod.addLocalVariable(Terminal.fromDeclaration(this.symbolTable, node));
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
         return null;
     }
 
@@ -91,6 +135,9 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // ----------------------------------------------------------------
 
     public void analyseMethodValues() {
+        if (!this.symbolTable.getReports().isEmpty())
+            return;
+
         for (Map.Entry<Method, List<JmmNode>> entry : this.methodStatements.entrySet()) {
             Method method = entry.getKey();
             for (JmmNode statementNode : entry.getValue()) {
@@ -98,13 +145,16 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                     Statement statement = Statement.fromNode(this.symbolTable, method, statementNode);
                     this.statementNode.put(statementNode, statement);
                 } catch (JmmException e) {
-                    this.symbolTable.addReport(e);
+                    this.addReport(e);
                 }
             }
         }
     }
 
     public String getOllir() {
+        if (!this.symbolTable.getReports().isEmpty())
+            return null;
+
         StringBuilder builder = new StringBuilder();
 
         for (Method method : this.symbolTable.getClass(null).getMethods()) {

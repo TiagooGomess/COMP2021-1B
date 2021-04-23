@@ -3,6 +3,7 @@ package analysis.symbol;
 import analysis.method.Method;
 import analysis.value.Terminal;
 import analysis.value.Value;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 public class Program {
     public static final Type INT_TYPE = new Type("int", false);
     public static final Type BOOL_TYPE = new Type("boolean", false);
+    public static final Type VOID_TYPE = new Type("void", false);
     public static final Type INT_ARRAY_TYPE = new Type("int", true);
 
     // Global methods
@@ -25,6 +27,7 @@ public class Program {
     public Program() {
         this.addOperatorMethods();
         this.addIntArray();
+        this.addString();
     }
 
     // ----------------------------------------------------------------
@@ -40,7 +43,7 @@ public class Program {
     }
 
     public Class getClass(String className) {
-        if (this.mainClass.getName().equals(className))
+        if (this.mainClass != null && this.mainClass.getName().equals(className))
             return this.mainClass;
         for (Class externalClass : this.externalClasses)
             if (externalClass.getName().equals(className))
@@ -83,6 +86,27 @@ public class Program {
 
         // Variable could not be found
         return null;
+    }
+
+    public Type getType(String typeName) throws JmmException {
+        switch (typeName) {
+            case "int":
+                return Program.INT_TYPE;
+            case "boolean":
+                return Program.BOOL_TYPE;
+            case "void":
+                return Program.VOID_TYPE;
+            default:
+                break;
+        }
+
+        if (this.mainClass != null && this.mainClass.getName().equals(typeName))
+            return this.mainClass.getReturnType();
+        for (Class externalClass : this.externalClasses)
+            if (externalClass.getName().equals(typeName))
+                return externalClass.getReturnType();
+
+        throw JmmException.invalidType(typeName);
     }
 
     // ----------------------------------------------------------------
@@ -142,18 +166,11 @@ public class Program {
         this.externalClasses.add(intArray);
     }
 
-    // ----------------------------------------------------------------
-    // Static function to create new types from strings
-    // ----------------------------------------------------------------
-
-    public static Type stringToType(String typeName) {
-        int size = typeName.length();
-        boolean isArray = false;
-        if (typeName.startsWith("[]", size - 2)) {
-            isArray = true;
-            typeName = typeName.substring(0, size - 2);
-        }
-        return new Type(typeName, isArray);
+    private void addString() {
+        Class string = new Class("String");
+        Class stringArray = new Class("String[]");
+        this.externalClasses.add(string);
+        this.externalClasses.add(stringArray);
     }
 
     // ----------------------------------------------------------------

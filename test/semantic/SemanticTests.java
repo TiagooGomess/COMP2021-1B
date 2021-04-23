@@ -191,7 +191,6 @@ public class SemanticTests {
 
     @Test
     public void testX() {
-        // NOT DONE YET
         /*
         String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/varNotInit.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
@@ -203,7 +202,6 @@ public class SemanticTests {
 
     @Test
     public void extra() {
-        // NOT DONE YET
         String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/extra/miss_type.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);

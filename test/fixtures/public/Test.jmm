@@ -1,4 +1,4 @@
-import test.Test0;
+import Test0;
 
 class Test extends Test0 {
 

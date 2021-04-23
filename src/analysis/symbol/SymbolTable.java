@@ -100,6 +100,10 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         return this.program.getVariable(scopeMethod, variableName);
     }
 
+    public Type getType(String typeName) throws JmmException {
+        return this.program.getType(typeName);
+    }
+
     // ----------------------------------------------------------------
     // Setters
     // ----------------------------------------------------------------
@@ -113,7 +117,7 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
     // ----------------------------------------------------------------
 
     public void addReport(JmmException exception) {
-        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, exception.getStackTrace()[0].getLineNumber(), exception.getMessage()));
+        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0, 0, exception.getMessage()));
     }
 
     public void addImport(Class externalClass) {

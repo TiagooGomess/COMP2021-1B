@@ -57,13 +57,14 @@ public class Terminal extends Value {
 
     // Creating of a terminal that represents a literal in the code
     // valid literals are integers and booleans
-    public static Terminal fromLiteral(JmmNode node) {
-        return new Terminal(Program.stringToType(node.get("type")), node.get("value"));
+    public static Terminal fromLiteral(SymbolTable table, JmmNode node) throws JmmException {
+        Type type = table.getType(node.get("type"));
+        return new Terminal(type, node.get("value"));
     }
 
-    public static Terminal fromDeclaration(JmmNode node) {
-        // TODO: verify if type exists instead of creating it
-        return new Terminal(Program.stringToType(node.get("type")), node.get("name"));
+    public static Terminal fromDeclaration(SymbolTable table, JmmNode node) throws JmmException {
+        Type type = table.getType(node.get("type"));
+        return new Terminal(type, node.get("name"));
     }
 
     public static Value fromVariable(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedType) throws JmmException {

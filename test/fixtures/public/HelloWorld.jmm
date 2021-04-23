@@ -1,7 +1,6 @@
-import java.utils.ioPlus;
-import java.util.Map;
+import ioPlus;
 
-class HelloWorld extends Hello {
+class HelloWorld {
 	public static void main(String[] args) {
 		ioPlus.printHelloWorld();
 	}

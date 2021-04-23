@@ -56,4 +56,8 @@ public class JmmException extends Exception {
     public static JmmException invalidMethod(String methodName) {
         return new JmmException("Method \"" + methodName + "\" could not be found");
     }
+
+    public static JmmException invalidType(String typeName) {
+        return new JmmException("Invalid type \"" + typeName + "\"");
+    }
 }

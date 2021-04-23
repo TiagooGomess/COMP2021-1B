@@ -42,14 +42,20 @@ public class Main implements JmmParser {
 
         AnalysisStage analysisStage = new AnalysisStage();
         JmmSemanticsResult semanticResult = analysisStage.semanticAnalysis(parserResult);
+        if (!semanticResult.getReports().isEmpty())
+            return;
 
         OptimizationStage optimizationStage = new OptimizationStage();
         OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
+        if (!ollirResult.getReports().isEmpty())
+            return;
 
         BackendStage backendStage = new BackendStage();
         JasminResult jasminResult = backendStage.toJasmin(ollirResult);
+        if (!jasminResult.getReports().isEmpty())
+            return;
 
-
+        System.out.println("Done");
     }
 
     @Override

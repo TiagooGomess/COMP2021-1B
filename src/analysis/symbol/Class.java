@@ -4,6 +4,7 @@ import analysis.method.Method;
 import analysis.method.MethodSignature;
 import analysis.value.Terminal;
 import analysis.value.Value;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
@@ -35,8 +36,8 @@ public class Class extends Value {
 
         // Constructor method
         Method constructor;
-        if (this.className.equals("int[]")) {
-            this.classType = new Type("int", true);
+        if (this.className.endsWith("[]")) {
+            this.classType = new Type(this.className.substring(0, this.className.length() - 2), true);
             constructor = new Method(this, "%Construction", this.classType, Collections.singletonList(new Terminal(Program.INT_TYPE, "array size")));
         } else {
             this.classType = new Type(this.className, false);
@@ -160,9 +161,12 @@ public class Class extends Value {
     // Creating from node
     // ----------------------------------------------------------------
 
-    public static Class fromNode(JmmNode node) {
+    public static Class fromNode(SymbolTable table, JmmNode node) throws JmmException {
         String className = node.get("name");
         String superName = node.getAttributes().contains("extends") ? node.get("extends") : null;
+        if (superName != null) {
+            Type superType = table.getType(superName);
+        }
         return new Class(className, superName);
     }
 

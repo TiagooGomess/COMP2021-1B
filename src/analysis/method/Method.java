@@ -2,8 +2,10 @@ package analysis.method;
 
 import analysis.symbol.Class;
 import analysis.symbol.Program;
+import analysis.symbol.SymbolTable;
 import analysis.value.Terminal;
 import analysis.value.Value;
+import exception.JmmException;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
@@ -118,9 +120,9 @@ public class Method extends Value {
     // Creating from node
     // ----------------------------------------------------------------
 
-    public static Method fromDeclaration(Class parentClass, JmmNode node) {
+    public static Method fromDeclaration(SymbolTable table, Class parentClass, JmmNode node) throws JmmException {
         String methodName = node.get("name");
-        Type returnType = Program.stringToType(node.get("type"));
+        Type returnType = table.getType(node.get("type"));
         return new Method(parentClass, methodName, returnType);
     }
 
