@@ -11,6 +11,9 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 
 public class Terminal extends Value {
     private Symbol symbol;
+    private boolean isInitiated = false;
+    private boolean isLiteral = false;
+    private boolean isParameter = false;
 
     public Terminal(Type type, String name) {
         this.symbol = new Symbol(type, name);
@@ -19,6 +22,18 @@ public class Terminal extends Value {
     // ----------------------------------------------------------------
     // Getters
     // ----------------------------------------------------------------
+
+    public boolean isLiteral() {
+        return this.isLiteral;
+    }
+
+    public boolean isParameter() {
+        return this.isParameter;
+    }
+
+    public boolean isInitiated() {
+        return this.isInitiated;
+    }
 
     public Symbol getSymbol() {
         return symbol;
@@ -46,6 +61,18 @@ public class Terminal extends Value {
     // ----------------------------------------------------------------
     // Setters
     // ----------------------------------------------------------------
+
+    public void setIsLiteral() {
+        this.isLiteral = true;
+    }
+
+    public void setIsParameter() {
+        this.isParameter = true;
+    }
+
+    public void setInitiated() {
+        this.isInitiated = true;
+    }
 
     public void setType(Type type) {
         this.symbol = new Symbol(type, this.getName());

@@ -86,14 +86,24 @@ public abstract class Value {
     // ----------------------------------------------------------------
 
     public static Value fromNode(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {
-        Value result = switch (node.getKind()) {
-            case "Literal" -> Terminal.fromLiteral(table, node);
-            case "Variable", "This" -> Terminal.fromVariable(table, scopeMethod, node, expectedReturn);
-            case "Access", "Call", "Construction", "Operation" -> Construction.fromNode(table, scopeMethod, node, expectedReturn);
-            default -> null;
-        };
+        boolean isLiteral = false;
+        Value result;
+        switch (node.getKind()) {
+            case "Literal" -> {
+                result = Terminal.fromLiteral(table, node);
+                isLiteral = true;
+            }
+            case "Variable", "This" -> result = Terminal.fromVariable(table, scopeMethod, node, expectedReturn);
+            case "Access", "Call", "Construction", "Operation" -> result = Construction.fromNode(table, scopeMethod, node, expectedReturn);
+            default -> result = null;
+        }
         if (result == null)
             System.out.println("null value result: " + node.getKind());
+
+        if (isLiteral) {
+            ((Terminal)result).setIsLiteral();
+        }
+
         return result;
     }
 }

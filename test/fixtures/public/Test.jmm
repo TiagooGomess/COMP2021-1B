@@ -1,13 +1,14 @@
-import Test0;
 
-class Test extends Test0 {
-
-    int integerField;
-    int[] arrayOfIntegers;
+class Test {
+    int b;
+    boolean flag;
 
     public static void main(String[] a) {
-        int b;
-        integerField = 1;
-        b = integerField + 2;
+        int c;
+        int d;
+        boolean flag2;
+        flag2 = flag && false;
+        c = d + 3;
+
     }
 }

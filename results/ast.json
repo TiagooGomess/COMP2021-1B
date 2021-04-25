@@ -4,22 +4,32 @@
     "attributes": {},
     "children": [
       {
-        "kind": "ImportDeclaration",
-        "attributes": {
-          "name": "ioPlus"
-        },
-        "children": []
-      },
-      {
         "kind": "Class",
         "attributes": {
-          "name": "HelloWorld"
+          "name": "Test"
         },
         "children": [
           {
             "kind": "Attributes",
             "attributes": {},
-            "children": []
+            "children": [
+              {
+                "kind": "AttributeDeclaration",
+                "attributes": {
+                  "name": "b",
+                  "type": "int"
+                },
+                "children": []
+              },
+              {
+                "kind": "AttributeDeclaration",
+                "attributes": {
+                  "name": "flag",
+                  "type": "boolean"
+                },
+                "children": []
+              }
+            ]
           },
           {
             "kind": "Methods",
@@ -36,7 +46,7 @@
                   {
                     "kind": "MainArgument",
                     "attributes": {
-                      "name": "args",
+                      "name": "a",
                       "type": "String[]"
                     },
                     "children": []
@@ -46,22 +56,108 @@
                     "attributes": {},
                     "children": [
                       {
-                        "kind": "Call",
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "name": "c",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "name": "d",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "name": "flag2",
+                          "type": "boolean"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Assignment",
                         "attributes": {},
                         "children": [
                           {
                             "kind": "Variable",
                             "attributes": {
-                              "name": "ioPlus"
+                              "name": "flag2"
                             },
                             "children": []
                           },
                           {
-                            "kind": "Method",
+                            "kind": "Operation",
+                            "attributes": {},
+                            "children": [
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "name": "flag"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Operator",
+                                "attributes": {
+                                  "name": "Conjunction"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Literal",
+                                "attributes": {
+                                  "type": "boolean",
+                                  "value": "false"
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Assignment",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "kind": "Variable",
                             "attributes": {
-                              "name": "printHelloWorld"
+                              "name": "c"
                             },
                             "children": []
+                          },
+                          {
+                            "kind": "Operation",
+                            "attributes": {},
+                            "children": [
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "name": "d"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Operator",
+                                "attributes": {
+                                  "name": "Addition"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Literal",
+                                "attributes": {
+                                  "type": "int",
+                                  "value": "3"
+                                },
+                                "children": []
+                              }
+                            ]
                           }
                         ]
                       }

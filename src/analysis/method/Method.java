@@ -109,6 +109,7 @@ public class Method extends Value {
     // ----------------------------------------------------------------
 
     public void addParameter(Terminal parameter) {
+        parameter.setIsParameter();
         this.getParameters().add(parameter);
     }
 

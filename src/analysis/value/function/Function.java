@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static analysis.symbol.Program.BOOL_TYPE;
+import static analysis.symbol.Program.INT_TYPE;
+
 public abstract class Function extends Value {
     protected SymbolTable table = null;
     protected Method scopeMethod = null;
@@ -81,6 +84,16 @@ public abstract class Function extends Value {
 
             // Create new method by inference
             this.methods = Collections.singletonList(createMethodByInference(table, methodClass, call, getNewParameters()));
+        }
+    }
+
+    public void checkInitiatedVariable() throws JmmException {
+        for (Value value: this.argumentValues) {
+            if (value instanceof Terminal) {
+                Terminal terminal = (Terminal) value;
+                if (!terminal.isInitiated() && !terminal.isLiteral() && !terminal.isParameter())
+                    throw JmmException.uninitializedVariable(terminal.getName());
+            }
         }
     }
 
@@ -174,6 +187,7 @@ public abstract class Function extends Value {
             Call call = (Call) function;
             function.method.setReturnType(call.expectedReturn);
         }
+        function.checkInitiatedVariable();
         return function;
     }
 }
