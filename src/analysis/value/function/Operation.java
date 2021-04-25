@@ -24,8 +24,6 @@ public class Operation extends Function {
             }
         }
         this.setMethod();
-
-
     }
 
     @Override

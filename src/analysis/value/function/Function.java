@@ -15,9 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static analysis.symbol.Program.BOOL_TYPE;
-import static analysis.symbol.Program.INT_TYPE;
-
 public abstract class Function extends Value {
     protected SymbolTable table = null;
     protected Method scopeMethod = null;
