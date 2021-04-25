@@ -84,6 +84,16 @@ public abstract class Function extends Value {
         }
     }
 
+    public void checkInitiatedVariable() throws JmmException {
+        for (Value value: this.argumentValues) {
+            if (value instanceof Terminal) {
+                Terminal terminal = (Terminal) value;
+                if (!terminal.isInitiated() && !terminal.isLiteral() && !terminal.isParameter())
+                    throw JmmException.uninitializedVariable(terminal.getName());
+            }
+        }
+    }
+
     // ----------------------------------------------------------------
     // Static functions for expression creation
     // ----------------------------------------------------------------
@@ -174,6 +184,7 @@ public abstract class Function extends Value {
             Call call = (Call) function;
             function.method.setReturnType(call.expectedReturn);
         }
+        function.checkInitiatedVariable();
         return function;
     }
 }

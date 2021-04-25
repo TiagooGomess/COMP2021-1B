@@ -21,6 +21,10 @@ public class JmmException extends Exception {
         return new JmmException("Variable \"" + variableName + "\" was not declared in the scope");
     }
 
+    public static JmmException uninitializedVariable(String variableName) {
+        return new JmmException("Variable \"" + variableName + "\" was not initialized");
+    }
+
     public static JmmException invalidNumberOfArguments(String methodName, int found) {
         return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found");
     }

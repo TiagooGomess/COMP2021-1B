@@ -19,6 +19,13 @@ public class Assignment extends Statement {
         this.method = method;
         this.variable = variable;
         this.expression = expression;
+        setInitiated();
+    }
+
+    private void setInitiated() {
+        if (variable instanceof Terminal) {
+            ((Terminal) variable).setInitiated();
+        }
     }
 
     public String getOllir() {
