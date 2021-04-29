@@ -1,6 +1,7 @@
 options
 {
    LOOKAHEAD = 1;
+   NODE_SCOPE_HOOK=true;
    //FORCE_LA_CHECK = true;
 }
 
@@ -29,6 +30,14 @@ public class JmmCompiler
 
    public void addReport(Exception e, String message){
       reports.add(new Report(ReportType.ERROR, Stage.SYNTATIC, e.getStackTrace()[0].getLineNumber(), message));
+   }
+
+   void jjtreeOpenNodeScope(Node n) {
+       ((SimpleNode)n).put("line", Integer.toString(getToken(1).beginLine));
+       ((SimpleNode)n).put("col", Integer.toString(getToken(1).beginColumn));
+   }
+
+   void jjtreeCloseNodeScope(Node n) {
    }
 }
 

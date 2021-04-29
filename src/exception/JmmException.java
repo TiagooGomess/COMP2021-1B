@@ -5,21 +5,41 @@ import analysis.value.Terminal;
 import analysis.value.Value;
 import analysis.value.function.Access;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.JmmNode;
 
 import java.util.List;
 import java.util.ArrayList;
 
 public class JmmException extends Exception {
+    private int line = 0;
+    private int column = 0;
+
     private JmmException(String message) {
         super(message);
     }
 
+    private JmmException(String message, String line, String col) {
+        super(message);
+        this.line = Integer.parseInt(line);
+        this.column = Integer.parseInt(col);
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
     private static String getOutputType(Type type) {
+        if (type == null)
+            return "unknown type";
         return type.isArray() ? type.getName() + "[]" : type.getName();
     }
 
-    public static JmmException undeclaredVariable(String variableName) {
-        return new JmmException("Variable \"" + variableName + "\" was not declared in the scope");
+    public static JmmException undeclaredVariable(JmmNode errorNode, String variableName) {
+        return new JmmException("Variable \"" + variableName + "\" was not declared in the scope", errorNode.get("line"), errorNode.get("col"));
     }
 
     public static JmmException attributeAlreadyDefined(String variableName, String className) {
@@ -83,8 +103,8 @@ public class JmmException extends Exception {
         return new JmmException("Invalid type \"" + typeName + "\"");
     }
 
-    public static JmmException invalidCaller(String methodName, Value caller) {
-        String explanationString = (caller instanceof Class) ? "was expecting instance of class, found class reference" : "was expecting class reference, found instance of class";
-        return new JmmException("Invalid caller of method \"" + methodName + "\" of class \"" + caller.getReturnType().getName() + "\", " + explanationString);
+    public static JmmException invalidCaller(JmmNode errorNode, String methodName, Value caller) {
+        String explanationString = (caller instanceof Class) ? "was expecting instance of class and found class reference" : "was expecting class reference and found instance of class";
+        return new JmmException("Invalid caller of method \"" + methodName + "\" of class \"" + caller.getReturnType().getName() + "\", " + explanationString, errorNode.get("line"), errorNode.get("col"));
     }
 }

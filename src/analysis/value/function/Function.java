@@ -192,7 +192,7 @@ public abstract class Function extends Value {
             // Varify if object or class reference
             if ((function.method.isStatic() && !(call.objectCalling instanceof Class))
                     || (!function.method.isStatic() && (call.objectCalling instanceof Class))) {
-                throw JmmException.invalidCaller(function.method.getName(), call.objectCalling);
+                throw JmmException.invalidCaller(node, function.method.getName(), call.objectCalling);
             }
         }
 

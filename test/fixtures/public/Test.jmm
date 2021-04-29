@@ -1,18 +1,11 @@
 
 class Test {
-    int b;
-    boolean flag;
-
     public static void main(String[] a) {
-        int c;
-        int d;
-        boolean flag2;
-        d = d;
     }
 
     public int a() {
-        Test a;
-        (new Test()).a();
+        int a;
+        Test.a();
         return 1;
     }
 }

@@ -1,44 +1,40 @@
 {
   "rootNode": {
     "kind": "Program",
-    "attributes": {},
+    "attributes": {
+      "col": "1",
+      "line": "2"
+    },
     "children": [
       {
         "kind": "Class",
         "attributes": {
+          "col": "1",
+          "line": "2",
           "name": "Test"
         },
         "children": [
           {
             "kind": "Attributes",
-            "attributes": {},
-            "children": [
-              {
-                "kind": "AttributeDeclaration",
-                "attributes": {
-                  "name": "b",
-                  "type": "int"
-                },
-                "children": []
-              },
-              {
-                "kind": "AttributeDeclaration",
-                "attributes": {
-                  "name": "flag",
-                  "type": "boolean"
-                },
-                "children": []
-              }
-            ]
+            "attributes": {
+              "col": "5",
+              "line": "3"
+            },
+            "children": []
           },
           {
             "kind": "Methods",
-            "attributes": {},
+            "attributes": {
+              "col": "5",
+              "line": "3"
+            },
             "children": [
               {
                 "kind": "MethodDeclaration",
                 "attributes": {
+                  "col": "5",
                   "isStatic": "true",
+                  "line": "3",
                   "name": "main",
                   "type": "void"
                 },
@@ -46,6 +42,8 @@
                   {
                     "kind": "MainArgument",
                     "attributes": {
+                      "col": "29",
+                      "line": "3",
                       "name": "a",
                       "type": "String[]"
                     },
@@ -53,95 +51,70 @@
                   },
                   {
                     "kind": "Body",
-                    "attributes": {},
-                    "children": [
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "c",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "d",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "VariableDeclaration",
-                        "attributes": {
-                          "name": "flag2",
-                          "type": "boolean"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "Assignment",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "d"
-                            },
-                            "children": []
-                          },
-                          {
-                            "kind": "Variable",
-                            "attributes": {
-                              "name": "d"
-                            },
-                            "children": []
-                          }
-                        ]
-                      }
-                    ]
+                    "attributes": {
+                      "col": "5",
+                      "line": "4"
+                    },
+                    "children": []
                   }
                 ]
               },
               {
                 "kind": "MethodDeclaration",
                 "attributes": {
+                  "col": "5",
                   "isStatic": "false",
+                  "line": "6",
                   "name": "a",
                   "type": "int"
                 },
                 "children": [
                   {
                     "kind": "Arguments",
-                    "attributes": {},
+                    "attributes": {
+                      "col": "20",
+                      "line": "6"
+                    },
                     "children": []
                   },
                   {
                     "kind": "Body",
-                    "attributes": {},
+                    "attributes": {
+                      "col": "9",
+                      "line": "7"
+                    },
                     "children": [
                       {
                         "kind": "VariableDeclaration",
                         "attributes": {
+                          "col": "9",
+                          "line": "8",
                           "name": "a",
-                          "type": "Test"
+                          "type": "int"
                         },
                         "children": []
                       },
                       {
                         "kind": "Call",
-                        "attributes": {},
+                        "attributes": {
+                          "col": "14",
+                          "line": "8"
+                        },
                         "children": [
                           {
-                            "kind": "Construction",
+                            "kind": "Variable",
                             "attributes": {
-                              "type": "Test"
+                              "col": "13",
+                              "line": "8",
+                              "name": "Test"
                             },
                             "children": []
                           },
                           {
                             "kind": "Method",
                             "attributes": {
+                              "col": "14",
+                              "line": "8",
                               "name": "a"
                             },
                             "children": []
@@ -150,11 +123,16 @@
                       },
                       {
                         "kind": "Return",
-                        "attributes": {},
+                        "attributes": {
+                          "col": "16",
+                          "line": "9"
+                        },
                         "children": [
                           {
                             "kind": "Literal",
                             "attributes": {
+                              "col": "17",
+                              "line": "9",
                               "type": "int",
                               "value": "1"
                             },
