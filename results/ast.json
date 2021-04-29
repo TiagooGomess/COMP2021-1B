@@ -114,54 +114,35 @@
                   {
                     "kind": "Arguments",
                     "attributes": {},
-                    "children": [
-                      {
-                        "kind": "Argument",
-                        "attributes": {
-                          "name": "a",
-                          "type": "int"
-                        },
-                        "children": []
-                      }
-                    ]
+                    "children": []
                   },
                   {
                     "kind": "Body",
                     "attributes": {},
                     "children": [
                       {
-                        "kind": "Call",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "This",
-                            "attributes": {},
-                            "children": []
-                          },
-                          {
-                            "kind": "Method",
-                            "attributes": {
-                              "name": "b"
-                            },
-                            "children": []
-                          }
-                        ]
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "name": "a",
+                          "type": "Test"
+                        },
+                        "children": []
                       },
                       {
                         "kind": "Call",
                         "attributes": {},
                         "children": [
                           {
-                            "kind": "Variable",
+                            "kind": "Construction",
                             "attributes": {
-                              "name": "Test"
+                              "type": "Test"
                             },
                             "children": []
                           },
                           {
                             "kind": "Method",
                             "attributes": {
-                              "name": "b"
+                              "name": "a"
                             },
                             "children": []
                           }
@@ -176,41 +157,6 @@
                             "attributes": {
                               "type": "int",
                               "value": "1"
-                            },
-                            "children": []
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "kind": "MethodDeclaration",
-                "attributes": {
-                  "isStatic": "false",
-                  "name": "b",
-                  "type": "int"
-                },
-                "children": [
-                  {
-                    "kind": "Arguments",
-                    "attributes": {},
-                    "children": []
-                  },
-                  {
-                    "kind": "Body",
-                    "attributes": {},
-                    "children": [
-                      {
-                        "kind": "Return",
-                        "attributes": {},
-                        "children": [
-                          {
-                            "kind": "Literal",
-                            "attributes": {
-                              "type": "int",
-                              "value": "3"
                             },
                             "children": []
                           }

@@ -65,7 +65,7 @@ public class Construction extends Function {
         if (!isArray) {
             builder.append("invokespecial");
             builder.append("(");
-            builder.append("A").append(typeOllir); // TODO: change A to variable name
+            builder.append("%VariableName");
             builder.append(", \"<init>\").V");
         }
 

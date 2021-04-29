@@ -10,13 +10,9 @@ class Test {
         d = d;
     }
 
-    public int a(int a) {
-        this.b();
-        Test.b();
+    public int a() {
+        Test a;
+        (new Test()).a();
         return 1;
-    }
-
-    public int b() {
-        return 3;
     }
 }
