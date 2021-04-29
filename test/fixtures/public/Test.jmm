@@ -1,14 +1,6 @@
 
 class Test {
-    int b;
-    boolean flag;
-
     public static void main(String[] a) {
-        int c;
-        int d;
-        boolean flag2;
-        flag2 = flag && false;
-        c = d + 3;
-
+        b + 2;
     }
 }

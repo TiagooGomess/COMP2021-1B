@@ -117,18 +117,18 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
     // ----------------------------------------------------------------
 
     public void addReport(JmmException exception) {
-        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, 0, 0, exception.getMessage()));
+        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, exception.getLine(), exception.getColumn(), exception.getMessage()));
     }
 
     public void addImport(Class externalClass) {
         this.program.addExternalClass(externalClass);
     }
 
-    public void addField(Terminal terminal) {
+    public void addField(Terminal terminal) throws JmmException {
         this.program.getMainClass().addAttribute(terminal);
     }
 
-    public void addMethod(Method method) {
+    public void addMethod(Method method) throws JmmException {
         this.program.getMainClass().addMethod(method);
     }
 

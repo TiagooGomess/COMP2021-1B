@@ -162,7 +162,11 @@ public class Program {
     private void addIntArray() {
         Class intArray = new Class("int[]");
         Method length = new Method(intArray, "length", INT_TYPE);
-        intArray.addMethod(length);
+        try {
+            intArray.addMethod(length);
+        } catch (Exception e) {
+
+        }
         this.externalClasses.add(intArray);
     }
 

@@ -30,7 +30,7 @@ public class Return extends Statement {
         JmmNode expressionNode = node.getChildren().get(0);
         Value returnExpression = Value.fromNode(table, currentMethod, expressionNode, currentMethod.getReturnType());
         if (!currentMethod.getReturnType().equals(returnExpression.getReturnType()))
-            throw JmmException.invalidReturn(currentMethod.getName(), currentMethod.getReturnType(), returnExpression.getReturnType());
+            throw JmmException.invalidReturn(node, currentMethod.getName(), currentMethod.getReturnType(), returnExpression.getReturnType());
         return new Return(table, currentMethod, returnExpression);
     }
 }

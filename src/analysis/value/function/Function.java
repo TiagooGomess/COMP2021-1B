@@ -76,7 +76,7 @@ public abstract class Function extends Value {
 
             // If its the main class of the Jmm file we are parsing
             if (methodClass == null || (this.table.getClassName().equals(methodClass.getName()) && this.table.getSuper() == null)) {
-                throw JmmException.invalidMethod(this.methodName);
+                throw JmmException.invalidMethod(this.node, this.methodName);
             }
 
             // Create new method by inference
@@ -85,11 +85,11 @@ public abstract class Function extends Value {
     }
 
     public void checkInitiatedVariable() throws JmmException {
-        for (Value value: this.argumentValues) {
+        for (Value value : this.argumentValues) {
             if (value instanceof Terminal) {
                 Terminal terminal = (Terminal) value;
                 if (!terminal.isInitiated() && !terminal.isLiteral() && !terminal.isParameter())
-                    throw JmmException.uninitializedVariable(terminal.getName());
+                    throw JmmException.uninitializedVariable(this.node, terminal.getName());
             }
         }
     }
@@ -99,10 +99,14 @@ public abstract class Function extends Value {
     // ----------------------------------------------------------------
 
     public static Method createMethodByInference(SymbolTable table, Class methodClass, Call call, List<Terminal> types) {
-        Method inferred = new Method(methodClass, call.methodName, call.expectedReturn, types);
+        Method inferred = new Method(methodClass, call.methodName, call.expectedReturn, types, call.objectCalling instanceof Class);
         if (methodClass == null)
             methodClass = table.getClass(null);
-        methodClass.addMethod(inferred);
+        try {
+            methodClass.addMethod(inferred);
+        } catch (Exception e) {
+
+        }
         return inferred;
     }
 
@@ -128,7 +132,7 @@ public abstract class Function extends Value {
 
         // If no method has the same number of arguments
         if (possibleParameterLists.isEmpty() && table.getSuper() == null) {
-            throw JmmException.invalidNumberOfArguments(function.getOutputName(), arguments.size());
+            throw JmmException.invalidNumberOfArguments(node, function.getOutputName(), arguments.size());
         }
 
         Map<Method, List<Value>> methodTypeList = new HashMap<>();
@@ -141,11 +145,7 @@ public abstract class Function extends Value {
                 List<Terminal> possibleParameterList = possibleParameterLists.get(method);
                 Terminal parameter = possibleParameterList.get(i);
                 Value value;
-                try {
-                    value = Value.fromNode(table, scopeMethod, arguments.get(i), possibleParameterList.get(i).getReturnType());
-                } catch (JmmException e) {
-                    continue;
-                }
+                value = Value.fromNode(table, scopeMethod, arguments.get(i), possibleParameterList.get(i).getReturnType());
 
                 if (parameter.getReturnType().equals(value.getReturnType()))
                     newParameterLists.put(method, possibleParameterList);
@@ -169,21 +169,30 @@ public abstract class Function extends Value {
             }
 
             for (Method method : methodTypeList.keySet())
-                throw JmmException.invalidTypeForArguments(function.getOutputName(), methodTypeList.get(method));
+                throw JmmException.invalidTypeForArguments(node, function.getOutputName(), methodTypeList.get(method));
         }
 
-        for (Method method : possibleParameterLists.keySet())
+        for (Method method : possibleParameterLists.keySet()) {
             function.method = method;
+        }
 
         function.argumentValues = methodTypeList.get(function.method);
         if (function.argumentValues == null)
             function.argumentValues = new ArrayList<>();
 
-        // Update method if found the type of it
-        if (function.getReturnType() == null && function instanceof Call) {
+        if (function instanceof Call) {
             Call call = (Call) function;
-            function.method.setReturnType(call.expectedReturn);
+            // Update method if found the type of it
+            if (function.getReturnType() == null)
+                function.method.setReturnType(call.expectedReturn);
+
+            // Varify if object or class reference
+            if ((function.method.isStatic() && !(call.objectCalling instanceof Class))
+                    || (!function.method.isStatic() && (call.objectCalling instanceof Class))) {
+                throw JmmException.invalidCaller(node, function.method.getName(), call.objectCalling);
+            }
         }
+
         function.checkInitiatedVariable();
         return function;
     }

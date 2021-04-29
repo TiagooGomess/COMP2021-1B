@@ -1,18 +1,14 @@
 import io;
+
 class Simple {
 
-    public int add(int a, int b){
+    public int add(int a, int b) {
         int c;
-        int b;
-        int a;
-        a = 1;
-        b = 1;
-        c = a + b;
-        //c = a + this.constInstr();
+        c = a + this.constInstr();
         return c;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         int a;
         int b;
         int c;
@@ -20,11 +16,11 @@ class Simple {
         a = 20;
         b = 10;
         s = new Simple();
-        c = s.add(a,b);
+        c = s.add(a, b);
         io.println(c);
     }
 
-    public int constInstr(){
+    public int constInstr() {
         int c;
         c = 0;
         c = 4;
@@ -34,7 +30,7 @@ class Simple {
         c = 400;
         c = 1000;
         c = 100474650;
-		c = 10;
+        c = 10;
         return c;
     }
 

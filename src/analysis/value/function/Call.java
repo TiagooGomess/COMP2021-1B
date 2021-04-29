@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Call extends Function {
     protected final Type expectedReturn;
-    private Value objectCalling;
+    protected Value objectCalling;
     private JmmNode argumentsNode = null;
 
     public Call(SymbolTable table, Method scopeMethod, JmmNode node, Type expectedReturn) throws JmmException {

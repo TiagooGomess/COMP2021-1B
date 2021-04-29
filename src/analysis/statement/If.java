@@ -51,7 +51,7 @@ public class If extends Statement {
 
         // the if condition needs to be a boolean
         if (!conditionValue.getReturnType().equals(Program.BOOL_TYPE))
-            throw JmmException.invalidCondition(conditionValue.getReturnType());
+            throw JmmException.invalidCondition(node, conditionValue.getReturnType());
 
         return new If(table, currentMethod, conditionValue, thenStatement, elseStatement);
     }

@@ -90,8 +90,20 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     // Methods
     // ----------------------------------------------------------------
 
+    private void verifyMethods() throws JmmException {
+        if (this.currentMethod != null) {
+            for (Method method : this.symbolTable.getClass(null).getMethods()) {
+                if (method == this.currentMethod)
+                    continue;
+                if (method.getSignature().equals(this.currentMethod.getSignature()))
+                    throw JmmException.methodAlreadyDefined(method.getName(), this.symbolTable.getClassName(), method.getParameters());
+            }
+        }
+    }
+
     private Value dealWithMethod(JmmNode node, SymbolTable jmmSymbolTable) {
         try {
+            verifyMethods();
             currentMethod = Method.fromDeclaration(symbolTable, symbolTable.getClass(null), node);
             symbolTable.addMethod(currentMethod);
             methodStatements.put(currentMethod, new ArrayList<>());
@@ -137,6 +149,12 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     public void analyseMethodValues() {
         if (!this.symbolTable.getReports().isEmpty())
             return;
+
+        try {
+            verifyMethods();
+        } catch (JmmException e) {
+            this.addReport(e);
+        }
 
         for (Map.Entry<Method, List<JmmNode>> entry : this.methodStatements.entrySet()) {
             Method method = entry.getKey();

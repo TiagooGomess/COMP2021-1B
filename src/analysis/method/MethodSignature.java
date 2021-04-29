@@ -5,6 +5,7 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MethodSignature {
     private boolean isStatic;
@@ -64,5 +65,13 @@ public class MethodSignature {
             return false;
         MethodSignature operand = (MethodSignature) obj;
         return this.methodName.equals(operand.methodName) && this.getParameterTypes().equals(operand.getParameterTypes());
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+        for (Type e : this.getParameterTypes())
+            hashCode = 31 * hashCode + e.hashCode();
+        return Objects.hash(isStatic, methodName) + hashCode;
     }
 }

@@ -40,7 +40,7 @@ public abstract class Value {
         }
 
         ArrayList<String> childLines = new ArrayList<>(Arrays.asList(ollir.split("\n")));
-        String lastLine = childLines.get(childLines.size() - 1);
+        String lastLine = childLines.get(childLines.size() - 1).replace("%VariableName", terminal.getOllir()).replace("; invokespecial", ";\ninvokespecial");
         childLines.remove(childLines.size() - 1);
         String assignmentType = Value.typeToOllir(operand.getReturnType());
         result.insert(0, terminal.getOllir() + " :=" + assignmentType + " " + lastLine + ";\n");
@@ -101,7 +101,7 @@ public abstract class Value {
             System.out.println("null value result: " + node.getKind());
 
         if (isLiteral) {
-            ((Terminal)result).setIsLiteral();
+            ((Terminal) result).setIsLiteral();
         }
 
         return result;

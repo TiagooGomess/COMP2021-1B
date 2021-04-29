@@ -32,6 +32,13 @@ public class Method extends Value {
         this.localVariables = new ArrayList<>();
     }
 
+    public Method(Class parentClass, String methodName, Type returnType, List<Terminal> parameters, boolean isStatic) {
+        this.parentClass = parentClass;
+        this.signature = new MethodSignature(methodName, parameters, isStatic);
+        this.returnType = returnType;
+        this.localVariables = new ArrayList<>();
+    }
+
     public Method(Class parentClass, String methodName, Type returnType, List<Terminal> parameters, boolean isStatic, List<Terminal> localVariables) {
         this.parentClass = parentClass;
         this.signature = new MethodSignature(methodName, parameters, isStatic);
@@ -73,7 +80,7 @@ public class Method extends Value {
         return this.localVariables;
     }
 
-    public Terminal getVariable(String variableName) {
+    public Terminal getLocalVariable(String variableName) {
         // Search in local variables
         for (Terminal variable : this.localVariables)
             if (variable.getName().equals(variableName))
@@ -83,6 +90,14 @@ public class Method extends Value {
         for (Terminal variable : this.getParameters())
             if (variable.getName().equals(variableName))
                 return variable;
+
+        return null;
+    }
+
+    public Terminal getVariable(String variableName) {
+        Terminal localVariable = getLocalVariable(variableName);
+        if (localVariable != null)
+            return localVariable;
 
         // Search in class fields
         for (Terminal variable : this.parentClass.getAttributes())
@@ -113,7 +128,9 @@ public class Method extends Value {
         this.getParameters().add(parameter);
     }
 
-    public void addLocalVariable(Terminal localVariable) {
+    public void addLocalVariable(Terminal localVariable) throws JmmException {
+        if (this.getLocalVariable(localVariable.getName()) != null)
+            throw JmmException.variableAlreadyDefined(localVariable.getName());
         this.localVariables.add(localVariable);
     }
 

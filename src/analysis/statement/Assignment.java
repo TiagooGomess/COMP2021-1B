@@ -75,7 +75,7 @@ public class Assignment extends Statement {
         if (variable instanceof Terminal && variable.getReturnType() == null)
             ((Terminal) variable).setType(expression.getReturnType());
         else if (!variable.getReturnType().equals(expression.getReturnType()))
-            throw JmmException.invalidAssignment(variable, expression.getReturnType());
+            throw JmmException.invalidAssignment(node, variable, expression.getReturnType());
 
         return new Assignment(table, currentMethod, variable, expression);
     }
