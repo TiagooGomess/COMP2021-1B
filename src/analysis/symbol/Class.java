@@ -138,7 +138,10 @@ public class Class extends Value {
     // Adders
     // ----------------------------------------------------------------
 
-    public void addAttribute(Terminal attribute) {
+    public void addAttribute(Terminal attribute) throws JmmException {
+        for (Terminal oldAttribute : this.attributes)
+            if (oldAttribute.getName().equals(attribute.getName()))
+                throw JmmException.attributeAlreadyDefined(attribute.getName(), this.className);
         this.attributes.add(attribute);
     }
 

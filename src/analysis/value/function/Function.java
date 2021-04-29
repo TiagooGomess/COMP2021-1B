@@ -85,7 +85,7 @@ public abstract class Function extends Value {
     }
 
     public void checkInitiatedVariable() throws JmmException {
-        for (Value value: this.argumentValues) {
+        for (Value value : this.argumentValues) {
             if (value instanceof Terminal) {
                 Terminal terminal = (Terminal) value;
                 if (!terminal.isInitiated() && !terminal.isLiteral() && !terminal.isParameter())
@@ -102,7 +102,11 @@ public abstract class Function extends Value {
         Method inferred = new Method(methodClass, call.methodName, call.expectedReturn, types);
         if (methodClass == null)
             methodClass = table.getClass(null);
-        methodClass.addMethod(inferred);
+        try {
+            methodClass.addMethod(inferred);
+        } catch (Exception e) {
+
+        }
         return inferred;
     }
 

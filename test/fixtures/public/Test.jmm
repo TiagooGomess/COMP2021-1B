@@ -7,8 +7,18 @@ class Test {
         int c;
         int d;
         boolean flag2;
-        flag2 = flag && false;
-        c = d + 3;
+        d = d;
+    }
 
+    public int a(int a) {
+        return 1;
+    }
+
+    public int a(int b) {
+        return 2;
+    }
+
+    public int b() {
+        return 3;
     }
 }

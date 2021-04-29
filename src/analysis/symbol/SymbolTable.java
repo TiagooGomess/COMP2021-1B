@@ -124,11 +124,11 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         this.program.addExternalClass(externalClass);
     }
 
-    public void addField(Terminal terminal) {
+    public void addField(Terminal terminal) throws JmmException {
         this.program.getMainClass().addAttribute(terminal);
     }
 
-    public void addMethod(Method method) {
+    public void addMethod(Method method) throws JmmException {
         this.program.getMainClass().addMethod(method);
     }
 

@@ -86,78 +86,139 @@
                           {
                             "kind": "Variable",
                             "attributes": {
-                              "name": "flag2"
+                              "name": "d"
                             },
                             "children": []
                           },
-                          {
-                            "kind": "Operation",
-                            "attributes": {},
-                            "children": [
-                              {
-                                "kind": "Variable",
-                                "attributes": {
-                                  "name": "flag"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Operator",
-                                "attributes": {
-                                  "name": "Conjunction"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Literal",
-                                "attributes": {
-                                  "type": "boolean",
-                                  "value": "false"
-                                },
-                                "children": []
-                              }
-                            ]
-                          }
-                        ]
-                      },
-                      {
-                        "kind": "Assignment",
-                        "attributes": {},
-                        "children": [
                           {
                             "kind": "Variable",
                             "attributes": {
-                              "name": "c"
+                              "name": "d"
                             },
                             "children": []
-                          },
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "isStatic": "false",
+                  "name": "a",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "name": "a",
+                          "type": "int"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Return",
+                        "attributes": {},
+                        "children": [
                           {
-                            "kind": "Operation",
-                            "attributes": {},
-                            "children": [
-                              {
-                                "kind": "Variable",
-                                "attributes": {
-                                  "name": "d"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Operator",
-                                "attributes": {
-                                  "name": "Addition"
-                                },
-                                "children": []
-                              },
-                              {
-                                "kind": "Literal",
-                                "attributes": {
-                                  "type": "int",
-                                  "value": "3"
-                                },
-                                "children": []
-                              }
-                            ]
+                            "kind": "Literal",
+                            "attributes": {
+                              "type": "int",
+                              "value": "1"
+                            },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "isStatic": "false",
+                  "name": "a",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "name": "b",
+                          "type": "int"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Return",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "kind": "Literal",
+                            "attributes": {
+                              "type": "int",
+                              "value": "2"
+                            },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "isStatic": "false",
+                  "name": "b",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {},
+                    "children": []
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {},
+                    "children": [
+                      {
+                        "kind": "Return",
+                        "attributes": {},
+                        "children": [
+                          {
+                            "kind": "Literal",
+                            "attributes": {
+                              "type": "int",
+                              "value": "3"
+                            },
+                            "children": []
                           }
                         ]
                       }

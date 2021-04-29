@@ -21,6 +21,22 @@ public class JmmException extends Exception {
         return new JmmException("Variable \"" + variableName + "\" was not declared in the scope");
     }
 
+    public static JmmException attributeAlreadyDefined(String variableName, String className) {
+        return new JmmException("Field \"" + variableName + "\" is already defined in class \"" + className + "\"");
+    }
+
+    public static JmmException methodAlreadyDefined(String methodName, String className, List<Terminal> parameters) {
+        List<String> types = new ArrayList<>();
+        for (Value value : parameters)
+            types.add("\"" + getOutputType(value.getReturnType()) + "\"");
+        String parameterString = types.size() > 0 ? "(" + String.join(", ", types) + ")" : "no";
+        return new JmmException("Method \"" + methodName + "\" with " + parameterString + " parameters is already defined in class \"" + className + "\"");
+    }
+
+    public static JmmException variableAlreadyDefined(String variableName) {
+        return new JmmException("Variable \"" + variableName + "\" is already defined in the scope");
+    }
+
     public static JmmException uninitializedVariable(String variableName) {
         return new JmmException("Variable \"" + variableName + "\" was not initialized");
     }
@@ -33,7 +49,8 @@ public class JmmException extends Exception {
         List<String> types = new ArrayList<>();
         for (Value value : arguments)
             types.add("\"" + getOutputType(value.getReturnType()) + "\"");
-        return new JmmException("Invalid call for " + methodName + ", no implementation with (" + String.join(", ", types) + ") parameters found");
+        String parameterString = types.size() > 0 ? "(" + String.join(", ", types) + ")" : "no";
+        return new JmmException("Invalid call for " + methodName + ", no implementation with " + parameterString + " parameters found");
     }
 
     public static JmmException invalidAssignmentVariable() {

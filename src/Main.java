@@ -42,7 +42,7 @@ public class Main implements JmmParser {
 
         AnalysisStage analysisStage = new AnalysisStage();
         JmmSemanticsResult semanticResult = analysisStage.semanticAnalysis(parserResult);
-        if (!semanticResult.getReports().isEmpty())
+        if (semanticResult == null || !semanticResult.getReports().isEmpty())
             return;
 
         OptimizationStage optimizationStage = new OptimizationStage();
