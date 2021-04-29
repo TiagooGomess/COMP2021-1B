@@ -57,7 +57,7 @@ public class While extends Statement {
 
         // the while condition needs to be a boolean
         if (!conditionValue.getReturnType().equals(Program.BOOL_TYPE))
-            throw JmmException.invalidCondition(conditionValue.getReturnType());
+            throw JmmException.invalidCondition(node, conditionValue.getReturnType());
 
         return new While(table, currentMethod, conditionValue, statement);
     }

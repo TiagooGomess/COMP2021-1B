@@ -4,8 +4,7 @@ class Test {
     }
 
     public int a() {
-        int a;
-        Test.a();
+        a = a + 2;
         return 1;
     }
 }

@@ -76,7 +76,7 @@ public abstract class Function extends Value {
 
             // If its the main class of the Jmm file we are parsing
             if (methodClass == null || (this.table.getClassName().equals(methodClass.getName()) && this.table.getSuper() == null)) {
-                throw JmmException.invalidMethod(this.methodName);
+                throw JmmException.invalidMethod(this.node, this.methodName);
             }
 
             // Create new method by inference
@@ -132,7 +132,7 @@ public abstract class Function extends Value {
 
         // If no method has the same number of arguments
         if (possibleParameterLists.isEmpty() && table.getSuper() == null) {
-            throw JmmException.invalidNumberOfArguments(function.getOutputName(), arguments.size());
+            throw JmmException.invalidNumberOfArguments(node, function.getOutputName(), arguments.size());
         }
 
         Map<Method, List<Value>> methodTypeList = new HashMap<>();
@@ -173,7 +173,7 @@ public abstract class Function extends Value {
             }
 
             for (Method method : methodTypeList.keySet())
-                throw JmmException.invalidTypeForArguments(function.getOutputName(), methodTypeList.get(method));
+                throw JmmException.invalidTypeForArguments(node, function.getOutputName(), methodTypeList.get(method));
         }
 
         for (Method method : possibleParameterLists.keySet())

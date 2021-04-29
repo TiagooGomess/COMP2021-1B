@@ -85,39 +85,57 @@
                     },
                     "children": [
                       {
-                        "kind": "VariableDeclaration",
+                        "kind": "Assignment",
                         "attributes": {
-                          "col": "9",
-                          "line": "8",
-                          "name": "a",
-                          "type": "int"
-                        },
-                        "children": []
-                      },
-                      {
-                        "kind": "Call",
-                        "attributes": {
-                          "col": "14",
-                          "line": "8"
+                          "col": "13",
+                          "line": "7"
                         },
                         "children": [
                           {
                             "kind": "Variable",
                             "attributes": {
-                              "col": "13",
-                              "line": "8",
-                              "name": "Test"
+                              "col": "11",
+                              "line": "7",
+                              "name": "a"
                             },
                             "children": []
                           },
                           {
-                            "kind": "Method",
+                            "kind": "Operation",
                             "attributes": {
-                              "col": "14",
-                              "line": "8",
-                              "name": "a"
+                              "col": "17",
+                              "line": "7"
                             },
-                            "children": []
+                            "children": [
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "col": "15",
+                                  "line": "7",
+                                  "name": "a"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Operator",
+                                "attributes": {
+                                  "col": "17",
+                                  "line": "7",
+                                  "name": "Addition"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Literal",
+                                "attributes": {
+                                  "col": "18",
+                                  "line": "7",
+                                  "type": "int",
+                                  "value": "2"
+                                },
+                                "children": []
+                              }
+                            ]
                           }
                         ]
                       },
@@ -125,14 +143,14 @@
                         "kind": "Return",
                         "attributes": {
                           "col": "16",
-                          "line": "9"
+                          "line": "8"
                         },
                         "children": [
                           {
                             "kind": "Literal",
                             "attributes": {
                               "col": "17",
-                              "line": "9",
+                              "line": "8",
                               "type": "int",
                               "value": "1"
                             },

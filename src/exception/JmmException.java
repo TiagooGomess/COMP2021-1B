@@ -62,41 +62,41 @@ public class JmmException extends Exception {
         return new JmmException("Variable \"" + variableName + "\" was not initialized");
     }
 
-    public static JmmException invalidNumberOfArguments(String methodName, int found) {
-        return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found");
+    public static JmmException invalidNumberOfArguments(JmmNode errorNode, String methodName, int found) {
+        return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found", errorNode.get("line"), errorNode.get("col"));
     }
 
-    public static JmmException invalidTypeForArguments(String methodName, List<Value> arguments) {
+    public static JmmException invalidTypeForArguments(JmmNode errorNode, String methodName, List<Value> arguments) {
         List<String> types = new ArrayList<>();
         for (Value value : arguments)
             types.add("\"" + getOutputType(value.getReturnType()) + "\"");
         String parameterString = types.size() > 0 ? "(" + String.join(", ", types) + ")" : "no";
-        return new JmmException("Invalid call for " + methodName + ", no implementation with " + parameterString + " parameters found");
+        return new JmmException("Invalid call for " + methodName + ", no implementation with " + parameterString + " parameters found", errorNode.get("line"), errorNode.get("col"));
     }
 
     public static JmmException invalidAssignmentVariable() {
         return new JmmException("Invalid left operand for assignment, was expecting a variable found expression");
     }
 
-    public static JmmException invalidAssignment(Value variable, Type found) {
+    public static JmmException invalidAssignment(JmmNode errorNode, Value variable, Type found) {
         String variableName;
         if (variable instanceof Access)
             variableName = ((Access) variable).getVariableName() + "[]";
         else
             variableName = ((Terminal) variable).getName();
-        return new JmmException("Invalid type for assignment of variable \"" + variableName + "\", was expecting \"" + getOutputType(variable.getReturnType()) + "\" and found \"" + getOutputType(found) + "\"");
+        return new JmmException("Invalid type for assignment of variable \"" + variableName + "\", was expecting \"" + getOutputType(variable.getReturnType()) + "\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"));
     }
 
-    public static JmmException invalidCondition(Type found) {
-        return new JmmException("Invalid condition expression, was expecting \"boolean\" and found \"" + getOutputType(found) + "\"");
+    public static JmmException invalidCondition(JmmNode errorNode, Type found) {
+        return new JmmException("Invalid condition expression, was expecting \"boolean\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"));
     }
 
-    public static JmmException invalidReturn(String methodName, Type expected, Type found) {
-        return new JmmException("Invalid return expression for method \"" + methodName + "\", was expecting \"" + getOutputType(expected) + "\" and found \"" + getOutputType(found) + "\"");
+    public static JmmException invalidReturn(JmmNode errorNode, String methodName, Type expected, Type found) {
+        return new JmmException("Invalid return expression for method \"" + methodName + "\", was expecting \"" + getOutputType(expected) + "\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"));
     }
 
-    public static JmmException invalidMethod(String methodName) {
-        return new JmmException("Method \"" + methodName + "\" could not be found");
+    public static JmmException invalidMethod(JmmNode errorNode, String methodName) {
+        return new JmmException("Method \"" + methodName + "\" could not be found", errorNode.get("line"), errorNode.get("col"));
     }
 
     public static JmmException invalidType(String typeName) {
