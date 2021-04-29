@@ -145,11 +145,7 @@ public abstract class Function extends Value {
                 List<Terminal> possibleParameterList = possibleParameterLists.get(method);
                 Terminal parameter = possibleParameterList.get(i);
                 Value value;
-                try {
-                    value = Value.fromNode(table, scopeMethod, arguments.get(i), possibleParameterList.get(i).getReturnType());
-                } catch (JmmException e) {
-                    continue;
-                }
+                value = Value.fromNode(table, scopeMethod, arguments.get(i), possibleParameterList.get(i).getReturnType());
 
                 if (parameter.getReturnType().equals(value.getReturnType()))
                     newParameterLists.put(method, possibleParameterList);
@@ -176,8 +172,9 @@ public abstract class Function extends Value {
                 throw JmmException.invalidTypeForArguments(node, function.getOutputName(), methodTypeList.get(method));
         }
 
-        for (Method method : possibleParameterLists.keySet())
+        for (Method method : possibleParameterLists.keySet()) {
             function.method = method;
+        }
 
         function.argumentValues = methodTypeList.get(function.method);
         if (function.argumentValues == null)
