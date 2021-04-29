@@ -99,7 +99,7 @@ public abstract class Function extends Value {
     // ----------------------------------------------------------------
 
     public static Method createMethodByInference(SymbolTable table, Class methodClass, Call call, List<Terminal> types) {
-        Method inferred = new Method(methodClass, call.methodName, call.expectedReturn, types);
+        Method inferred = new Method(methodClass, call.methodName, call.expectedReturn, types, call.objectCalling instanceof Class);
         if (methodClass == null)
             methodClass = table.getClass(null);
         try {
@@ -183,11 +183,19 @@ public abstract class Function extends Value {
         if (function.argumentValues == null)
             function.argumentValues = new ArrayList<>();
 
-        // Update method if found the type of it
-        if (function.getReturnType() == null && function instanceof Call) {
+        if (function instanceof Call) {
             Call call = (Call) function;
-            function.method.setReturnType(call.expectedReturn);
+            // Update method if found the type of it
+            if (function.getReturnType() == null)
+                function.method.setReturnType(call.expectedReturn);
+
+            // Varify if object or class reference
+            if ((function.method.isStatic() && !(call.objectCalling instanceof Class))
+                    || (!function.method.isStatic() && (call.objectCalling instanceof Class))) {
+                throw JmmException.invalidCaller(function.method.getName(), call.objectCalling);
+            }
         }
+
         function.checkInitiatedVariable();
         return function;
     }

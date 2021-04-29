@@ -32,6 +32,13 @@ public class Method extends Value {
         this.localVariables = new ArrayList<>();
     }
 
+    public Method(Class parentClass, String methodName, Type returnType, List<Terminal> parameters, boolean isStatic) {
+        this.parentClass = parentClass;
+        this.signature = new MethodSignature(methodName, parameters, isStatic);
+        this.returnType = returnType;
+        this.localVariables = new ArrayList<>();
+    }
+
     public Method(Class parentClass, String methodName, Type returnType, List<Terminal> parameters, boolean isStatic, List<Terminal> localVariables) {
         this.parentClass = parentClass;
         this.signature = new MethodSignature(methodName, parameters, isStatic);

@@ -11,11 +11,9 @@ class Test {
     }
 
     public int a(int a) {
+        this.b();
+        Test.b();
         return 1;
-    }
-
-    public int a(int b) {
-        return 2;
     }
 
     public int b() {

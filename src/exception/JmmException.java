@@ -1,5 +1,6 @@
 package exception;
 
+import analysis.symbol.Class;
 import analysis.value.Terminal;
 import analysis.value.Value;
 import analysis.value.function.Access;
@@ -80,5 +81,10 @@ public class JmmException extends Exception {
 
     public static JmmException invalidType(String typeName) {
         return new JmmException("Invalid type \"" + typeName + "\"");
+    }
+
+    public static JmmException invalidCaller(String methodName, Value caller) {
+        String explanationString = (caller instanceof Class) ? "was expecting instance of class, found class reference" : "was expecting class reference, found instance of class";
+        return new JmmException("Invalid caller of method \"" + methodName + "\" of class \"" + caller.getReturnType().getName() + "\", " + explanationString);
     }
 }
