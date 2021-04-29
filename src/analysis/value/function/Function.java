@@ -89,7 +89,7 @@ public abstract class Function extends Value {
             if (value instanceof Terminal) {
                 Terminal terminal = (Terminal) value;
                 if (!terminal.isInitiated() && !terminal.isLiteral() && !terminal.isParameter())
-                    throw JmmException.uninitializedVariable(terminal.getName());
+                    throw JmmException.uninitializedVariable(this.node, terminal.getName());
             }
         }
     }
