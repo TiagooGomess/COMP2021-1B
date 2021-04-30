@@ -103,6 +103,7 @@ public class BackendStage implements JasminBackend {
                 Element dest = assignInstruction.getDest();
                 Instruction rhs = assignInstruction.getRhs();
 
+                builder.append(this.getJasminInstruction(rhs));
 
                 builder.append("Assign instruction\n");
             }
@@ -115,8 +116,35 @@ public class BackendStage implements JasminBackend {
                 ArrayList<Element> listOfOperands = callInstruction.getListOfOperands();
                 Type returnType = callInstruction.getReturnType();
 
+                System.out.println("-----------");
+                callInstruction.show();
+                System.out.println("-----------");
 
-                builder.append("Call instruction\n");
+                switch (invocationType) {
+                    case invokevirtual -> {
+                        builder.append("invokevirtual");
+                        // ...
+                    }
+                    case invokespecial -> {
+                        builder.append("invokespecial");
+                        // ...
+                    }
+                    case invokestatic -> {
+                        builder.append("invokestatic");
+                        // ...
+                    }
+                    case NEW -> {
+                        builder.append("NEW");
+                        // ...
+                    }
+                    case arraylength -> {
+                        builder.append("arraylength");
+                        // ...
+                    }
+                }
+
+
+                builder.append("\n");
             }
             case GOTO -> { // Just for checkpoint 3
                 builder.append("Goto instruction\n");
@@ -130,8 +158,14 @@ public class BackendStage implements JasminBackend {
                 Element operand = returnInstruction.getOperand();
                 ElementType elementType = returnInstruction.getElementType();
 
+                if (!hasReturnValue)
+                    builder.append("return");
+                else {
+                    String jasminReturnType = getJasminReturnType(operand.getType());
+                    builder.append(jasminReturnType).append("return"); // TODO: adjust jasminReturnType to return
+                }
 
-                builder.append("Return instruction\n");
+                builder.append("\n");
             }
             case PUTFIELD -> {
                 PutFieldInstruction putFieldInstruction = (PutFieldInstruction) instruction;
@@ -169,13 +203,13 @@ public class BackendStage implements JasminBackend {
             case NOPER -> {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
                 Element singleOperand = singleOpInstruction.getSingleOperand();
-                
+
 
                 builder.append("Noper instruction\n");
             }
         }
 
-        return builder + "\n";
+        return builder.toString();
     }
 
     private String getJasminCode() {
