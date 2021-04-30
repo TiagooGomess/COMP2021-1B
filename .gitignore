@@ -2,7 +2,7 @@
 .gradle/
 /build/
 /generated/
-/results/
+/results/ast.json
 COMP2021-*.jar
 .idea/
 gradlew.bat
