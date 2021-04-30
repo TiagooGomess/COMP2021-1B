@@ -1,9 +1,8 @@
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import analysis.statement.Return;
 import analysis.symbol.SymbolTable;
+import analysis.value.function.Call;
 import org.specs.comp.ollir.*;
 
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
@@ -100,43 +99,78 @@ public class BackendStage implements JasminBackend {
 
         switch (instructionType) {
             case ASSIGN -> {
-                builder.append("Assign instruction\n");
+                AssignInstruction assignInstruction = (AssignInstruction) instruction;
+                Element dest = assignInstruction.getDest();
+                Instruction rhs = assignInstruction.getRhs();
+
+
                 builder.append("Assign instruction\n");
             }
             case CALL -> {
-                builder.append("Call instruction\n");
+                CallInstruction callInstruction = (CallInstruction) instruction;
+                int numOperands = callInstruction.getNumOperands();
+                CallType invocationType = callInstruction.getInvocationType();
+                Element firstArg = callInstruction.getFirstArg();
+                Element secondArg = callInstruction.getSecondArg();
+                ArrayList<Element> listOfOperands = callInstruction.getListOfOperands();
+                Type returnType = callInstruction.getReturnType();
+
+
                 builder.append("Call instruction\n");
             }
-            case GOTO -> {
-                builder.append("Goto instruction\n");
+            case GOTO -> { // Just for checkpoint 3
                 builder.append("Goto instruction\n");
             }
-            case BRANCH -> {
-                builder.append("Branch instruction\n");
+            case BRANCH -> { // Just for checkpoint 3
                 builder.append("Branch instruction\n");
             }
             case RETURN -> {
-                builder.append("Return instruction\n");
+                ReturnInstruction returnInstruction = (ReturnInstruction) instruction;
+                boolean hasReturnValue = returnInstruction.hasReturnValue();
+                Element operand = returnInstruction.getOperand();
+                ElementType elementType = returnInstruction.getElementType();
+
+
                 builder.append("Return instruction\n");
             }
             case PUTFIELD -> {
-                builder.append("Putfield instruction\n");
+                PutFieldInstruction putFieldInstruction = (PutFieldInstruction) instruction;
+                Element firstOperand = putFieldInstruction.getFirstOperand();
+                Element secondOperand = putFieldInstruction.getSecondOperand();
+                Element thirdOperand = putFieldInstruction.getThirdOperand();
+
+
                 builder.append("Putfield instruction\n");
             }
             case GETFIELD -> {
-                builder.append("Getfield instruction\n");
+                GetFieldInstruction getFieldInstruction = (GetFieldInstruction) instruction;
+                Element firstOperand = getFieldInstruction.getFirstOperand();
+                Element secondOperand = getFieldInstruction.getSecondOperand();
+
                 builder.append("Getfield instruction\n");
             }
             case UNARYOPER -> {
-                builder.append("Unaryoper instruction\n");
+                UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
+                Element rightOperand = unaryOpInstruction.getRightOperand();
+                Operation operation = unaryOpInstruction.getUnaryOperation();
+
+
                 builder.append("Unaryoper instruction\n");
             }
             case BINARYOPER -> {
-                builder.append("Binaryoper instruction\n");
+                BinaryOpInstruction binaryOpInstruction = (BinaryOpInstruction) instruction;
+                Element rightOperand = binaryOpInstruction.getRightOperand();
+                Operation operation = binaryOpInstruction.getUnaryOperation();
+                Element leftOperand = binaryOpInstruction.getLeftOperand();
+
+
                 builder.append("Binaryoper instruction\n");
             }
             case NOPER -> {
-                builder.append("Noper instruction\n");
+                SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
+                Element singleOperand = singleOpInstruction.getSingleOperand();
+                
+
                 builder.append("Noper instruction\n");
             }
         }
