@@ -11,6 +11,9 @@ import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
 
+import static org.specs.comp.ollir.ElementType.BOOLEAN;
+import static org.specs.comp.ollir.ElementType.INT32;
+
 /**
  * Copyright 2021 SPeCS.
  * <p>
@@ -89,6 +92,10 @@ public class BackendStage implements JasminBackend {
         };
     }
 
+    private boolean isIntOrBooleanType(ElementType elementType) {
+        return elementType == INT32 || elementType == BOOLEAN;
+    }
+
     private String getJasminInstruction(Instruction instruction) {
         // TODO: update stackLimit and locals
         // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
@@ -161,8 +168,8 @@ public class BackendStage implements JasminBackend {
                 if (!hasReturnValue)
                     builder.append("return");
                 else {
-                    String jasminReturnType = getJasminReturnType(operand.getType());
-                    builder.append(jasminReturnType).append("return"); // TODO: adjust jasminReturnType to return
+                    builder.append(this.isIntOrBooleanType(elementType) ? "i" : "a");
+                    builder.append("return");
                 }
 
                 builder.append("\n");
