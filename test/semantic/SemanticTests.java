@@ -191,13 +191,12 @@ public class SemanticTests {
 
     @Test
     public void testX() {
-        /*
-        String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/varNotInit.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/var_undef.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
         TestUtils.mustFail(semanticsResult.getReports());
         long numErrors = TestUtils.getNumErrors(semanticsResult.getReports());
-        assertEquals(1, numErrors);*/
+        assertEquals(1, numErrors);
     }
 
     @Test
