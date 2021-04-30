@@ -135,10 +135,10 @@ public class SemanticTests {
 
     @Test
     public void test14() {
-        /*String jmmCode = SpecsIo.getResource("fixtures/public/Life.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/public/Life.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
+        TestUtils.noErrors(semanticsResult.getReports());
     }
 
     @Test
@@ -167,10 +167,10 @@ public class SemanticTests {
 
     @Test
     public void test18() {
-        /*String jmmCode = SpecsIo.getResource("fixtures/public/TicTacToe.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/public/TicTacToe.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
+        TestUtils.noErrors(semanticsResult.getReports());
     }
 
     @Test
@@ -183,21 +183,20 @@ public class SemanticTests {
 
     @Test
     public void test20() {
-        /*String jmmCode = SpecsIo.getResource("fixture/private/Turing.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/private/Turing.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
+        TestUtils.noErrors(semanticsResult.getReports());
     }
 
     @Test
     public void testX() {
-        /*
-        String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/varNotInit.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/public/fail/semantic/var_undef.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
         TestUtils.mustFail(semanticsResult.getReports());
         long numErrors = TestUtils.getNumErrors(semanticsResult.getReports());
-        assertEquals(1, numErrors);*/
+        assertEquals(1, numErrors);
     }
 
     @Test

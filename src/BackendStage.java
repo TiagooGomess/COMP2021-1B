@@ -1,9 +1,10 @@
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
+import analysis.statement.Return;
 import analysis.symbol.SymbolTable;
+import analysis.value.function.Call;
 import org.specs.comp.ollir.*;
 
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
@@ -11,6 +12,8 @@ import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
+
+import static org.specs.comp.ollir.ElementType.*;
 
 /**
  * Copyright 2021 SPeCS.
@@ -90,11 +93,127 @@ public class BackendStage implements JasminBackend {
         };
     }
 
+    private boolean isIntOrBooleanType(ElementType elementType) {
+        return elementType == INT32 || elementType == BOOLEAN;
+    }
+
     private String getJasminInstruction(Instruction instruction) {
         // TODO: update stackLimit and locals
         // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
 
-        return instruction.toString() + "\n";
+        InstructionType instructionType = instruction.getInstType();
+
+        StringBuilder builder = new StringBuilder();
+
+        switch (instructionType) {
+            case ASSIGN -> {
+                AssignInstruction assignInstruction = (AssignInstruction) instruction;
+                Element dest = assignInstruction.getDest();
+                Instruction rhs = assignInstruction.getRhs();
+
+                builder.append(this.getJasminInstruction(rhs));
+
+                builder.append("Assign instruction\n");
+            }
+            case CALL -> {
+                CallInstruction callInstruction = (CallInstruction) instruction;
+                int numOperands = callInstruction.getNumOperands();
+                CallType invocationType = callInstruction.getInvocationType();
+                Element firstArg = callInstruction.getFirstArg();
+                Element secondArg = callInstruction.getSecondArg();
+                ArrayList<Element> listOfOperands = callInstruction.getListOfOperands();
+                Type returnType = callInstruction.getReturnType();
+
+                switch (invocationType) {
+                    case invokevirtual -> {
+                        builder.append("invokevirtual");
+                        // ...
+                    }
+                    case invokespecial -> {
+                        builder.append("invokespecial");
+                        // ...
+                    }
+                    case invokestatic -> {
+                        builder.append("invokestatic");
+                        // ...
+                    }
+                    case NEW -> {
+                        builder.append("NEW");
+                        // ...
+                    }
+                    case arraylength -> {
+                        builder.append("arraylength");
+                        // ...
+                    }
+                }
+
+
+                builder.append("\n");
+            }
+            case GOTO -> { // Just for checkpoint 3
+                builder.append("Goto instruction\n");
+            }
+            case BRANCH -> { // Just for checkpoint 3
+                builder.append("Branch instruction\n");
+            }
+            case RETURN -> {
+                ReturnInstruction returnInstruction = (ReturnInstruction) instruction;
+                boolean hasReturnValue = returnInstruction.hasReturnValue();
+                Element operand = returnInstruction.getOperand();
+                ElementType elementType = VOID;
+                if (operand != null)
+                    elementType = operand.getType().getTypeOfElement();
+
+                if (hasReturnValue && operand != null)
+                    builder.append(this.isIntOrBooleanType(elementType) ? "i" : "a");
+
+                builder.append("return");
+
+                builder.append("\n");
+            }
+            case PUTFIELD -> {
+                PutFieldInstruction putFieldInstruction = (PutFieldInstruction) instruction;
+                Element firstOperand = putFieldInstruction.getFirstOperand();
+                Element secondOperand = putFieldInstruction.getSecondOperand();
+                Element thirdOperand = putFieldInstruction.getThirdOperand();
+
+
+                builder.append("Putfield instruction\n");
+            }
+            case GETFIELD -> {
+                GetFieldInstruction getFieldInstruction = (GetFieldInstruction) instruction;
+                Element firstOperand = getFieldInstruction.getFirstOperand();
+                Element secondOperand = getFieldInstruction.getSecondOperand();
+
+                builder.append("Getfield instruction\n");
+            }
+            case UNARYOPER -> {
+                UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
+                Element rightOperand = unaryOpInstruction.getRightOperand();
+                Operation operation = unaryOpInstruction.getUnaryOperation();
+
+
+                builder.append("Unaryoper instruction\n");
+            }
+            case BINARYOPER -> {
+                BinaryOpInstruction binaryOpInstruction = (BinaryOpInstruction) instruction;
+                Element rightOperand = binaryOpInstruction.getRightOperand();
+                Operation operation = binaryOpInstruction.getUnaryOperation();
+                Element leftOperand = binaryOpInstruction.getLeftOperand();
+
+
+                builder.append("Binaryoper instruction\n");
+            }
+            case NOPER -> {
+                SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
+                Element singleOperand = singleOpInstruction.getSingleOperand();
+
+
+                builder.append("Noper instruction\n");
+            }
+        }
+
+        return builder.toString();
     }
 
     private String getJasminCode() {
@@ -161,7 +280,12 @@ public class BackendStage implements JasminBackend {
             jasminCode.append("\n.end method\n");
         }
 
-        System.out.println(jasminCode);
+        try {
+            Files.writeString(Path.of("results/code.j"), jasminCode);
+        } catch (Exception e) {
+            System.out.println(jasminCode);
+        }
+
         return jasminCode.toString();
     }
 

@@ -1,6 +1,7 @@
 package analysis.value.function;
 
 import analysis.method.Method;
+import analysis.symbol.Program;
 import analysis.symbol.SymbolTable;
 import analysis.value.*;
 import exception.JmmException;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Access extends Function {
+    private final Terminal variable;
+
     public Access(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
         this.table = table;
         this.node = node;
@@ -18,6 +21,7 @@ public class Access extends Function {
         // Method name and class
         this.methodName = "%" + node.getKind();
         this.setMethod();
+        this.variable = (Terminal) Terminal.fromVariable(table, scopeMethod, getArguments().get(0), Program.INT_ARRAY_TYPE);
     }
 
     @Override
@@ -45,10 +49,15 @@ public class Access extends Function {
         Value position = argumentValues.get(1);
 
         StringBuilder builder = new StringBuilder();
+        Terminal t = new Terminal(position.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+        builder.append(t.getOllir());
+        builder.append(":=").append(Value.typeToOllir(t.getReturnType())).append(" ");
+        addValueToBuilder(builder, position, this.method);
+        builder.append(";\n");
 
-        builder.append(getVariableName());
+        builder.append(variable.getOllirName());
         builder.append("[");
-        Value.addValueToBuilder(builder, position, this.scopeMethod);
+        builder.append(t.getOllir());
         builder.append("]");
         builder.append(".i32");
 

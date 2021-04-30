@@ -2,6 +2,7 @@ package pt.up.fe.comp.jmm.analysis;
 
 import java.util.List;
 
+import analysis.JmmVisitor;
 import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;

@@ -20,6 +20,7 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
 
 public class AnalysisStage implements JmmAnalysis {
+    public JmmVisitor visitor = null;
 
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
@@ -33,20 +34,24 @@ public class AnalysisStage implements JmmAnalysis {
 
         JmmNode node = parserResult.getRootNode().sanitize();
 
-        JmmVisitor visitor = new JmmVisitor();
+        visitor = new JmmVisitor();
         visitor.visit(node, null);
         SymbolTable symbolTable = visitor.getSymbolTable();
         visitor.analyseMethodValues();
 
         List<Report> reports = parserResult.getReports();
-        reports.addAll(symbolTable.getReports());
+        reports.addAll(visitor.getReports());
 
-        for (Report report : reports) {
+        for (Report report : visitor.getReports()) {
             System.out.println(report.toString());
         }
 
         return new JmmSemanticsResult(node, symbolTable, reports);
 
+    }
+
+    public JmmVisitor getVisitor() {
+        return this.visitor;
     }
 
 }

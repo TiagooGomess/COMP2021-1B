@@ -143,6 +143,7 @@ public class Class extends Value {
             if (oldAttribute.getName().equals(attribute.getName()))
                 throw JmmException.attributeAlreadyDefined(attribute.getName(), this.className);
         this.attributes.add(attribute);
+        attribute.setInitiated(); // assume the class fields are always initialized
     }
 
     public void addMethod(Method method) {
