@@ -167,10 +167,10 @@ public class SemanticTests {
 
     @Test
     public void test18() {
-        /*String jmmCode = SpecsIo.getResource("fixtures/public/TicTacToe.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/public/TicTacToe.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
+        TestUtils.noErrors(semanticsResult.getReports());
     }
 
     @Test
@@ -183,10 +183,10 @@ public class SemanticTests {
 
     @Test
     public void test20() {
-        /*String jmmCode = SpecsIo.getResource("fixture/private/Turing.jmm");
+        String jmmCode = SpecsIo.getResource("fixtures/private/Turing.jmm");
         JmmParserResult parseResult = TestUtils.parse(jmmCode);
         JmmSemanticsResult semanticsResult = TestUtils.analyse(parseResult);
-        TestUtils.noErrors(semanticsResult.getReports());*/
+        TestUtils.noErrors(semanticsResult.getReports());
     }
 
     @Test
