@@ -94,7 +94,54 @@ public class BackendStage implements JasminBackend {
         // TODO: update stackLimit and locals
         // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
 
-        return instruction.toString() + "\n";
+        InstructionType instructionType = instruction.getInstType();
+
+        StringBuilder builder = new StringBuilder();
+
+        switch (instructionType) {
+            case ASSIGN -> {
+                builder.append("Assign instruction\n");
+                builder.append("Assign instruction\n");
+            }
+            case CALL -> {
+                builder.append("Call instruction\n");
+                builder.append("Call instruction\n");
+            }
+            case GOTO -> {
+                builder.append("Goto instruction\n");
+                builder.append("Goto instruction\n");
+            }
+            case BRANCH -> {
+                builder.append("Branch instruction\n");
+                builder.append("Branch instruction\n");
+            }
+            case RETURN -> {
+                builder.append("Return instruction\n");
+                builder.append("Return instruction\n");
+            }
+            case PUTFIELD -> {
+                builder.append("Putfield instruction\n");
+                builder.append("Putfield instruction\n");
+            }
+            case GETFIELD -> {
+                builder.append("Getfield instruction\n");
+                builder.append("Getfield instruction\n");
+            }
+            case UNARYOPER -> {
+                builder.append("Unaryoper instruction\n");
+                builder.append("Unaryoper instruction\n");
+            }
+            case BINARYOPER -> {
+                builder.append("Binaryoper instruction\n");
+                builder.append("Binaryoper instruction\n");
+            }
+            case NOPER -> {
+                builder.append("Noper instruction\n");
+                builder.append("Noper instruction\n");
+            }
+        }
+
+        return builder + "\n";
     }
 
     private String getJasminCode() {
