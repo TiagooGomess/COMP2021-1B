@@ -1,3 +1,5 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import analysis.statement.Return;
@@ -11,8 +13,7 @@ import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.Stage;
 
-import static org.specs.comp.ollir.ElementType.BOOLEAN;
-import static org.specs.comp.ollir.ElementType.INT32;
+import static org.specs.comp.ollir.ElementType.*;
 
 /**
  * Copyright 2021 SPeCS.
@@ -123,10 +124,6 @@ public class BackendStage implements JasminBackend {
                 ArrayList<Element> listOfOperands = callInstruction.getListOfOperands();
                 Type returnType = callInstruction.getReturnType();
 
-                System.out.println("-----------");
-                callInstruction.show();
-                System.out.println("-----------");
-
                 switch (invocationType) {
                     case invokevirtual -> {
                         builder.append("invokevirtual");
@@ -163,14 +160,14 @@ public class BackendStage implements JasminBackend {
                 ReturnInstruction returnInstruction = (ReturnInstruction) instruction;
                 boolean hasReturnValue = returnInstruction.hasReturnValue();
                 Element operand = returnInstruction.getOperand();
-                ElementType elementType = returnInstruction.getElementType();
+                ElementType elementType = VOID;
+                if (operand != null)
+                    elementType = operand.getType().getTypeOfElement();
 
-                if (!hasReturnValue)
-                    builder.append("return");
-                else {
+                if (hasReturnValue && operand != null)
                     builder.append(this.isIntOrBooleanType(elementType) ? "i" : "a");
-                    builder.append("return");
-                }
+
+                builder.append("return");
 
                 builder.append("\n");
             }
@@ -283,7 +280,12 @@ public class BackendStage implements JasminBackend {
             jasminCode.append("\n.end method\n");
         }
 
-        System.out.println(jasminCode);
+        try {
+            Files.writeString(Path.of("results/code.j"), jasminCode);
+        } catch (Exception e) {
+            System.out.println(jasminCode);
+        }
+
         return jasminCode.toString();
     }
 

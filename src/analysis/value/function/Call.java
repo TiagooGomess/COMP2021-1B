@@ -78,6 +78,8 @@ public class Call extends Function {
                 result.append(", ");
                 addValueToBuilder(result, argument, this.scopeMethod);
             }
+        } else {
+            Value.addValueToBuilder(result, this.objectCalling, this.method);
         }
 
         result.append(")");

@@ -25,41 +25,42 @@ public class Main implements JmmParser {
         try {
             fileStr = Files.readString(Path.of("test/fixtures/public/" + args[0] + ".jmm"));
         } catch (Exception e) {
-            System.err.println("File not found");
+            System.err.println("--> File not found");
             return;
         }
 
-        System.out.println("\n\n--------------------- Generating AST... ---------------------\n\n");
+        System.out.println("--> Parsing file...");
 
         Main m = new Main();
         JmmParserResult parserResult = m.parse(fileStr);
         try {
+            System.out.println("--> Generating AST...");
             Files.writeString(Path.of("results/ast.json"), parserResult.toJson());
         } catch (Exception e) {
-            System.err.println("File not found");
+            System.err.println("--> File not found");
             return;
         }
 
-        System.out.println("\n\n--------------------- OLLIR Code: ---------------------\n\n");
+        System.out.println("--> Generating OLLIR Code...");
 
         AnalysisStage analysisStage = new AnalysisStage();
         JmmSemanticsResult semanticResult = analysisStage.semanticAnalysis(parserResult);
         if (semanticResult == null || !semanticResult.getReports().isEmpty())
             return;
 
-        OptimizationStage optimizationStage = new OptimizationStage();
+        OptimizationStage optimizationStage = new OptimizationStage(analysisStage.getVisitor());
         OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
         if (!ollirResult.getReports().isEmpty())
             return;
 
-        System.out.println("\n\n--------------------- Jasmin Code: ---------------------\n\n");
+        System.out.println("--> Generating Jasmin Code...");
 
         BackendStage backendStage = new BackendStage();
         JasminResult jasminResult = backendStage.toJasmin(ollirResult);
         if (!jasminResult.getReports().isEmpty())
             return;
 
-        System.out.println("\n\n--------------------- DONE ---------------------\n\n");
+        System.out.println("--> Success");
     }
 
     @Override
@@ -69,7 +70,7 @@ public class Main implements JmmParser {
             SimpleNode root = jmmCompiler.Program(); // returns reference to root node
             return new JmmParserResult(root, jmmCompiler.getReports());
         } catch (Exception e) {
-            System.err.println("Error catch in main");
+            System.err.println("--> Error catch in main");
             return null;
         }
     }

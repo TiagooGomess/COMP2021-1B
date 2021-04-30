@@ -1,3 +1,5 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +26,22 @@ import pt.up.fe.specs.util.SpecsIo;
  */
 
 public class OptimizationStage implements JmmOptimization {
+    private final JmmVisitor visitor;
+
+    public OptimizationStage(JmmVisitor visitor) {
+        this.visitor = visitor;
+    }
 
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
-
-        JmmNode node = semanticsResult.getRootNode();
-
         // Convert the AST to a String containing the equivalent OLLIR code
-        JmmVisitor visitor = new JmmVisitor();
-        visitor.visit(node, null);
-        visitor.analyseMethodValues();
-        String ollirCode = visitor.getOllir(); // Convert node ...
-        System.out.println(ollirCode);
+        String ollirCode = this.visitor.getOllir(); // Convert node ...
+
+        try {
+            Files.writeString(Path.of("results/code.ollir"), ollirCode);
+        } catch (Exception e) {
+            System.out.println(ollirCode);
+        }
 
         // More reports from this stage
         List<Report> reports = new ArrayList<>();

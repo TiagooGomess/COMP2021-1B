@@ -52,10 +52,21 @@ public class Terminal extends Value {
         return getType();
     }
 
+    public boolean isReservedWord(String word) {
+        return switch (word) {
+            case "ret", "putfield", "getfield" -> true;
+            default -> false;
+        };
+    }
+
+    public String getOllirName() { // Deal with the case when a variable name is a ollir reserved word
+        return (this.isReservedWord(getName()) ? "__" : "") + symbol.getName();
+    }
+
     public String getOllir() {
         if (symbol.getName().equals("this"))
             return "this";
-        return symbol.getName() + typeToOllir(symbol.getType());
+        return getOllirName() + typeToOllir(symbol.getType());
     }
 
     // ----------------------------------------------------------------

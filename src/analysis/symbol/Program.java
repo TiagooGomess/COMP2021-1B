@@ -74,9 +74,11 @@ public class Program {
 
     public Value getVariable(Method scopeMethod, String variableName) {
         // Searches for the variable in the class scope
-        Value variable = this.mainClass.getVariable(scopeMethod, variableName);
-        if (variable != null)
-            return variable;
+        if (scopeMethod != null) {
+            Value variable = this.mainClass.getVariable(scopeMethod, variableName);
+            if (variable != null)
+                return variable;
+        }
 
         // Searches for class references in imports
         for (Class externalClass : this.externalClasses) {

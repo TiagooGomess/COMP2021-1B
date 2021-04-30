@@ -9,6 +9,7 @@ import analysis.value.Value;
 import analysis.value.Terminal;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.JmmNode;
+import pt.up.fe.comp.jmm.report.Report;
 
 import java.util.*;
 
@@ -53,6 +54,10 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
 
     public SymbolTable getSymbolTable() {
         return symbolTable;
+    }
+
+    public List<Report> getReports() {
+        return this.symbolTable.getReports();
     }
 
     // ----------------------------------------------------------------
@@ -192,6 +197,8 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
                             declaration.append("\n  ").append(ollir.replace("\n", "\n  "));
                     }
             }
+            if (declaration.toString().endsWith(":"))
+                declaration.append("\n  ret.V;");
             declaration.append("\n}\n");
 
             if (specialCase)
