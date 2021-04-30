@@ -2,6 +2,7 @@
 .gradle/
 /build/
 /generated/
+/results/
 COMP2021-*.jar
 .idea/
 gradlew.bat

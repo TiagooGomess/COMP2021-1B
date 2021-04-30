@@ -20,8 +20,6 @@ import java.util.List;
 public class Main implements JmmParser {
 
     public static void main(String[] args) {
-        System.out.println("Compiling the code...\n\n");
-
         String fileStr;
 
         try {
@@ -31,6 +29,8 @@ public class Main implements JmmParser {
             return;
         }
 
+        System.out.println("\n\n--------------------- Generating AST... ---------------------\n\n");
+
         Main m = new Main();
         JmmParserResult parserResult = m.parse(fileStr);
         try {
@@ -39,6 +39,8 @@ public class Main implements JmmParser {
             System.err.println("File not found");
             return;
         }
+
+        System.out.println("\n\n--------------------- OLLIR Code: ---------------------\n\n");
 
         AnalysisStage analysisStage = new AnalysisStage();
         JmmSemanticsResult semanticResult = analysisStage.semanticAnalysis(parserResult);
@@ -50,12 +52,14 @@ public class Main implements JmmParser {
         if (!ollirResult.getReports().isEmpty())
             return;
 
+        System.out.println("\n\n--------------------- Jasmin Code: ---------------------\n\n");
+
         BackendStage backendStage = new BackendStage();
         JasminResult jasminResult = backendStage.toJasmin(ollirResult);
         if (!jasminResult.getReports().isEmpty())
             return;
 
-        System.out.println("Done");
+        System.out.println("\n\n--------------------- DONE ---------------------\n\n");
     }
 
     @Override
