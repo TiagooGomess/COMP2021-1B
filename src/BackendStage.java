@@ -219,6 +219,9 @@ public class BackendStage implements JasminBackend {
                 Element rightOperand = unaryOpInstruction.getRightOperand();
                 Operation operation = unaryOpInstruction.getUnaryOperation();
 
+                System.out.println("right operand: " + rightOperand.toString());
+                System.out.println("operation: " + operation.toString());
+
 
                 builder.append("Unaryoper instruction\n");
             }
@@ -235,8 +238,26 @@ public class BackendStage implements JasminBackend {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
                 Element singleOperand = singleOpInstruction.getSingleOperand();
 
+                // TODO: check if it's not literal and deal with that
+                LiteralElement thirdElemLiteral = (LiteralElement) singleOperand; // works just for literal integers for now
+                String thirdElemLiteralString = thirdElemLiteral.getLiteral();
 
-                builder.append("Noper instruction\n");
+                if (singleOperand.getType().getTypeOfElement() == INT32) {
+                    int thirdElemInteger = Integer.parseInt(thirdElemLiteralString);
+                    if (thirdElemInteger >= 0 && thirdElemInteger <= 5)
+                        builder.append("iconst_").append(thirdElemLiteralString);
+                    else
+                        builder.append("bipush ").append(thirdElemLiteralString);
+                }
+                else if (singleOperand.getType().getTypeOfElement() == BOOLEAN) {
+                    if (thirdElemLiteralString.equals("true"))
+                        builder.append("iconst_1").append(thirdElemLiteralString); // true
+                    else
+                        builder.append("iconst_0").append(thirdElemLiteralString); // false
+                }
+                // TODO: deal with arrays and other objects
+
+                builder.append("\n");
             }
         }
 

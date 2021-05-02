@@ -1,12 +1,10 @@
 
 class Test {
-    int b;
-
     public static void main(String[] a) {
         int d;
-        b = 1;
-
-        d = b;
-
+        int b;
+        boolean flag;
+        d = 1;
+        b = 2;
     }
 }
