@@ -211,20 +211,35 @@ public class BackendStage implements JasminBackend {
                 Element secondOperand = putFieldInstruction.getSecondOperand();
                 Element thirdOperand = putFieldInstruction.getThirdOperand();
 
+                builder.append(this.pushToStack(thirdOperand));
 
-                builder.append("Putfield instruction\n");
+                builder.append("\nputfield ");
+                builder.append(((Operand) firstOperand).getName());
+                builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
+                builder.append(this.getJasminReturnType(thirdOperand.getType()));
+                builder.append("\n");
+
+                // NON-STATIC METHOD -> THIS IS IN STACK POSITION 0
+
             }
             case GETFIELD -> {
                 GetFieldInstruction getFieldInstruction = (GetFieldInstruction) instruction;
                 Element firstOperand = getFieldInstruction.getFirstOperand();
                 Element secondOperand = getFieldInstruction.getSecondOperand();
 
-                builder.append("Getfield instruction\n");
+                builder.append("getfield ");
+                builder.append(((Operand) firstOperand).getName());
+                builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
+                builder.append(this.getJasminReturnType(secondOperand.getType()));
+                builder.append("\n");
             }
             case UNARYOPER -> {
                 UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
                 Element rightOperand = unaryOpInstruction.getRightOperand();
                 Operation operation = unaryOpInstruction.getUnaryOperation();
+
+                System.out.println("right operand: " + rightOperand.toString());
+                System.out.println("operation: " + operation.toString());
 
 
                 builder.append("Unaryoper instruction\n");
@@ -235,6 +250,42 @@ public class BackendStage implements JasminBackend {
                 Operation operation = binaryOpInstruction.getUnaryOperation();
                 Element leftOperand = binaryOpInstruction.getLeftOperand();
 
+                System.out.println("right operand: " + rightOperand.toString());
+                System.out.println("operation: " + operation.toString());
+                System.out.println("leftOperand operand: " + leftOperand.toString());
+
+                builder.append(this.pushToStack(leftOperand)).append("\n");
+                builder.append(this.pushToStack(rightOperand)).append("\n");
+                builder.append(operation.getOpType().name());
+
+                OperationType operationType = operation.getOpType();
+
+                /*switch (operationType) {
+                    case AND -> { // maybe it's always ANDB ?????
+                        // ...
+                    }
+                    case ANDB -> { // and boolean
+                        // ...
+                    }
+                    case LTHI32 -> { // less than for integers
+                        // ...
+                    }
+                    case ADDI32 -> { // addition for integers
+                        // ...
+                    }
+                    case SUBI32 -> { // subtraction for integers
+                        // ...
+                    }
+                    case MULI32 -> { // multiplication for integers
+                        // ...
+                    }
+                    case DIVI32 -> { // subtraction for integers
+                        // ...
+                    }
+                }*/
+
+
+                builder.append("\n");
 
                 builder.append("Binaryoper instruction\n");
             }
@@ -242,8 +293,9 @@ public class BackendStage implements JasminBackend {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
                 Element singleOperand = singleOpInstruction.getSingleOperand();
 
+                builder.append(this.pushToStack(singleOperand));
 
-                builder.append("Noper instruction\n");
+                builder.append("\n");
             }
         }
 

@@ -1,26 +1,8 @@
-import A;
 
 class Test {
     public static void main(String[] a) {
-        int b;
-        int c;
-        b = 1;
-        c = this.f(b, b);
-    }
-
-    public int f(int a, int b) {
-        return a + b;
-    }
-
-    public int virtualFunc() {
-        A a;
-        a = new A();
-        a.function();
-        return 0;
-    }
-
-    public int staticFunc() {
-        A.functionStatic();
-        return 0;
+        boolean flag;
+        flag = true;
+        flag = flag && flag;
     }
 }
