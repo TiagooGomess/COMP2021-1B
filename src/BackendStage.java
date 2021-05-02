@@ -95,27 +95,18 @@ public class BackendStage implements JasminBackend {
         return elementType == INT32 || elementType == BOOLEAN;
     }
 
-    private String pushToStack(Element singleOperand) {
-        StringBuilder builder = new StringBuilder();
-        String thirdElemLiteralString;
-        if (singleOperand instanceof Operand)
-            thirdElemLiteralString = ((Operand) singleOperand).getName();
-        else
-            thirdElemLiteralString = ((LiteralElement) singleOperand).getLiteral();
+    private String pushPrefix(ElementType type) {
+        return this.isIntOrBooleanType(type) ? "i" : "a";
+    }
 
-        if (singleOperand.getType().getTypeOfElement() == INT32) {
-            int thirdElemInteger = Integer.parseInt(thirdElemLiteralString);
-            if (thirdElemInteger >= 0 && thirdElemInteger <= 5)
-                builder.append("iconst_").append(thirdElemLiteralString);
-            else
-                builder.append("bipush ").append(thirdElemLiteralString);
-        }
-        else if (singleOperand.getType().getTypeOfElement() == BOOLEAN) { // TODO: deal with non-literal elements
-            if (thirdElemLiteralString.equals("true"))
-                builder.append("iconst_1"); // true
-            else
-                builder.append("iconst_0"); // false
-        }
+    private String pushToStack(Element element) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(pushPrefix(element.getType().getTypeOfElement()));
+        if (element.isLiteral()) {
+            int value = Integer.parseInt(((LiteralElement) element).getLiteral());
+            builder.append(value > 5 || value < 0 ? "bipush " : "const_");
+        } else
+            builder.append("load_" + "<<LOCAL>>");
         // TODO: deal with arrays and other objects
 
         return builder.toString();
@@ -240,6 +231,42 @@ public class BackendStage implements JasminBackend {
                 Operation operation = binaryOpInstruction.getUnaryOperation();
                 Element leftOperand = binaryOpInstruction.getLeftOperand();
 
+                System.out.println("right operand: " + rightOperand.toString());
+                System.out.println("operation: " + operation.toString());
+                System.out.println("leftOperand operand: " + leftOperand.toString());
+
+                builder.append(this.pushToStack(leftOperand)).append("\n");
+                builder.append(this.pushToStack(rightOperand)).append("\n");
+                builder.append(operation.getOpType().name());
+
+                OperationType operationType = operation.getOpType();
+
+                /*switch (operationType) {
+                    case AND -> { // maybe it's always ANDB ?????
+                        // ...
+                    }
+                    case ANDB -> { // and boolean
+                        // ...
+                    }
+                    case LTHI32 -> { // less than for integers
+                        // ...
+                    }
+                    case ADDI32 -> { // addition for integers
+                        // ...
+                    }
+                    case SUBI32 -> { // subtraction for integers
+                        // ...
+                    }
+                    case MULI32 -> { // multiplication for integers
+                        // ...
+                    }
+                    case DIVI32 -> { // subtraction for integers
+                        // ...
+                    }
+                }*/
+
+
+                builder.append("\n");
 
                 builder.append("Binaryoper instruction\n");
             }
