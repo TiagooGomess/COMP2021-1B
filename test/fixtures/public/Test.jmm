@@ -1,16 +1,10 @@
+
 class Test {
     int b;
-
+    int c;
     public static void main(String[] a) {
-        this.setB();
-    }
+        b = 1;
+        c = 3;
 
-    public int setB() {
-        b = 2;
-        return 0;
-    }
-
-    public int f() {
-        return b + 1;
     }
 }

@@ -2,9 +2,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import analysis.statement.Return;
 import analysis.symbol.SymbolTable;
-import analysis.value.function.Call;
 import org.specs.comp.ollir.*;
 
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
@@ -177,8 +175,33 @@ public class BackendStage implements JasminBackend {
                 Element secondOperand = putFieldInstruction.getSecondOperand();
                 Element thirdOperand = putFieldInstruction.getThirdOperand();
 
+                // TODO: check if it's not literal and deal with that
+                LiteralElement thirdElemLiteral = (LiteralElement) thirdOperand; // works just for literal integers for now
+                String thirdElemLiteralString = thirdElemLiteral.getLiteral();
 
-                builder.append("Putfield instruction\n");
+                if (thirdOperand.getType().getTypeOfElement() == INT32) {
+                    int thirdElemInteger = Integer.parseInt(thirdElemLiteralString);
+                    if (thirdElemInteger >= 0 && thirdElemInteger <= 5)
+                        builder.append("iconst_").append(thirdElemLiteralString);
+                    else
+                        builder.append("bipush ").append(thirdElemLiteralString);
+                }
+                else if (thirdOperand.getType().getTypeOfElement() == BOOLEAN) {
+                    if (thirdElemLiteralString.equals("true"))
+                        builder.append("iconst_1").append(thirdElemLiteralString); // true
+                    else
+                        builder.append("iconst_0").append(thirdElemLiteralString); // false
+                }
+                // TODO: deal with arrays and other objects
+
+                builder.append("\nputfield ");
+                builder.append(((Operand) firstOperand).getName());
+                builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
+                builder.append(this.getJasminReturnType(thirdOperand.getType()));
+                builder.append("\n");
+
+                // NON-STATIC METHOD -> THIS IS IN STACK POSITION 0
+
             }
             case GETFIELD -> {
                 GetFieldInstruction getFieldInstruction = (GetFieldInstruction) instruction;
