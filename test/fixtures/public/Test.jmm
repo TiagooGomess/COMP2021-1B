@@ -1,10 +1,7 @@
 
 class Test {
     public static void main(String[] a) {
-        int d;
-        int b;
         boolean flag;
-        d = 1;
-        b = 2;
+        flag = 1 < 2;
     }
 }

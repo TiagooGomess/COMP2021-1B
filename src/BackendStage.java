@@ -95,6 +95,32 @@ public class BackendStage implements JasminBackend {
         return elementType == INT32 || elementType == BOOLEAN;
     }
 
+    private String pushToStack(Element singleOperand) {
+        StringBuilder builder = new StringBuilder();
+        String thirdElemLiteralString;
+        if (singleOperand instanceof Operand)
+            thirdElemLiteralString = ((Operand) singleOperand).getName();
+        else
+            thirdElemLiteralString = ((LiteralElement) singleOperand).getLiteral();
+
+        if (singleOperand.getType().getTypeOfElement() == INT32) {
+            int thirdElemInteger = Integer.parseInt(thirdElemLiteralString);
+            if (thirdElemInteger >= 0 && thirdElemInteger <= 5)
+                builder.append("iconst_").append(thirdElemLiteralString);
+            else
+                builder.append("bipush ").append(thirdElemLiteralString);
+        }
+        else if (singleOperand.getType().getTypeOfElement() == BOOLEAN) { // TODO: deal with non-literal elements
+            if (thirdElemLiteralString.equals("true"))
+                builder.append("iconst_1"); // true
+            else
+                builder.append("iconst_0"); // false
+        }
+        // TODO: deal with arrays and other objects
+
+        return builder.toString();
+    }
+
     private String getJasminInstruction(Instruction instruction) {
         // TODO: update stackLimit and locals
         // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
@@ -175,24 +201,7 @@ public class BackendStage implements JasminBackend {
                 Element secondOperand = putFieldInstruction.getSecondOperand();
                 Element thirdOperand = putFieldInstruction.getThirdOperand();
 
-                // TODO: check if it's not literal and deal with that
-                LiteralElement thirdElemLiteral = (LiteralElement) thirdOperand; // works just for literal integers for now
-                String thirdElemLiteralString = thirdElemLiteral.getLiteral();
-
-                if (thirdOperand.getType().getTypeOfElement() == INT32) {
-                    int thirdElemInteger = Integer.parseInt(thirdElemLiteralString);
-                    if (thirdElemInteger >= 0 && thirdElemInteger <= 5)
-                        builder.append("iconst_").append(thirdElemLiteralString);
-                    else
-                        builder.append("bipush ").append(thirdElemLiteralString);
-                }
-                else if (thirdOperand.getType().getTypeOfElement() == BOOLEAN) {
-                    if (thirdElemLiteralString.equals("true"))
-                        builder.append("iconst_1").append(thirdElemLiteralString); // true
-                    else
-                        builder.append("iconst_0").append(thirdElemLiteralString); // false
-                }
-                // TODO: deal with arrays and other objects
+                builder.append(this.pushToStack(thirdOperand));
 
                 builder.append("\nputfield ");
                 builder.append(((Operand) firstOperand).getName());
@@ -238,24 +247,7 @@ public class BackendStage implements JasminBackend {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
                 Element singleOperand = singleOpInstruction.getSingleOperand();
 
-                // TODO: check if it's not literal and deal with that
-                LiteralElement thirdElemLiteral = (LiteralElement) singleOperand; // works just for literal integers for now
-                String thirdElemLiteralString = thirdElemLiteral.getLiteral();
-
-                if (singleOperand.getType().getTypeOfElement() == INT32) {
-                    int thirdElemInteger = Integer.parseInt(thirdElemLiteralString);
-                    if (thirdElemInteger >= 0 && thirdElemInteger <= 5)
-                        builder.append("iconst_").append(thirdElemLiteralString);
-                    else
-                        builder.append("bipush ").append(thirdElemLiteralString);
-                }
-                else if (singleOperand.getType().getTypeOfElement() == BOOLEAN) {
-                    if (thirdElemLiteralString.equals("true"))
-                        builder.append("iconst_1").append(thirdElemLiteralString); // true
-                    else
-                        builder.append("iconst_0").append(thirdElemLiteralString); // false
-                }
-                // TODO: deal with arrays and other objects
+                builder.append(this.pushToStack(singleOperand));
 
                 builder.append("\n");
             }
