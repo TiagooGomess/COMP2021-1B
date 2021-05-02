@@ -23,7 +23,7 @@ public abstract class Value {
             int argumentNumber = method.getArgumentNumber(terminalOperand);
             if (argumentNumber != 0)
                 result.append("$").append(argumentNumber).append(".");
-            else if (!fromPutField && method.getParentClass() != null && method.getParentClass().isField(terminalOperand))
+            else if (!fromPutField && method.getParentClass() != null && method.getParentClass().isField(terminalOperand) && !terminalOperand.getName().equals("this"))
                 terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
 
             if (terminal == null) {

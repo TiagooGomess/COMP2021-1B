@@ -100,12 +100,27 @@ public class BackendStage implements JasminBackend {
     }
 
     private void pushToStack(StringBuilder builder, Element element) {
-        builder.append(pushPrefix(element.getType().getTypeOfElement()));
         if (element.isLiteral()) {
             int value = Integer.parseInt(((LiteralElement) element).getLiteral());
-            builder.append(value > 5 || value < 0 ? "bipush " : "const_");
-        } else
-            builder.append("load_" + "<<LOCAL>>");
+            if (value > 32767)
+                builder.append("ldc ");
+            else if (value > 127)
+                builder.append("sipush ");
+            else if (value > 5 || value < 0)
+                builder.append("bipush ");
+            else
+                builder.append(pushPrefix(element.getType().getTypeOfElement())).append("const_");
+            builder.append(value);
+        } else {
+            builder.append(pushPrefix(element.getType().getTypeOfElement()));
+            builder.append("load_").append(((Operand) element).getParamId());
+        }
+        builder.append("\n");
+    }
+
+    private void storeFromStack(StringBuilder builder, Element element) {
+        builder.append(pushPrefix(element.getType().getTypeOfElement()));
+        builder.append("store_").append(((Operand) element).getParamId());
         builder.append("\n");
     }
 
@@ -124,8 +139,7 @@ public class BackendStage implements JasminBackend {
                 Instruction rhs = assignInstruction.getRhs();
 
                 builder.append(this.getJasminInstruction(rhs));
-
-                builder.append("Assign instruction\n");
+                storeFromStack(builder, dest);
             }
             case CALL -> {
                 CallInstruction callInstruction = (CallInstruction) instruction;
@@ -138,6 +152,7 @@ public class BackendStage implements JasminBackend {
 
                 switch (invocationType) {
                     case invokevirtual -> {
+                        String className = "Simple"; // TODO: get real class name
                         pushToStack(builder, caller);
                         StringBuilder argumentTypes = new StringBuilder();
                         for (Element argument : listOfOperands) {
@@ -145,16 +160,8 @@ public class BackendStage implements JasminBackend {
                             argumentTypes.append(getJasminReturnType(argument.getType()));
                         }
 
-                        builder.append("invokevirtual Class.").append(methodName); // TODO: get real class name
+                        builder.append("invokevirtual ").append(className).append(".").append(((LiteralElement) methodName).getLiteral().replace("\"", ""));
                         builder.append("(").append(argumentTypes).append(")");
-                        builder.append(getJasminReturnType(returnType));
-                    }
-                    case invokespecial -> {
-                        String className = "java/lang/Object"; // TODO: get real class name
-                        builder.append("aload_0\n");
-                        builder.append("invokespecial ").append(className).append(".");
-                        //builder.append(((Operand) methodName).getName());
-                        builder.append("<init>()");
                         builder.append(getJasminReturnType(returnType));
                     }
                     case invokestatic -> {
@@ -170,8 +177,16 @@ public class BackendStage implements JasminBackend {
                         builder.append(getJasminReturnType(returnType));
                     }
                     case NEW -> {
-                        builder.append("NEW");
-                        // ...
+                        String className = "Simple"; // TODO: get real class name
+                        builder.append("new ").append(className).append("\n"); // TODO: add real class name
+                        builder.append("dup\n");
+                    }
+                    case invokespecial -> {
+                        String className = "Simple"; // TODO: get real class name
+                        builder.append("invokespecial ").append(className).append(".");
+                        //builder.append(((Operand) methodName).getName());
+                        builder.append("<init>()");
+                        builder.append(getJasminReturnType(returnType));
                     }
                     case arraylength -> {
                         pushToStack(builder, caller);
@@ -179,10 +194,10 @@ public class BackendStage implements JasminBackend {
                     }
                 }
                 builder.append("\n");
-                if (returnType.getTypeOfElement() != VOID) {
+                /*if (returnType.getTypeOfElement() != VOID) {
                     builder.append(pushPrefix(returnType.getTypeOfElement()));
                     builder.append("store_<<LOCAL>>");
-                }
+                }*/
             }
             case GOTO -> { // Just for checkpoint 3
                 builder.append("Goto instruction\n");
@@ -195,8 +210,11 @@ public class BackendStage implements JasminBackend {
                 boolean hasReturnValue = returnInstruction.hasReturnValue();
                 Element operand = returnInstruction.getOperand();
                 ElementType elementType = VOID;
-                if (operand != null)
+
+                if (operand != null) {
                     elementType = operand.getType().getTypeOfElement();
+                    pushToStack(builder, operand);
+                }
 
                 if (hasReturnValue && operand != null)
                     builder.append(this.isIntOrBooleanType(elementType) ? "i" : "a");
@@ -211,7 +229,7 @@ public class BackendStage implements JasminBackend {
                 Element secondOperand = putFieldInstruction.getSecondOperand();
                 Element thirdOperand = putFieldInstruction.getThirdOperand();
 
-                builder.append(this.pushToStack(thirdOperand));
+                this.pushToStack(builder, thirdOperand);
 
                 builder.append("\nputfield ");
                 builder.append(((Operand) firstOperand).getName());
@@ -226,11 +244,15 @@ public class BackendStage implements JasminBackend {
                 GetFieldInstruction getFieldInstruction = (GetFieldInstruction) instruction;
                 Element firstOperand = getFieldInstruction.getFirstOperand();
                 Element secondOperand = getFieldInstruction.getSecondOperand();
-
-                builder.append("getfield ");
-                builder.append(((Operand) firstOperand).getName());
-                builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
-                builder.append(this.getJasminReturnType(secondOperand.getType()));
+                String name = ((Operand) firstOperand).getName();
+                if (name.equals("this"))
+                    builder.append("aload_0");
+                else {
+                    builder.append("getfield ");
+                    builder.append(name);
+                    builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
+                    builder.append(this.getJasminReturnType(secondOperand.getType()));
+                }
                 builder.append("\n");
             }
             case UNARYOPER -> {
@@ -254,48 +276,40 @@ public class BackendStage implements JasminBackend {
                 System.out.println("operation: " + operation.toString());
                 System.out.println("leftOperand operand: " + leftOperand.toString());
 
-                builder.append(this.pushToStack(leftOperand)).append("\n");
-                builder.append(this.pushToStack(rightOperand)).append("\n");
-                builder.append(operation.getOpType().name());
+                this.pushToStack(builder, leftOperand);
+                this.pushToStack(builder, rightOperand);
+                //builder.append(operation.getOpType().name());
 
                 OperationType operationType = operation.getOpType();
 
-                /*switch (operationType) {
-                    case AND -> { // maybe it's always ANDB ?????
+                switch (operationType) {
+                    case AND, ANDB -> {
+                        builder.append("iand");
+                    }
+                    case LTH, LTHI32 -> { // less than TODO: [checkpoint 3]
                         // ...
                     }
-                    case ANDB -> { // and boolean
-                        // ...
+                    case ADD, ADDI32 -> {
+                        builder.append("iadd");
                     }
-                    case LTHI32 -> { // less than for integers
-                        // ...
+                    case SUB, SUBI32 -> {
+                        builder.append("isub");
                     }
-                    case ADDI32 -> { // addition for integers
-                        // ...
+                    case MUL, MULI32 -> {
+                        builder.append("imul");
                     }
-                    case SUBI32 -> { // subtraction for integers
-                        // ...
+                    case DIV, DIVI32 -> {
+                        builder.append("idiv");
                     }
-                    case MULI32 -> { // multiplication for integers
-                        // ...
-                    }
-                    case DIVI32 -> { // subtraction for integers
-                        // ...
-                    }
-                }*/
+                }
 
 
                 builder.append("\n");
-
-                builder.append("Binaryoper instruction\n");
             }
             case NOPER -> {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
                 Element singleOperand = singleOpInstruction.getSingleOperand();
-
-                builder.append(this.pushToStack(singleOperand));
-
-                builder.append("\n");
+                this.pushToStack(builder, singleOperand);
             }
         }
 
@@ -348,8 +362,9 @@ public class BackendStage implements JasminBackend {
             if (method.getMethodName().equals("main")) {
                 jasminCode.append("[Ljava/lang/String;");
             } else {
-                for (Element parameter : method.getParams())
+                for (Element parameter : method.getParams()) {
                     jasminCode.append(this.getJasminReturnType(parameter.getType()));
+                }
             }
 
             jasminCode.append(")");
