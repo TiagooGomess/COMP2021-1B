@@ -2,9 +2,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import analysis.statement.Return;
 import analysis.symbol.SymbolTable;
-import analysis.value.function.Call;
 import org.specs.comp.ollir.*;
 
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
@@ -97,6 +95,20 @@ public class BackendStage implements JasminBackend {
         return elementType == INT32 || elementType == BOOLEAN;
     }
 
+    private String pushPrefix(ElementType type) {
+        return this.isIntOrBooleanType(type) ? "i" : "a";
+    }
+
+    private void pushToStack(StringBuilder builder, Element element) {
+        builder.append(pushPrefix(element.getType().getTypeOfElement()));
+        if (element.isLiteral()) {
+            int value = Integer.parseInt(((LiteralElement) element).getLiteral());
+            builder.append(value > 5 || value < 0 ? "bipush " : "const_");
+        } else
+            builder.append("load_" + "<<LOCAL>>");
+        builder.append("\n");
+    }
+
     private String getJasminInstruction(Instruction instruction) {
         // TODO: update stackLimit and locals
         // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
@@ -119,15 +131,22 @@ public class BackendStage implements JasminBackend {
                 CallInstruction callInstruction = (CallInstruction) instruction;
                 int numOperands = callInstruction.getNumOperands();
                 CallType invocationType = callInstruction.getInvocationType();
-                Element firstArg = callInstruction.getFirstArg();
-                Element secondArg = callInstruction.getSecondArg();
+                Element caller = callInstruction.getFirstArg();
+                Element methodName = callInstruction.getSecondArg();
                 ArrayList<Element> listOfOperands = callInstruction.getListOfOperands();
                 Type returnType = callInstruction.getReturnType();
 
                 switch (invocationType) {
                     case invokevirtual -> {
-                        builder.append("invokevirtual");
-                        // ...
+                        pushToStack(builder, caller);
+                        for (Element argument : listOfOperands) {
+                            pushToStack(builder, argument);
+                        }
+
+
+
+                        builder.append("invokevirtual Class.").append(((Operand) methodName).getName()).append("(");
+                        builder.append()
                     }
                     case invokespecial -> {
                         builder.append("invokespecial");
@@ -135,7 +154,6 @@ public class BackendStage implements JasminBackend {
                     }
                     case invokestatic -> {
                         builder.append("invokestatic");
-                        // ...
                     }
                     case NEW -> {
                         builder.append("NEW");
