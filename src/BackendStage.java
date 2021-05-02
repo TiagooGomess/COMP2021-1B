@@ -208,7 +208,11 @@ public class BackendStage implements JasminBackend {
                 Element firstOperand = getFieldInstruction.getFirstOperand();
                 Element secondOperand = getFieldInstruction.getSecondOperand();
 
-                builder.append("Getfield instruction\n");
+                builder.append("getfield ");
+                builder.append(((Operand) firstOperand).getName());
+                builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
+                builder.append(this.getJasminReturnType(secondOperand.getType()));
+                builder.append("\n");
             }
             case UNARYOPER -> {
                 UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
