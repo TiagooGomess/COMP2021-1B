@@ -22,6 +22,14 @@ import pt.up.fe.comp.jmm.report.Stage;
 public class AnalysisStage implements JmmAnalysis {
     public JmmVisitor visitor = null;
 
+    public static JmmVisitor visit(JmmNode node) {
+        JmmVisitor visitor = new JmmVisitor();
+        visitor.visit(node, null);
+        SymbolTable symbolTable = visitor.getSymbolTable();
+        visitor.analyseMethodValues();
+        return visitor;
+    }
+
     @Override
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
 
@@ -32,12 +40,7 @@ public class AnalysisStage implements JmmAnalysis {
             return null;
         }
 
-        JmmNode node = parserResult.getRootNode().sanitize();
-
-        visitor = new JmmVisitor();
-        visitor.visit(node, null);
-        SymbolTable symbolTable = visitor.getSymbolTable();
-        visitor.analyseMethodValues();
+        visitor = visit(parserResult.getRootNode().sanitize());
 
         List<Report> reports = parserResult.getReports();
         reports.addAll(visitor.getReports());
@@ -46,7 +49,7 @@ public class AnalysisStage implements JmmAnalysis {
             System.out.println(report.toString());
         }
 
-        return new JmmSemanticsResult(node, symbolTable, reports);
+        return new JmmSemanticsResult(parserResult.getRootNode(), visitor.getSymbolTable(), reports);
 
     }
 

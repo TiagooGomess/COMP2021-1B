@@ -87,7 +87,7 @@ public class BackendStage implements JasminBackend {
             case THIS -> "this;";
             case STRING -> "Ljava/lang/String;";
             case VOID -> "V";
-            case OBJECTREF, CLASS -> type + ";";
+            case OBJECTREF, CLASS -> "L" + type + ";";
         };
     }
 
@@ -139,34 +139,50 @@ public class BackendStage implements JasminBackend {
                 switch (invocationType) {
                     case invokevirtual -> {
                         pushToStack(builder, caller);
+                        StringBuilder argumentTypes = new StringBuilder();
                         for (Element argument : listOfOperands) {
                             pushToStack(builder, argument);
+                            argumentTypes.append(getJasminReturnType(argument.getType()));
                         }
 
-
-
-                        builder.append("invokevirtual Class.").append(((Operand) methodName).getName()).append("(");
-                        builder.append()
+                        builder.append("invokevirtual Class.").append(methodName); // TODO: get real class name
+                        builder.append("(").append(argumentTypes).append(")");
+                        builder.append(getJasminReturnType(returnType));
                     }
                     case invokespecial -> {
-                        builder.append("invokespecial");
-                        // ...
+                        String className = "java/lang/Object"; // TODO: get real class name
+                        builder.append("aload_0\n");
+                        builder.append("invokespecial ").append(className).append(".");
+                        //builder.append(((Operand) methodName).getName());
+                        builder.append("<init>()");
+                        builder.append(getJasminReturnType(returnType));
                     }
                     case invokestatic -> {
-                        builder.append("invokestatic");
+                        StringBuilder argumentTypes = new StringBuilder();
+                        for (Element argument : listOfOperands) {
+                            pushToStack(builder, argument);
+                            argumentTypes.append(getJasminReturnType(argument.getType()));
+                        }
+
+                        builder.append("invokestatic ").append(((Operand) caller).getName());
+                        builder.append(".").append(((LiteralElement) methodName).getLiteral().replace("\"", ""));
+                        builder.append("(").append(argumentTypes).append(")");
+                        builder.append(getJasminReturnType(returnType));
                     }
                     case NEW -> {
                         builder.append("NEW");
                         // ...
                     }
                     case arraylength -> {
+                        pushToStack(builder, caller);
                         builder.append("arraylength");
-                        // ...
                     }
                 }
-
-
                 builder.append("\n");
+                if (returnType.getTypeOfElement() != VOID) {
+                    builder.append(pushPrefix(returnType.getTypeOfElement()));
+                    builder.append("store_<<LOCAL>>");
+                }
             }
             case GOTO -> { // Just for checkpoint 3
                 builder.append("Goto instruction\n");
@@ -257,7 +273,7 @@ public class BackendStage implements JasminBackend {
             jasminCode.append("\n");
         }
 
-        jasminCode.append("method public <init>()V\n");
+        jasminCode.append(".method public <init>()V\n");
         jasminCode.append("  aload_0\n");
         jasminCode.append("  invokenonvirtual java/lang/Object/<init>()V\n");
         jasminCode.append("  return\n");
@@ -277,8 +293,12 @@ public class BackendStage implements JasminBackend {
 
             jasminCode.append(method.getMethodName()).append("(");
 
-            for (Element parameter : method.getParams())
-                jasminCode.append(this.getJasminReturnType(parameter.getType()));
+            if (method.getMethodName().equals("main")) {
+                jasminCode.append("[Ljava/lang/String;");
+            } else {
+                for (Element parameter : method.getParams())
+                    jasminCode.append(this.getJasminReturnType(parameter.getType()));
+            }
 
             jasminCode.append(")");
             Type returnType = method.getReturnType();
@@ -293,6 +313,8 @@ public class BackendStage implements JasminBackend {
 
             methodBuilder.insert(0, ".limit locals " + this.methodLimits.get(method).getLocals() + "\n\n");
             methodBuilder.insert(0, ".limit stack " + this.methodLimits.get(method).getStackLimit() + "\n");
+            if (method.getReturnType().getTypeOfElement() == VOID)
+                methodBuilder.append("return\n");
 
             jasminCode.append(methodBuilder.toString().trim().replace("\n", "\n  "));
             jasminCode.append("\n.end method\n");

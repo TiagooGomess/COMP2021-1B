@@ -3,6 +3,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import analysis.AnalysisStage;
 import analysis.JmmVisitor;
 import analysis.symbol.SymbolTable;
 import pt.up.fe.comp.jmm.JmmNode;
@@ -26,16 +27,10 @@ import pt.up.fe.specs.util.SpecsIo;
  */
 
 public class OptimizationStage implements JmmOptimization {
-    private final JmmVisitor visitor;
-
-    public OptimizationStage(JmmVisitor visitor) {
-        this.visitor = visitor;
-    }
-
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
         // Convert the AST to a String containing the equivalent OLLIR code
-        String ollirCode = this.visitor.getOllir(); // Convert node ...
+        String ollirCode = AnalysisStage.visit(semanticsResult.getRootNode()).getOllir(); // Convert node ...
 
         try {
             Files.writeString(Path.of("results/code.ollir"), ollirCode);
