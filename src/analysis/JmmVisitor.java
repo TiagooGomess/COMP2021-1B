@@ -175,8 +175,9 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
     }
 
     public String getOllir() {
-        if (!this.symbolTable.getReports().isEmpty())
+        if (!this.symbolTable.getReports().isEmpty()) {
             return null;
+        }
 
         StringBuilder builder = new StringBuilder();
 

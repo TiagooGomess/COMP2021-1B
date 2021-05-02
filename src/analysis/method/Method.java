@@ -141,7 +141,7 @@ public class Method extends Value {
     public static Method fromDeclaration(SymbolTable table, Class parentClass, JmmNode node) throws JmmException {
         String methodName = node.get("name");
         Type returnType = table.getType(node.get("type"));
-        return new Method(parentClass, methodName, returnType);
+        return new Method(parentClass, methodName, returnType, new ArrayList<>(), methodName.equals("main"));
     }
 
     // ----------------------------------------------------------------

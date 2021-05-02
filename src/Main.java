@@ -48,9 +48,9 @@ public class Main implements JmmParser {
         if (semanticResult == null || !semanticResult.getReports().isEmpty())
             return;
 
-        OptimizationStage optimizationStage = new OptimizationStage(analysisStage.getVisitor());
+        OptimizationStage optimizationStage = new OptimizationStage();
         OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
-        if (!ollirResult.getReports().isEmpty())
+        if (ollirResult == null || !ollirResult.getReports().isEmpty())
             return;
 
         System.out.println("--> Generating Jasmin Code...");
