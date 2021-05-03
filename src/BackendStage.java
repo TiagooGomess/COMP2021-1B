@@ -131,6 +131,7 @@ public class BackendStage implements JasminBackend {
         InstructionType instructionType = instruction.getInstType();
 
         StringBuilder builder = new StringBuilder();
+        builder.append("; ").append(instructionType.toString().toLowerCase()).append("\n");
 
         switch (instructionType) {
             case ASSIGN -> {
@@ -297,7 +298,6 @@ public class BackendStage implements JasminBackend {
                     }
                 }
 
-
                 builder.append("\n");
             }
             case NOPER -> {
@@ -307,7 +307,7 @@ public class BackendStage implements JasminBackend {
             }
         }
 
-        return builder.toString();
+        return builder.append("\n").toString();
     }
 
     private String getJasminCode() {
