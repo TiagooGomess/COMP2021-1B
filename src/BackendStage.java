@@ -29,6 +29,7 @@ import static org.specs.comp.ollir.ElementType.*;
 public class BackendStage implements JasminBackend {
     private int currentVariableRegister;
     private Map<String, Integer> variableRegisterMap;
+    private String actualNewClass = null;
 
     private class MethodLimits {
         int stackLimit = 99;
@@ -116,7 +117,7 @@ public class BackendStage implements JasminBackend {
             builder.append(value);
         } else {
             builder.append(pushPrefix(element.getType().getTypeOfElement()));
-            builder.append("load_");
+            builder.append("load ");
             builder.append(getRegister(((Operand) element).getName()));
         }
         builder.append("\n");
@@ -124,7 +125,7 @@ public class BackendStage implements JasminBackend {
 
     private void storeFromStack(StringBuilder builder, Element element) {
         builder.append(pushPrefix(element.getType().getTypeOfElement()));
-        builder.append("store_");
+        builder.append("store ");
         builder.append(getRegister(((Operand) element).getName()));
         builder.append("\n");
     }
@@ -158,7 +159,7 @@ public class BackendStage implements JasminBackend {
 
                 switch (invocationType) {
                     case invokevirtual -> {
-                        String className = "Simple"; // TODO: get real class name
+                        String className = ((Operand) caller).getName().equals("this") ? classUnit.getClassName() : classUnit.getClassName(); // TODO: get real class name
                         pushToStack(builder, caller);
                         StringBuilder argumentTypes = new StringBuilder();
                         for (Element argument : listOfOperands) {
@@ -183,16 +184,17 @@ public class BackendStage implements JasminBackend {
                         builder.append(getJasminReturnType(returnType));
                     }
                     case NEW -> {
-                        String className = "Simple"; // TODO: get real class name
-                        builder.append("new ").append(className).append("\n"); // TODO: add real class name
+                        actualNewClass = ((Operand) caller).getName();
+                        builder.append("new ").append(actualNewClass).append("\n");
                         builder.append("dup\n");
                     }
                     case invokespecial -> {
-                        String className = "Simple"; // TODO: get real class name
-                        builder.append("invokespecial ").append(className).append(".");
-                        //builder.append(((Operand) methodName).getName());
+                        if (actualNewClass == null)
+                            actualNewClass = classUnit.getClassName();
+                        builder.append("invokespecial ").append(actualNewClass).append(".");
                         builder.append("<init>()");
                         builder.append(getJasminReturnType(returnType));
+                        actualNewClass = null;
                     }
                     case arraylength -> {
                         pushToStack(builder, caller);
@@ -312,7 +314,7 @@ public class BackendStage implements JasminBackend {
             }
         }
 
-        return builder.append("\n").toString();
+        return builder.toString();
     }
 
     private void resetRegisters() {
@@ -403,7 +405,7 @@ public class BackendStage implements JasminBackend {
                 methodBuilder.append("return\n");
 
             jasminCode.append(methodBuilder.toString().trim().replace("\n", "\n  "));
-            jasminCode.append("\n.end method\n");
+            jasminCode.append("\n.end method\n\n");
         }
 
         try {
