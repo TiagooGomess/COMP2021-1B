@@ -260,21 +260,15 @@ public class BackendStage implements JasminBackend {
                 Element rightOperand = unaryOpInstruction.getRightOperand();
                 Operation operation = unaryOpInstruction.getUnaryOperation();
 
-                System.out.println("right operand: " + rightOperand.toString());
-                System.out.println("operation: " + operation.toString());
-
-
                 builder.append("Unaryoper instruction\n");
+                builder.append("-> right operand: " + rightOperand.toString()).append("\n");
+                builder.append("-> operation: " + operation.toString()).append("\n");
             }
             case BINARYOPER -> {
                 BinaryOpInstruction binaryOpInstruction = (BinaryOpInstruction) instruction;
                 Element rightOperand = binaryOpInstruction.getRightOperand();
                 Operation operation = binaryOpInstruction.getUnaryOperation();
                 Element leftOperand = binaryOpInstruction.getLeftOperand();
-
-                System.out.println("right operand: " + rightOperand.toString());
-                System.out.println("operation: " + operation.toString());
-                System.out.println("leftOperand operand: " + leftOperand.toString());
 
                 this.pushToStack(builder, leftOperand);
                 this.pushToStack(builder, rightOperand);
