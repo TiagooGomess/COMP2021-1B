@@ -116,14 +116,16 @@ public class BackendStage implements JasminBackend {
             builder.append(value);
         } else {
             builder.append(pushPrefix(element.getType().getTypeOfElement()));
-            builder.append("load_").append(((Operand) element).getParamId());
+            builder.append("load_");
+            builder.append(getRegister(((Operand) element).getName()));
         }
         builder.append("\n");
     }
 
     private void storeFromStack(StringBuilder builder, Element element) {
         builder.append(pushPrefix(element.getType().getTypeOfElement()));
-        builder.append("store_").append(((Operand) element).getParamId());
+        builder.append("store_");
+        builder.append(getRegister(((Operand) element).getName()));
         builder.append("\n");
     }
 
@@ -134,7 +136,7 @@ public class BackendStage implements JasminBackend {
         InstructionType instructionType = instruction.getInstType();
 
         StringBuilder builder = new StringBuilder();
-        builder.append("; ").append(instructionType.toString().toLowerCase()).append("\n");
+        // builder.append("; ").append(instructionType.toString().toLowerCase()).append("\n");
 
         switch (instructionType) {
             case ASSIGN -> {
@@ -316,6 +318,7 @@ public class BackendStage implements JasminBackend {
     private void resetRegisters() {
         currentVariableRegister = 0;
         variableRegisterMap = new HashMap<>();
+        addVariable("this");
     }
 
     private void addVariable(String variableName) {
@@ -323,6 +326,9 @@ public class BackendStage implements JasminBackend {
     }
 
     private int getRegister(String variableName) {
+        if (!variableRegisterMap.containsKey(variableName)) {
+            addVariable(variableName);
+        }
         return variableRegisterMap.get(variableName);
     }
 
@@ -359,8 +365,6 @@ public class BackendStage implements JasminBackend {
 
         for (Method method : methods) {
             resetRegisters();
-            if (!method.isStaticMethod())
-                addVariable("this");
 
             this.methodLimits.put(method, new MethodLimits());
 
@@ -378,6 +382,7 @@ public class BackendStage implements JasminBackend {
             } else {
                 for (Element parameter : method.getParams()) {
                     jasminCode.append(this.getJasminReturnType(parameter.getType()));
+                    addVariable(((Operand) parameter).getName());
                 }
             }
 
