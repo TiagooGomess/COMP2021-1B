@@ -27,6 +27,9 @@ import static org.specs.comp.ollir.ElementType.*;
  */
 
 public class BackendStage implements JasminBackend {
+    private int currentVariableRegister;
+    private Map<String, Integer> variableRegisterMap;
+
     private class MethodLimits {
         int stackLimit = 99;
         int locals = 99;
@@ -310,6 +313,19 @@ public class BackendStage implements JasminBackend {
         return builder.append("\n").toString();
     }
 
+    private void resetRegisters() {
+        currentVariableRegister = 0;
+        variableRegisterMap = new HashMap<>();
+    }
+
+    private void addVariable(String variableName) {
+        variableRegisterMap.put(variableName, currentVariableRegister++);
+    }
+
+    private int getRegister(String variableName) {
+        return variableRegisterMap.get(variableName);
+    }
+
     private String getJasminCode() {
         StringBuilder jasminCode = new StringBuilder();
 
@@ -342,6 +358,10 @@ public class BackendStage implements JasminBackend {
         List<Method> methods = this.classUnit.getMethods();
 
         for (Method method : methods) {
+            resetRegisters();
+            if (!method.isStaticMethod())
+                addVariable("this");
+
             this.methodLimits.put(method, new MethodLimits());
 
             if (method.isConstructMethod()) // already defined
