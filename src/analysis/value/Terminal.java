@@ -97,7 +97,12 @@ public class Terminal extends Value {
     // valid literals are integers and booleans
     public static Terminal fromLiteral(SymbolTable table, JmmNode node) throws JmmException {
         Type type = table.getType(node.get("type"));
-        return new Terminal(type, node.get("value"));
+        String value = node.get("value");
+        if (value.equals("true"))
+            value = "1";
+        else if (value.equals("false"))
+            value = "0";
+        return new Terminal(type, value);
     }
 
     public static Terminal fromDeclaration(SymbolTable table, JmmNode node) throws JmmException {

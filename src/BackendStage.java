@@ -159,7 +159,7 @@ public class BackendStage implements JasminBackend {
 
                 switch (invocationType) {
                     case invokevirtual -> {
-                        String className = ((Operand) caller).getName().equals("this") ? classUnit.getClassName() : classUnit.getClassName(); // TODO: get real class name
+                        String className = ((Operand) caller).getName().equals("this") ? classUnit.getClassName() : ((ClassType) caller.getType()).getName();
                         pushToStack(builder, caller);
                         StringBuilder argumentTypes = new StringBuilder();
                         for (Element argument : listOfOperands) {
@@ -302,6 +302,9 @@ public class BackendStage implements JasminBackend {
                     }
                     case DIV, DIVI32 -> {
                         builder.append("idiv");
+                    }
+                    case NOT, NOTB -> {
+                        builder.append("ineg");
                     }
                 }
 
