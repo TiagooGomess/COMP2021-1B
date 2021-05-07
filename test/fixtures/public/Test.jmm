@@ -2,11 +2,18 @@ import io;
 
 class Test {
     public static void main(String[] a) {
+        int b;
         boolean flag;
-        flag = false;
-        flag = !flag;
-        //if (!flag)
-        io.println(0);
-        //else {}
+        flag = true;
+        b = 0;
+        while (flag) {
+            b = b + 1;
+            if (b < 10) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        }
+        io.println(b);
     }
 }

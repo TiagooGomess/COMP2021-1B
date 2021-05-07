@@ -30,7 +30,7 @@ public class If extends Statement {
         builder.append("if (");
         Terminal t = Value.addValueToBuilder(builder, this.condition, this.method);
         if (t != null || this.condition instanceof Terminal)
-            builder.append(" &&.bool true.bool");
+            builder.append(" &&.bool 1.bool");
         builder.append(") goto ").append(thenLabel).append(";");
         builder.append(("\n" + this.elseStatement.getOllir()).replace("\n", "\n  "));
         builder.append("goto ").append(endifLabel).append(";\n").append(thenLabel).append(":");

@@ -55,6 +55,7 @@ public class BackendStage implements JasminBackend {
     ClassUnit classUnit;
     SymbolTable symbolTable;
     final Map<Method, MethodLimits> methodLimits = new HashMap<>();
+    private int actualCompareLabel = 0;
 
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
@@ -103,6 +104,15 @@ public class BackendStage implements JasminBackend {
         return this.isIntOrBooleanType(type) ? "i" : "a";
     }
 
+    private void addRegister(StringBuilder builder, Element element) {
+        int register = getRegister(((Operand) element).getName());
+        if (register >= 0 && register < 4)
+            builder.append("_");
+        else
+            builder.append(" ");
+        builder.append(register);
+    }
+
     private void pushToStack(StringBuilder builder, Element element) {
         if (element.isLiteral()) {
             int value = Integer.parseInt(((LiteralElement) element).getLiteral());
@@ -117,16 +127,16 @@ public class BackendStage implements JasminBackend {
             builder.append(value);
         } else {
             builder.append(pushPrefix(element.getType().getTypeOfElement()));
-            builder.append("load ");
-            builder.append(getRegister(((Operand) element).getName()));
+            builder.append("load");
+            addRegister(builder, element);
         }
         builder.append("\n");
     }
 
     private void storeFromStack(StringBuilder builder, Element element) {
         builder.append(pushPrefix(element.getType().getTypeOfElement()));
-        builder.append("store ");
-        builder.append(getRegister(((Operand) element).getName()));
+        builder.append("store");
+        addRegister(builder, element);
         builder.append("\n");
     }
 
@@ -207,11 +217,22 @@ public class BackendStage implements JasminBackend {
                     builder.append("store_<<LOCAL>>");
                 }*/
             }
-            case GOTO -> { // Just for checkpoint 3
-                builder.append("Goto instruction\n");
+            case GOTO -> {
+                GotoInstruction gotoInstruction = (GotoInstruction) instruction;
+                String label = gotoInstruction.getLabel();
+                builder.append("goto ").append(label).append("\n");
             }
-            case BRANCH -> { // Just for checkpoint 3
-                builder.append("Branch instruction\n");
+            case BRANCH -> {
+                CondBranchInstruction branchInstruction = (CondBranchInstruction) instruction;
+                Element rightOperand = branchInstruction.getRightOperand();
+                Element leftOperand = branchInstruction.getLeftOperand();
+                String label = branchInstruction.getLabel();
+
+                pushToStack(builder, leftOperand);
+                pushToStack(builder, rightOperand);
+                builder.append("iand").append("\n");
+                builder.append("iconst_1").append("\n");
+                builder.append("if_icmpeq ").append(label).append("\n");
             }
             case RETURN -> {
                 ReturnInstruction returnInstruction = (ReturnInstruction) instruction;
@@ -264,13 +285,13 @@ public class BackendStage implements JasminBackend {
                 builder.append("\n");
             }
             case UNARYOPER -> {
-                UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
+                /*UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
                 Element rightOperand = unaryOpInstruction.getRightOperand();
                 Operation operation = unaryOpInstruction.getUnaryOperation();
 
                 builder.append("Unaryoper instruction\n");
                 builder.append("-> right operand: " + rightOperand.toString()).append("\n");
-                builder.append("-> operation: " + operation.toString()).append("\n");
+                builder.append("-> operation: " + operation.toString()).append("\n");*/
             }
             case BINARYOPER -> {
                 BinaryOpInstruction binaryOpInstruction = (BinaryOpInstruction) instruction;
@@ -288,8 +309,15 @@ public class BackendStage implements JasminBackend {
                     case AND, ANDB -> {
                         builder.append("iand");
                     }
-                    case LTH, LTHI32 -> { // less than TODO: [checkpoint 3]
-                        // ...
+                    case LTH, LTHI32 -> {
+                        String label = "less" + actualCompareLabel;
+                        String elseLabel = "greater" + actualCompareLabel++;
+                        builder.append("if_icmpge ").append(label).append("\n");
+                        builder.append("iconst_1").append("\n");
+                        builder.append("goto ").append(elseLabel).append("\n");
+                        builder.append(label).append(":\n");
+                        builder.append("iconst_0").append("\n");
+                        builder.append(elseLabel).append(":");
                     }
                     case ADD, ADDI32 -> {
                         builder.append("iadd");
@@ -307,13 +335,17 @@ public class BackendStage implements JasminBackend {
                         builder.append("ineg");
                     }
                 }
-
                 builder.append("\n");
             }
             case NOPER -> {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
                 Element singleOperand = singleOpInstruction.getSingleOperand();
                 this.pushToStack(builder, singleOperand);
+            }
+            default -> {
+                builder.append("\n;-----------------------------;\n");
+                builder.append(instruction);
+                builder.append("\n;-----------------------------;\n");
             }
         }
 
@@ -335,6 +367,15 @@ public class BackendStage implements JasminBackend {
             addVariable(variableName);
         }
         return variableRegisterMap.get(variableName);
+    }
+
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     private String getJasminCode() {
@@ -398,7 +439,13 @@ public class BackendStage implements JasminBackend {
 
             StringBuilder methodBuilder = new StringBuilder();
 
+
+            Map<String, Instruction> labels = method.getLabels();
             for (Instruction instruction : method.getInstructions()) {
+                String label = BackendStage.getKeyByValue(labels, instruction);
+                if (label != null)
+                    methodBuilder.append(label).append(":\n");
+                labels.containsValue(instruction);
                 methodBuilder.append(getJasminInstruction(instruction));
             }
 

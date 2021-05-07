@@ -21,31 +21,72 @@ import pt.up.fe.specs.util.SpecsIo;
 
 public class BackendTest {
 
-    @Test
-    public void testHelloWorld() {
-        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
+    private void testFile(String file, String expectedOutput) {
+        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
         TestUtils.noErrors(result.getReports());
 
         System.out.println(result.getJasminCode());
         var output = result.run();
-        assertEquals("Hello, World!", output.trim());
+        assertEquals(expectedOutput, output.trim());
+    }
+
+    @Test
+    public void testHelloWorld() {
+        testFile("HelloWorld", "Hello, World!");
     }
 
     @Test
     public void testSimple() {
-        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Simple.jmm"));
-        TestUtils.noErrors(result.getReports());
+        testFile("Simple", "30");
+    }
 
-        var output = result.run();
-        assertEquals("30", output.trim());
+    @Test
+    public void testFac() {
+        testFile("Fac", "3628800");
     }
 
     /*@Test
-    public void testTest() {
-        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/Test.jmm"));
-        TestUtils.noErrors(result.getReports());
+    public void testFindMaximum() {
+        testFile("FindMaximum", "28");
+    }
 
-        var output = result.run();
-        assertEquals("0", output.trim());
+    @Test
+    public void testLazySort() {
+        testFile("Lazysort", "");
+    }
+
+    @Test
+    public void testLife() {
+        testFile("Life", "");
+    }
+
+    @Test
+    public void testMonteCarloPi() {
+        testFile("MonteCarloPi", "");
+    }
+
+    @Test
+    public void testQuickSort() {
+        testFile("QuickSort", "");
+    }
+
+    @Test
+    public void testTicTacToe() {
+        testFile("TicTacToe", "");
+    }
+
+    @Test
+    public void testWhileAndIf() {
+        testFile("WhileAndIf", "");
+    }
+
+    @Test
+    public void testTuring() {
+        testFile("../private/Turing", "");
     }*/
+
+    @Test
+    public void testTest() {
+        testFile("Test", "10");
+    }
 }
