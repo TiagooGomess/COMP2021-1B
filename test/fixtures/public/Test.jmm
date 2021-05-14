@@ -1,6 +1,48 @@
 import io;
 
 class Test {
+    int[] field;
+
+    public static void main(String[] args) {
+        int[] array;
+        Test a;
+        array = new int[10]; // array with 10 elements
+        a = new Test();
+        a.function(array);
+        io.println(array[1]);
+    }
+
+    public int function(int[] array) {
+        array[1] = 10;
+        return 1;
+    }
+
+    /*
+    public int function(){
+        this.field = new int[5]; // array with 5 elements
+        this.field[0] = 2;
+        return 1;
+    }
+    */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*import io;
+
+class Test {
     public static void main(String[] a) {
         int b;
         boolean flag;
@@ -16,4 +58,4 @@ class Test {
         }
         io.println(b);
     }
-}
+}*/

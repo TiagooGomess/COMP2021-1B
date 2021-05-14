@@ -40,18 +40,30 @@ public class Access extends Function {
         return arguments;
     }
 
+    public boolean isTerminal() {
+        return this.getVariable() instanceof Terminal;
+    }
+
+    public Value getVariable() {
+        return this.table.getVariable(this.scopeMethod, this.getVariableName());
+    }
+
     public String getVariableName() {
         return getArguments().get(0).get("name");
     }
 
+    public Value getPosition() {
+        return argumentValues.get(1);
+    }
+
     @Override
     public String getOllir() {
-        Value position = argumentValues.get(1);
+        Value position = this.getPosition();
 
         StringBuilder builder = new StringBuilder();
         Terminal t = new Terminal(position.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
         builder.append(t.getOllir());
-        builder.append(":=").append(Value.typeToOllir(t.getReturnType())).append(" ");
+        builder.append(" :=").append(Value.typeToOllir(t.getReturnType())).append(" ");
         addValueToBuilder(builder, position, this.method);
         builder.append(";\n");
 

@@ -101,7 +101,9 @@ public class BackendStage implements JasminBackend {
     }
 
     private String pushPrefix(ElementType type) {
-        return this.isIntOrBooleanType(type) ? "i" : "a";
+        if (this.isIntOrBooleanType(type))
+            return "i";
+        return "a";
     }
 
     private void addRegister(StringBuilder builder, Element element) {
@@ -126,9 +128,23 @@ public class BackendStage implements JasminBackend {
                 builder.append(pushPrefix(element.getType().getTypeOfElement())).append("const_");
             builder.append(value);
         } else {
-            builder.append(pushPrefix(element.getType().getTypeOfElement()));
-            builder.append("load");
-            addRegister(builder, element);
+            if (element instanceof ArrayOperand) {
+                ArrayOperand operand = (ArrayOperand) element;
+                // load array
+                builder.append("aload");
+                addRegister(builder, element);
+                builder.append("\n");
+                // load indexes
+                for (Element index : operand.getIndexOperands())
+                    pushToStack(builder, index);
+                // load the array element
+                builder.append("iaload");
+
+            } else {
+                builder.append(pushPrefix(element.getType().getTypeOfElement()));
+                builder.append("load");
+                addRegister(builder, element);
+            }
         }
         builder.append("\n");
     }
@@ -162,22 +178,22 @@ public class BackendStage implements JasminBackend {
                 CallInstruction callInstruction = (CallInstruction) instruction;
                 int numOperands = callInstruction.getNumOperands();
                 CallType invocationType = callInstruction.getInvocationType();
-                Element caller = callInstruction.getFirstArg();
-                Element methodName = callInstruction.getSecondArg();
+                Element firstArg = callInstruction.getFirstArg();
+                Element secondArg = callInstruction.getSecondArg();
                 ArrayList<Element> listOfOperands = callInstruction.getListOfOperands();
                 Type returnType = callInstruction.getReturnType();
 
                 switch (invocationType) {
                     case invokevirtual -> {
-                        String className = ((Operand) caller).getName().equals("this") ? classUnit.getClassName() : ((ClassType) caller.getType()).getName();
-                        pushToStack(builder, caller);
+                        String className = ((Operand) firstArg).getName().equals("this") ? classUnit.getClassName() : ((ClassType) firstArg.getType()).getName();
+                        pushToStack(builder, firstArg);
                         StringBuilder argumentTypes = new StringBuilder();
                         for (Element argument : listOfOperands) {
                             pushToStack(builder, argument);
                             argumentTypes.append(getJasminReturnType(argument.getType()));
                         }
 
-                        builder.append("invokevirtual ").append(className).append(".").append(((LiteralElement) methodName).getLiteral().replace("\"", ""));
+                        builder.append("invokevirtual ").append(className).append(".").append(((LiteralElement) secondArg).getLiteral().replace("\"", ""));
                         builder.append("(").append(argumentTypes).append(")");
                         builder.append(getJasminReturnType(returnType));
                     }
@@ -188,15 +204,21 @@ public class BackendStage implements JasminBackend {
                             argumentTypes.append(getJasminReturnType(argument.getType()));
                         }
 
-                        builder.append("invokestatic ").append(((Operand) caller).getName());
-                        builder.append(".").append(((LiteralElement) methodName).getLiteral().replace("\"", ""));
+                        builder.append("invokestatic ").append(((Operand) firstArg).getName());
+                        builder.append(".").append(((LiteralElement) secondArg).getLiteral().replace("\"", ""));
                         builder.append("(").append(argumentTypes).append(")");
                         builder.append(getJasminReturnType(returnType));
                     }
                     case NEW -> {
-                        actualNewClass = ((Operand) caller).getName();
-                        builder.append("new ").append(actualNewClass).append("\n");
-                        builder.append("dup\n");
+                        actualNewClass = ((Operand) firstArg).getName();
+                        if (actualNewClass.equals("array")) {
+                            pushToStack(builder, listOfOperands.get(0));
+                            builder.append("newarray int").append("\n");
+                            // builder.append("dup\n");
+                        } else {
+                            builder.append("new ").append(actualNewClass).append("\n");
+                            builder.append("dup\n");
+                        }
                     }
                     case invokespecial -> {
                         if (actualNewClass == null)
@@ -207,7 +229,7 @@ public class BackendStage implements JasminBackend {
                         actualNewClass = null;
                     }
                     case arraylength -> {
-                        pushToStack(builder, caller);
+                        pushToStack(builder, firstArg);
                         builder.append("arraylength");
                     }
                 }
@@ -283,15 +305,6 @@ public class BackendStage implements JasminBackend {
                     builder.append(this.getJasminReturnType(secondOperand.getType()));
                 }
                 builder.append("\n");
-            }
-            case UNARYOPER -> {
-                /*UnaryOpInstruction unaryOpInstruction = (UnaryOpInstruction) instruction;
-                Element rightOperand = unaryOpInstruction.getRightOperand();
-                Operation operation = unaryOpInstruction.getUnaryOperation();
-
-                builder.append("Unaryoper instruction\n");
-                builder.append("-> right operand: " + rightOperand.toString()).append("\n");
-                builder.append("-> operation: " + operation.toString()).append("\n");*/
             }
             case BINARYOPER -> {
                 BinaryOpInstruction binaryOpInstruction = (BinaryOpInstruction) instruction;

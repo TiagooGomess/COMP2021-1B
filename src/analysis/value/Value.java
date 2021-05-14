@@ -2,6 +2,7 @@ package analysis.value;
 
 import analysis.method.Method;
 import analysis.symbol.SymbolTable;
+import analysis.value.function.Access;
 import analysis.value.function.Call;
 import exception.JmmException;
 import analysis.value.function.Construction;

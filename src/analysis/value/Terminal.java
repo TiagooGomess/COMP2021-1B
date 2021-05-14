@@ -54,8 +54,8 @@ public class Terminal extends Value {
 
     public boolean isReservedWord(String word) {
         return switch (word) {
-            case "ret", "putfield", "getfield" -> true;
-            default -> false;
+            case "ret", "putfield", "getfield", "array", "field", "invokespecial", "invokestatic", "construct", "method", "public", "static", "main", "String" -> true;
+            default -> word.startsWith("aux");
         };
     }
 
