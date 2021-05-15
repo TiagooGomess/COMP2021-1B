@@ -116,6 +116,10 @@ public class BackendStage implements JasminBackend {
     }
 
     private void pushToStack(StringBuilder builder, Element element) {
+        pushToStack(builder, element, false);
+    }
+
+    private void pushToStack(StringBuilder builder, Element element, boolean loadReference) {
         if (element.isLiteral()) {
             int value = Integer.parseInt(((LiteralElement) element).getLiteral());
             if (value > 32767)
@@ -128,7 +132,7 @@ public class BackendStage implements JasminBackend {
                 builder.append(pushPrefix(element.getType().getTypeOfElement())).append("const_");
             builder.append(value);
         } else {
-            if (element instanceof ArrayOperand) {
+            if (element instanceof ArrayOperand && !loadReference) {
                 ArrayOperand operand = (ArrayOperand) element;
                 // load array
                 builder.append("aload");
@@ -139,9 +143,11 @@ public class BackendStage implements JasminBackend {
                     pushToStack(builder, index);
                 // load the array element
                 builder.append("iaload");
-
             } else {
-                builder.append(pushPrefix(element.getType().getTypeOfElement()));
+                if (element instanceof ArrayOperand)
+                    builder.append("a");
+                else
+                    builder.append(pushPrefix(element.getType().getTypeOfElement()));
                 builder.append("load");
                 addRegister(builder, element);
             }
@@ -150,9 +156,13 @@ public class BackendStage implements JasminBackend {
     }
 
     private void storeFromStack(StringBuilder builder, Element element) {
-        builder.append(pushPrefix(element.getType().getTypeOfElement()));
-        builder.append("store");
-        addRegister(builder, element);
+        if (element instanceof ArrayOperand) {
+            builder.append("iastore");
+        } else {
+            builder.append(pushPrefix(element.getType().getTypeOfElement()));
+            builder.append("store");
+            addRegister(builder, element);
+        }
         builder.append("\n");
     }
 
@@ -170,6 +180,13 @@ public class BackendStage implements JasminBackend {
                 AssignInstruction assignInstruction = (AssignInstruction) instruction;
                 Element dest = assignInstruction.getDest();
                 Instruction rhs = assignInstruction.getRhs();
+
+                if (dest instanceof ArrayOperand) {
+                    ArrayOperand array = (ArrayOperand) dest;
+                    pushToStack(builder, array, true); // array reference
+                    for (Element position : array.getIndexOperands()) // array position
+                        pushToStack(builder, position);
+                }
 
                 builder.append(this.getJasminInstruction(rhs));
                 storeFromStack(builder, dest);

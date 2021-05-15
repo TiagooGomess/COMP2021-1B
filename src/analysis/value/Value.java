@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public abstract class Value {
 
-    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method, boolean fromPutField) {
+    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method, boolean fromPutField, boolean assignmentVariable) {
         String ollir = operand.getOllir();
 
         Terminal terminal = null;
@@ -33,27 +33,38 @@ public abstract class Value {
             }
         }
 
-        if (terminal == null)
-            terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
-        else {
+        if (terminal == null) {
+            if (!assignmentVariable)
+                terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+        } else {
             String typeOllir = Value.typeToOllir(terminalOperand.getReturnType());
             ollir = "getfield(this, " + terminalOperand.getName() + typeOllir + ")" + typeOllir + "\n";
         }
 
         ArrayList<String> childLines = new ArrayList<>(Arrays.asList(ollir.split("\n")));
-        String lastLine = childLines.get(childLines.size() - 1).replace("%VariableName", terminal.getOllir()).replace("; invokespecial", ";\ninvokespecial");
+        String lastLine = childLines.get(childLines.size() - 1);
+        if (!assignmentVariable)
+            lastLine = lastLine.replace("%VariableName", terminal.getOllir()).replace(";invokespecial", ";\ninvokespecial");
         childLines.remove(childLines.size() - 1);
         String assignmentType = Value.typeToOllir(operand.getReturnType());
-        result.insert(0, terminal.getOllir() + " :=" + assignmentType + " " + lastLine + ";\n");
+        if (!assignmentVariable)
+            result.insert(0, terminal.getOllir() + " :=" + assignmentType + " " + lastLine + ";\n");
         if (!childLines.isEmpty())
             result.insert(0, String.join("\n", childLines) + "\n");
-        result.append(terminal.getOllir());
+        if (!assignmentVariable)
+            result.append(terminal.getOllir());
+        else
+            result.append(lastLine);
 
         return terminal;
     }
 
     public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method) {
-        return addValueToBuilder(result, operand, method, false);
+        return addValueToBuilder(result, operand, method, false, false);
+    }
+
+    public static Terminal addValueToAssignmentBuilder(StringBuilder result, Value operand, Method method, boolean fromPutField) {
+        return addValueToBuilder(result, operand, method, fromPutField, true);
     }
 
     public abstract Type getReturnType();

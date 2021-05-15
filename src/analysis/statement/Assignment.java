@@ -40,7 +40,7 @@ public class Assignment extends Statement {
         if (isField)
             builder.append("putfield(this, ");
 
-        Value.addValueToBuilder(builder, variable, this.method, isField);
+        Value.addValueToAssignmentBuilder(builder, variable, this.method, isField);
 
         if (isField) {
             builder.append(", ");

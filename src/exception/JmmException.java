@@ -13,15 +13,29 @@ import java.util.ArrayList;
 public class JmmException extends Exception {
     private int line = 0;
     private int column = 0;
+    private boolean isWarning = false;
 
     private JmmException(String message) {
         super(message);
+    }
+
+    private JmmException(String message, boolean isWarning) {
+        super(message);
+        this.isWarning = isWarning;
     }
 
     private JmmException(String message, String line, String col) {
         super(message);
         this.line = Integer.parseInt(line);
         this.column = Integer.parseInt(col);
+        this.isWarning = false;
+    }
+
+    private JmmException(String message, String line, String col, boolean isWarning) {
+        super(message);
+        this.line = Integer.parseInt(line);
+        this.column = Integer.parseInt(col);
+        this.isWarning = isWarning;
     }
 
     public int getLine() {
@@ -32,6 +46,10 @@ public class JmmException extends Exception {
         return column;
     }
 
+    public boolean isWarning() {
+        return this.isWarning;
+    }
+
     private static String getOutputType(Type type) {
         if (type == null)
             return "unknown type";
@@ -39,11 +57,11 @@ public class JmmException extends Exception {
     }
 
     public static JmmException undeclaredVariable(JmmNode errorNode, String variableName) {
-        return new JmmException("Variable \"" + variableName + "\" was not declared in the scope", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Variable \"" + variableName + "\" was not declared in the scope", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidNumberOfArguments(JmmNode errorNode, String methodName, int found) {
-        return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid number of arguments for " + methodName + ", no implementation with " + found + " parameters found", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidTypeForArguments(JmmNode errorNode, String methodName, List<Value> arguments) {
@@ -51,11 +69,11 @@ public class JmmException extends Exception {
         for (Value value : arguments)
             types.add("\"" + getOutputType(value.getReturnType()) + "\"");
         String parameterString = types.size() > 0 ? "(" + String.join(", ", types) + ")" : "no";
-        return new JmmException("Invalid call for " + methodName + ", no implementation with " + parameterString + " parameters found", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid call for " + methodName + ", no implementation with " + parameterString + " parameters found", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidAssignmentVariable(JmmNode errorNode) {
-        return new JmmException("Invalid left operand for assignment, was expecting a variable found expression", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid left operand for assignment, was expecting a variable found expression", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidAssignment(JmmNode errorNode, Value variable, Type found) {
@@ -64,28 +82,28 @@ public class JmmException extends Exception {
             variableName = ((Access) variable).getVariableName() + "[]";
         else
             variableName = ((Terminal) variable).getName();
-        return new JmmException("Invalid type for assignment of variable \"" + variableName + "\", was expecting \"" + getOutputType(variable.getReturnType()) + "\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid type for assignment of variable \"" + variableName + "\", was expecting \"" + getOutputType(variable.getReturnType()) + "\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidCondition(JmmNode errorNode, Type found) {
-        return new JmmException("Invalid condition expression, was expecting \"boolean\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid condition expression, was expecting \"boolean\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidReturn(JmmNode errorNode, String methodName, Type expected, Type found) {
-        return new JmmException("Invalid return expression for method \"" + methodName + "\", was expecting \"" + getOutputType(expected) + "\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid return expression for method \"" + methodName + "\", was expecting \"" + getOutputType(expected) + "\" and found \"" + getOutputType(found) + "\"", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidMethod(JmmNode errorNode, String methodName) {
-        return new JmmException("Method \"" + methodName + "\" could not be found", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Method \"" + methodName + "\" could not be found", errorNode.get("line"), errorNode.get("col"), false);
     }
 
     public static JmmException invalidCaller(JmmNode errorNode, String methodName, Value caller) {
         String explanationString = (caller instanceof Class) ? "was expecting instance of class and found class reference" : "was expecting class reference and found instance of class";
-        return new JmmException("Invalid caller of method \"" + methodName + "\" of class \"" + caller.getReturnType().getName() + "\", " + explanationString, errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Invalid caller of method \"" + methodName + "\" of class \"" + caller.getReturnType().getName() + "\", " + explanationString, errorNode.get("line"), errorNode.get("col"), true);
     }
 
     public static JmmException uninitializedVariable(JmmNode errorNode, String variableName) {
-        return new JmmException("Variable \"" + variableName + "\" was not initialized", errorNode.get("line"), errorNode.get("col"));
+        return new JmmException("Variable \"" + variableName + "\" was not initialized", errorNode.get("line"), errorNode.get("col"), true);
     }
 
     public static JmmException methodAlreadyDefined(String methodName, String className, List<Terminal> parameters) {
@@ -94,7 +112,7 @@ public class JmmException extends Exception {
         for (Value value : parameters)
             types.add("\"" + getOutputType(value.getReturnType()) + "\"");
         String parameterString = types.size() > 0 ? "(" + String.join(", ", types) + ")" : "no";
-        return new JmmException("Method \"" + methodName + "\" with " + parameterString + " parameters is already defined in class \"" + className + "\"");
+        return new JmmException("Method \"" + methodName + "\" with " + parameterString + " parameters is already defined in class \"" + className + "\"", false);
     }
 
     // TODO: Add line and col, PROBLEM: need refactoring,

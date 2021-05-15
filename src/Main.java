@@ -12,10 +12,13 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import analysis.JmmVisitor;
 
+import java.awt.*;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import static pt.up.fe.comp.jmm.report.ReportType.ERROR;
 
 public class Main implements JmmParser {
 
@@ -45,8 +48,16 @@ public class Main implements JmmParser {
 
         AnalysisStage analysisStage = new AnalysisStage();
         JmmSemanticsResult semanticResult = analysisStage.semanticAnalysis(parserResult);
-        if (semanticResult == null || !semanticResult.getReports().isEmpty())
+        if (semanticResult == null)
             return;
+        List<Report> reports = semanticResult.getReports();
+        if (!reports.isEmpty()) {
+            for (Report report: reports) {
+                if (report.getType() == ERROR)
+                    return;
+            }
+        }
+
 
         OptimizationStage optimizationStage = new OptimizationStage();
         OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
