@@ -11,7 +11,7 @@ import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
 public class Assignment extends Statement {
-    private final Value variable;
+    private Value variable;
     private final Value expression;
 
     private Assignment(SymbolTable table, Method method, Value variable, Value expression) {
@@ -37,10 +37,23 @@ public class Assignment extends Statement {
             isField = mainClass.isField(this.method.getVariable(((Access) variable).getVariableName()));
 
         StringBuilder builder = new StringBuilder();
-        if (isField)
-            builder.append("putfield(this, ");
+        if (isField) {
+            if (variable instanceof Access) {
+                Access access = (Access) variable;
+                Terminal terminal = (Terminal) access.getVariable();
+                Terminal aux = new Terminal(terminal.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+                variable = new Access(table, this.method, aux, access.getPosition());
+                builder.append(aux.getOllir()).append(" :=");
+                builder.append(Value.typeToOllir(aux.getReturnType())).append(" ");
+                builder.append("getfield(this, ").append(terminal.getOllir()).append(")");
+                builder.append(Value.typeToOllir(terminal.getReturnType())).append(";\n");
+                isField = false;
+            } else {
+                builder.append("putfield(this, ");
+            }
+        }
 
-        Value.addValueToAssignmentBuilder(builder, variable, this.method, isField);
+        Value.addValueToAssignmentBuilder(builder, table, variable, this.method, isField);
 
         if (isField) {
             builder.append(", ");
@@ -50,7 +63,7 @@ public class Assignment extends Statement {
             builder.append(Value.typeToOllir(assignmentType)).append(" ");
         }
 
-        Value.addValueToBuilder(builder, expression, this.method);
+        Value.addValueToBuilder(builder, this.table, expression, this.method);
 
         if (isField)
             builder.append(").V");

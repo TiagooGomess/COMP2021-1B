@@ -12,6 +12,19 @@ import java.util.List;
 
 public class Access extends Function {
     private final Terminal variable;
+    private Value position = null;
+
+    public Access(SymbolTable table, Method scopeMethod, Terminal variable, Value position) {
+        this.table = table;
+        this.node = null;
+        this.scopeMethod = scopeMethod;
+
+        // Method name and class
+        this.methodName = "%Access";
+        this.method = this.table.getMethod(this.methodName).get(0);
+        this.variable = variable;
+        this.position = position;
+    }
 
     public Access(SymbolTable table, Method scopeMethod, JmmNode node) throws JmmException {
         this.table = table;
@@ -53,18 +66,21 @@ public class Access extends Function {
     }
 
     public Value getPosition() {
-        return argumentValues.get(1);
+        if (position == null)
+            position = argumentValues.get(1);
+        return position;
     }
 
     @Override
     public String getOllir() {
-        Value position = this.getPosition();
+        if (position == null)
+            position = this.getPosition();
 
         StringBuilder builder = new StringBuilder();
         Terminal t = new Terminal(position.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
         builder.append(t.getOllir());
         builder.append(" :=").append(Value.typeToOllir(t.getReturnType())).append(" ");
-        addValueToBuilder(builder, position, this.method);
+        addValueToBuilder(builder, table, position, this.method);
         builder.append(";\n");
 
         builder.append(variable.getOllirName());

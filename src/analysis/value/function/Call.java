@@ -72,14 +72,14 @@ public class Call extends Function {
             if (this.method.isStatic())
                 result.append(Value.typeToOllir(this.objectCalling.getReturnType()).substring(1));
             else
-                addValueToBuilder(result, objectCalling, this.scopeMethod);
+                addValueToBuilder(result, table, objectCalling, this.scopeMethod);
             result.append(", \"").append(this.methodName).append("\"");
             for (Value argument : this.argumentValues) {
                 result.append(", ");
-                addValueToBuilder(result, argument, this.scopeMethod);
+                addValueToBuilder(result, table, argument, this.scopeMethod);
             }
         } else {
-            Value.addValueToBuilder(result, this.objectCalling, this.method);
+            Value.addValueToBuilder(result, table, this.objectCalling, this.method);
         }
 
         result.append(")");

@@ -32,7 +32,7 @@ public class While extends Statement {
         // Condition
         StringBuilder conditionBuilder = new StringBuilder();
         conditionBuilder.append("if (");
-        Terminal t = Value.addValueToBuilder(conditionBuilder, this.condition, this.method);
+        Terminal t = Value.addValueToBuilder(conditionBuilder, table, this.condition, this.method);
         if (t != null || this.condition instanceof Terminal)
             conditionBuilder.append(" &&.bool 1.bool");
         conditionBuilder.append(") goto ").append(bodyLabel).append(";\ngoto ").append(endLoopLabel).append(";\n");

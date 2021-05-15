@@ -57,9 +57,9 @@ public class Operation extends Function {
             default -> null;
         };
 
-        addValueToBuilder(result, leftOperand, this.scopeMethod);
+        addValueToBuilder(result, this.table, leftOperand, this.scopeMethod);
         result.append(" ").append(operator).append(" ");
-        addValueToBuilder(result, rightOperand, this.scopeMethod);
+        addValueToBuilder(result, this.table, rightOperand, this.scopeMethod);
 
         return result.toString();
     }

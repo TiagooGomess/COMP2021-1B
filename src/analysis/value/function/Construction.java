@@ -53,7 +53,7 @@ public class Construction extends Function {
 
         if (isArray) {
             builder.append("array, ");
-            Value.addValueToBuilder(builder, argumentValues.get(0), this.scopeMethod);
+            Value.addValueToBuilder(builder, table, argumentValues.get(0), this.scopeMethod);
         } else {
             builder.append(typeOllir.substring(1));
         }

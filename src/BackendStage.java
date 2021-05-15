@@ -313,14 +313,15 @@ public class BackendStage implements JasminBackend {
                 Element firstOperand = getFieldInstruction.getFirstOperand();
                 Element secondOperand = getFieldInstruction.getSecondOperand();
                 String name = ((Operand) firstOperand).getName();
-                if (name.equals("this"))
+                /*if (name.equals("this"))
                     builder.append("aload_0");
-                else {
-                    builder.append("getfield ");
-                    builder.append(name);
-                    builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
-                    builder.append(this.getJasminReturnType(secondOperand.getType()));
-                }
+                else {*/
+                builder.append("aload_0\n");
+                builder.append("getfield ");
+                builder.append(this.getJasminReturnType(secondOperand.getType()));
+                builder.append(" ").append(((Operand) secondOperand).getName());
+
+                //}
                 builder.append("\n");
             }
             case BINARYOPER -> {

@@ -28,7 +28,7 @@ public class If extends Statement {
 
         StringBuilder builder = new StringBuilder();
         builder.append("if (");
-        Terminal t = Value.addValueToBuilder(builder, this.condition, this.method);
+        Terminal t = Value.addValueToBuilder(builder, table, this.condition, this.method);
         if (t != null || this.condition instanceof Terminal)
             builder.append(" &&.bool 1.bool");
         builder.append(") goto ").append(thenLabel).append(";");

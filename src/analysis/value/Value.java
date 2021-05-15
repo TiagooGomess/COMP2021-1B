@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public abstract class Value {
 
-    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method, boolean fromPutField, boolean assignmentVariable) {
+    public static Terminal addValueToBuilder(StringBuilder result, SymbolTable table, Value operand, Method method, boolean fromPutField, boolean assignmentVariable) {
         String ollir = operand.getOllir();
 
         Terminal terminal = null;
@@ -24,8 +24,9 @@ public abstract class Value {
             int argumentNumber = method.getArgumentNumber(terminalOperand);
             if (argumentNumber != 0)
                 result.append("$").append(argumentNumber).append(".");
-            else if (!fromPutField && method.getParentClass() != null && method.getParentClass().isField(terminalOperand) && !terminalOperand.getName().equals("this"))
+            else if (!fromPutField && table.getClass(null).isField(terminalOperand) && !terminalOperand.getName().equals("this")) {
                 terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
+            }
 
             if (terminal == null) {
                 result.append(ollir);
@@ -38,7 +39,7 @@ public abstract class Value {
                 terminal = new Terminal(operand.getReturnType(), "aux" + SymbolTable.auxiliaryVariableNumber++);
         } else {
             String typeOllir = Value.typeToOllir(terminalOperand.getReturnType());
-            ollir = "getfield(this, " + terminalOperand.getName() + typeOllir + ")" + typeOllir + "\n";
+            ollir = "getfield(this, " + terminalOperand.getOllir() + ")" + typeOllir + "\n";
         }
 
         ArrayList<String> childLines = new ArrayList<>(Arrays.asList(ollir.split("\n")));
@@ -59,12 +60,12 @@ public abstract class Value {
         return terminal;
     }
 
-    public static Terminal addValueToBuilder(StringBuilder result, Value operand, Method method) {
-        return addValueToBuilder(result, operand, method, false, false);
+    public static Terminal addValueToBuilder(StringBuilder result, SymbolTable table, Value operand, Method method) {
+        return addValueToBuilder(result, table, operand, method, false, false);
     }
 
-    public static Terminal addValueToAssignmentBuilder(StringBuilder result, Value operand, Method method, boolean fromPutField) {
-        return addValueToBuilder(result, operand, method, fromPutField, true);
+    public static Terminal addValueToAssignmentBuilder(StringBuilder result, SymbolTable table, Value operand, Method method, boolean fromPutField) {
+        return addValueToBuilder(result, table, operand, method, fromPutField, true);
     }
 
     public abstract Type getReturnType();

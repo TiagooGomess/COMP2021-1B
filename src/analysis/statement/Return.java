@@ -20,7 +20,7 @@ public class Return extends Statement {
         StringBuilder builder = new StringBuilder();
 
         builder.append("ret").append(Terminal.typeToOllir(this.returnValue.getReturnType())).append(" ");
-        Value.addValueToBuilder(builder, this.returnValue, this.method);
+        Value.addValueToBuilder(builder, table, this.returnValue, this.method);
         builder.append(";");
 
         return builder.toString();
