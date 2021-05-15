@@ -32,8 +32,8 @@ public class BackendStage implements JasminBackend {
     private String actualNewClass = null;
 
     private class MethodLimits {
-        int stackLimit = 99;
-        int locals = 99;
+        int stackLimit = 105;
+        int locals = 105;
 
         public int getStackLimit() {
             return stackLimit;
@@ -399,15 +399,6 @@ public class BackendStage implements JasminBackend {
         return variableRegisterMap.get(variableName);
     }
 
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Map.Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
     private String getJasminCode() {
         StringBuilder jasminCode = new StringBuilder();
 
@@ -417,7 +408,7 @@ public class BackendStage implements JasminBackend {
         String superClassName = this.symbolTable.getSuper();
         jasminCode.append(".super ");
         if (superClassName != null) {
-            jasminCode.append(this.symbolTable.getClass(superClassName).getImportName().replace(".", "/"));
+            jasminCode.append(this.symbolTable.getClass(superClassName).getImportName().replaceAll("^.", "").replace(".", "/"));
         } else
             jasminCode.append("java/lang/Object");
         jasminCode.append("\n\n");
@@ -470,12 +461,10 @@ public class BackendStage implements JasminBackend {
             StringBuilder methodBuilder = new StringBuilder();
 
 
-            Map<String, Instruction> labels = method.getLabels();
             for (Instruction instruction : method.getInstructions()) {
-                String label = BackendStage.getKeyByValue(labels, instruction);
-                if (label != null)
+                List<String> instructionLabels = method.getLabels(instruction);
+                for (String label : instructionLabels)
                     methodBuilder.append(label).append(":\n");
-                labels.containsValue(instruction);
                 methodBuilder.append(getJasminInstruction(instruction));
             }
 

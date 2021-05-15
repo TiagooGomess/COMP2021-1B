@@ -182,8 +182,10 @@ public class JmmVisitor extends PreorderJmmVisitor<SymbolTable, Value> {
         StringBuilder builder = new StringBuilder();
 
         for (Method method : this.symbolTable.getClass(null).getMethods()) {
-            StringBuilder declaration = new StringBuilder(method.getOllir() + " {");
             boolean specialCase = !methodStatements.containsKey(method);
+            if (specialCase && !method.getName().equals("%Construction"))
+                continue;
+            StringBuilder declaration = new StringBuilder(method.getOllir() + " {");
 
             if (specialCase) {
                 declaration.append("\n  invokespecial(this, \"<init>\").V;");

@@ -60,7 +60,7 @@ public class Terminal extends Value {
     }
 
     public String getOllirName() { // Deal with the case when a variable name is a ollir reserved word
-        return (this.isReservedWord(getName()) ? "__" : "") + symbol.getName();
+        return (this.isReservedWord(getName()) ? "__" : "") + symbol.getName().replace("$", "__");
     }
 
     public String getOllir() {
