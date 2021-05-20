@@ -1,5 +1,4 @@
 import io;
-import pack.Fa;
 
 class QuickSort {
     public static void main(String[] a) {
@@ -10,7 +9,7 @@ class QuickSort {
         L = new int[10];
 
         i = 0;
-        while ((!this.printL(L)) && (i < 10) && i < (i*2+3)) {
+        while (i < L.length) {
             L[i] = L.length - i;
 
             i = i + 1;
@@ -19,7 +18,7 @@ class QuickSort {
         q = new QuickSort();
 
         q.quicksort(L);
-        Fa.printL(L);
+        q.printL(L);
     }
 
     public boolean printL(int[] L) {
@@ -31,6 +30,7 @@ class QuickSort {
         }
 
         return true;
+
     }
 
     public boolean quicksort(int[] L) {

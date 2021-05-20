@@ -331,12 +331,12 @@ public class BackendStage implements JasminBackend {
                 Element rightOperand = binaryOpInstruction.getRightOperand();
                 Operation operation = binaryOpInstruction.getUnaryOperation();
                 Element leftOperand = binaryOpInstruction.getLeftOperand();
+                OperationType operationType = operation.getOpType();
 
                 this.pushToStack(builder, leftOperand);
-                this.pushToStack(builder, rightOperand);
+                if (!(operationType == OperationType.NOT || operationType == OperationType.NOTB))
+                    this.pushToStack(builder, rightOperand);
                 //builder.append(operation.getOpType().name());
-
-                OperationType operationType = operation.getOpType();
 
                 switch (operationType) {
                     case AND, ANDB -> {

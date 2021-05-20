@@ -1,6 +1,7 @@
 package analysis.statement;
 
 import analysis.method.Method;
+import analysis.symbol.Program;
 import analysis.symbol.SymbolTable;
 import analysis.value.Value;
 import exception.JmmException;
@@ -17,8 +18,14 @@ public class Expression extends Statement {
 
     public String getOllir() {
         StringBuilder result = new StringBuilder();
-        result.append(this.expression.getOllir());
-        result.append(";");
+        if (this.expression.getReturnType() != null && this.expression.getReturnType() != Program.VOID_TYPE) {
+            Value.addValueToBuilder(result, this.table, this.expression, this.method);
+            int index = result.lastIndexOf("\n");
+            result.setLength(index);
+        } else {
+            result.append(this.expression.getOllir());
+            result.append(";");
+        }
         return result.toString();
     }
 

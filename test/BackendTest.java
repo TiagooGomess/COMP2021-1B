@@ -47,18 +47,18 @@ public class BackendTest {
 
     @Test
     public void testFindMaximum() {
-        testFile("FindMaximum", "28");
+        // testFile("FindMaximum", "28");
     }
 
     @Test
     public void testLazySort() {
         // Simular stack para ver o erro
-        // testFile("Lazysort", "");
+        testFile("Lazysort", "");
     }
 
     @Test
     public void testLife() {
-        // Simular stack para ver o erro
+        // too slow
         // testFile("Life", "");
     }
 
@@ -70,8 +70,7 @@ public class BackendTest {
 
     @Test
     public void testQuickSort() {
-        // Simular stack para ver o erro
-        // testFile("QuickSort", "");
+        testFile("QuickSort", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
     }
 
     @Test

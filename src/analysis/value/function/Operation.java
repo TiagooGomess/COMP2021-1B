@@ -44,7 +44,7 @@ public class Operation extends Function {
     public String getOllir() {
         StringBuilder result = new StringBuilder();
         Value leftOperand = this.argumentValues.get(0);
-        Value rightOperand = this.argumentValues.size() > 1 ? this.argumentValues.get(1) : this.argumentValues.get(0);
+        Value rightOperand = this.argumentValues.size() > 1 ? this.argumentValues.get(1) : null;
 
         String operator = switch (this.methodName.substring(1)) {
             case "Addition" -> "+.i32";
@@ -57,9 +57,15 @@ public class Operation extends Function {
             default -> null;
         };
 
-        addValueToBuilder(result, this.table, leftOperand, this.scopeMethod);
+        Terminal aux = addValueToBuilder(result, this.table, leftOperand, this.scopeMethod);
         result.append(" ").append(operator).append(" ");
-        addValueToBuilder(result, this.table, rightOperand, this.scopeMethod);
+        if (rightOperand != null) {
+            addValueToBuilder(result, this.table, rightOperand, this.scopeMethod);
+        } else if (aux == null) {
+            addValueToBuilder(result, this.table, leftOperand, this.scopeMethod);
+        } else {
+            addValueToBuilder(result, this.table, aux, this.scopeMethod);
+        }
 
         return result.toString();
     }
