@@ -1,0 +1,6 @@
+package fixtures.ourTests;
+
+// Static and nonstatic caller verification and overloading
+
+public class Test2 {
+}
