@@ -1,5 +1,7 @@
 import io;
 
 class Test {
-
+    public static void main(String[] args) {
+        io.println(10);
+    }
 }

@@ -32,8 +32,8 @@ public class BackendStage implements JasminBackend {
     private String actualNewClass = null;
 
     private class MethodLimits {
-        int stackLimit = 105;
-        int locals = 105;
+        int stackLimit = 110;
+        int locals = 110;
 
         public int getStackLimit() {
             return stackLimit;
@@ -410,10 +410,11 @@ public class BackendStage implements JasminBackend {
 
         String superClassName = this.symbolTable.getSuper();
         jasminCode.append(".super ");
-        if (superClassName != null) {
-            jasminCode.append(this.symbolTable.getClass(superClassName).getImportName().replaceAll("^.", "").replace(".", "/"));
-        } else
-            jasminCode.append("java/lang/Object");
+        if (superClassName != null)
+            superClassName = this.symbolTable.getClass(superClassName).getImportName().replaceAll("^.", "").replace(".", "/");
+        else
+            superClassName = "java/lang/Object";
+        jasminCode.append(superClassName);
         jasminCode.append("\n\n");
 
         for (Field field : this.classUnit.getFields()) {
@@ -427,7 +428,9 @@ public class BackendStage implements JasminBackend {
 
         jasminCode.append(".method public <init>()V\n");
         jasminCode.append("  aload_0\n");
-        jasminCode.append("  invokenonvirtual java/lang/Object/<init>()V\n");
+        jasminCode.append("  invokenonvirtual ");
+        jasminCode.append(superClassName);
+        jasminCode.append("/<init>()V\n");
         jasminCode.append("  return\n");
         jasminCode.append(".end method\n\n");
 

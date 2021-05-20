@@ -161,15 +161,17 @@ public abstract class Function extends Value {
         }
 
 
+        boolean neededInferredMethod = false;
         if (possibleParameterLists.keySet().size() != 1) {
             if (possibleParameterLists.keySet().isEmpty() && function instanceof Call) {
                 List<Terminal> parameters = function.getNewParameters();
                 Method inferredMethod = createMethodByInference(table, function.methodClass, (Call) function, parameters);
                 possibleParameterLists.put(inferredMethod, null);
+                neededInferredMethod = true;
+            } else {
+                for (Method method : methodTypeList.keySet())
+                    throw JmmException.invalidTypeForArguments(node, function.getOutputName(), methodTypeList.get(method));
             }
-
-            for (Method method : methodTypeList.keySet())
-                throw JmmException.invalidTypeForArguments(node, function.getOutputName(), methodTypeList.get(method));
         }
 
         for (Method method : possibleParameterLists.keySet()) {
@@ -177,8 +179,16 @@ public abstract class Function extends Value {
         }
 
         function.argumentValues = methodTypeList.get(function.method);
-        if (function.argumentValues == null)
-            function.argumentValues = new ArrayList<>();
+        if (function.argumentValues == null) {
+            if (!neededInferredMethod) {
+                function.argumentValues = new ArrayList<>();
+            } else {
+                List<Value> methodTypeListForInferred = new ArrayList<>();
+                for (JmmNode argument : arguments)
+                    methodTypeListForInferred.add(Value.fromNode(table, scopeMethod, argument, null));
+                function.argumentValues = methodTypeListForInferred;
+            }
+        }
 
         if (function instanceof Call) {
             Call call = (Call) function;

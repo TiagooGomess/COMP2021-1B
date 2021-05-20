@@ -46,20 +46,40 @@ public class BackendTest {
     }
 
     @Test
+    public void testWhileAndIf() {
+        testFile("WhileAndIF", "10\n10\n10\n10\n10\n10\n10\n10\n10\n10");
+    }
+
+    @Test
     public void testFindMaximum() {
-        // testFile("FindMaximum", "28");
+        testFile("FindMaximum", "Result: 28");
+    }
+
+    @Test
+    public void testQuickSort() {
+        testFile("QuickSort", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
+    }
+
+    @Test
+    public void testTuring() {
+        testFile("../private/Turing", "111111111111111111\n000000000000000000");
+    }
+
+    @Test
+    public void testTicTacToe() {
+        testFile("TicTacToe", "0|0|0\n" +
+                "- - -\n" +
+                "0|0|0\n" +
+                "- - -\n" +
+                "0|0|0\n" +
+                "\n" +
+                "Congratulations, -1, you have won the game.");
     }
 
     @Test
     public void testLazySort() {
-        // Simular stack para ver o erro
-        testFile("Lazysort", "");
-    }
-
-    @Test
-    public void testLife() {
-        // too slow
-        // testFile("Life", "");
+        // impossible to predict
+        testFile("Lazysort", null);
     }
 
     @Test
@@ -69,25 +89,9 @@ public class BackendTest {
     }
 
     @Test
-    public void testQuickSort() {
-        testFile("QuickSort", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
-    }
-
-    @Test
-    public void testTicTacToe() {
-        // Simular stack para ver o erro
-        // testFile("TicTacToe", "");
-    }
-
-    @Test
-    public void testWhileAndIf() {
-        testFile("WhileAndIF", "10\n10\n10\n10\n10\n10\n10\n10\n10\n10");
-    }
-
-    @Test
-    public void testTuring() {
-        // Simular stack para ver o erro
-        // testFile("../private/Turing", "");
+    public void testLife() {
+        // too slow to test
+        // testFile("Life", "");
     }
 
     @Test
