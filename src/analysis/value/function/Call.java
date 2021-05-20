@@ -1,5 +1,6 @@
 package analysis.value.function;
 
+import analysis.value.Terminal;
 import analysis.method.Method;
 import analysis.symbol.SymbolTable;
 import analysis.value.Value;
@@ -56,6 +57,7 @@ public class Call extends Function {
     public String getOllir() {
         StringBuilder result = new StringBuilder();
         boolean length = false;
+        boolean virtual = false;
 
         if (this.methodName.equals("length")) {
             result.append("arraylength");
@@ -63,6 +65,7 @@ public class Call extends Function {
         } else if (this.method.isStatic()) {
             result.append("invokestatic");
         } else {
+            virtual = true;
             result.append("invokevirtual");
         }
 
@@ -73,6 +76,13 @@ public class Call extends Function {
                 result.append(Value.typeToOllir(this.objectCalling.getReturnType()).substring(1));
             else
                 addValueToBuilder(result, table, objectCalling, this.scopeMethod);
+
+            // Remove type of first argument
+            if (virtual && objectCalling instanceof Terminal && ((Terminal) objectCalling).getName().equals("this")) {
+                int index = result.lastIndexOf(".");
+                result.setLength(index);
+            }
+
             result.append(", \"").append(this.methodName).append("\"");
             for (Value argument : this.argumentValues) {
                 result.append(", ");

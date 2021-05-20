@@ -573,7 +573,7 @@ void AdditionExpression() #void : {}
 
 void SubtractionExpression() #void : {}
 {
-   MultiplicationExpression()
+   DivisionExpression()
    (
       <MINUS>
       Operator("Subtraction")
@@ -582,27 +582,27 @@ void SubtractionExpression() #void : {}
    )?
 }
 
-void MultiplicationExpression() #void : {}
+void DivisionExpression() #void : {}
 {
-   DivisionExpression()
+   MultiplicationExpression()
    (
-      <MULT>
-      Operator("Multiplication")
-      MultiplicationExpression()
+      <DIV>
+      Operator("Division")
+      DivisionExpression()
       #Operation(3)
    )?
 }
 
-void DivisionExpression() #void : {}
+void MultiplicationExpression() #void : {}
 {
     (
         NotExpression()
     ) | (
        AccessExpression()
        (
-          <DIV>
-          Operator("Division")
-          DivisionExpression()
+          <MULT>
+          Operator("Multiplication")
+          MultiplicationExpression()
           #Operation(3)
        )?
    )

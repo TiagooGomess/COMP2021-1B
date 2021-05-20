@@ -25,9 +25,9 @@ public class BackendTest {
         var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
         TestUtils.noErrors(result.getReports());
 
-        System.out.println(result.getJasminCode());
         var output = result.run();
-        assertEquals(expectedOutput, output.trim());
+        if (expectedOutput != null)
+            assertEquals(expectedOutput, output.trim());
     }
 
     @Test
@@ -47,8 +47,7 @@ public class BackendTest {
 
     @Test
     public void testFindMaximum() {
-        // Putfield com array
-        testFile("FindMaximum", "Result: 28");
+        testFile("FindMaximum", "28");
     }
 
     @Test
@@ -59,14 +58,14 @@ public class BackendTest {
 
     @Test
     public void testLife() {
-        // invalid arguments for trIdx
+        // Simular stack para ver o erro
         // testFile("Life", "");
     }
 
     @Test
     public void testMonteCarloPi() {
-        // logic error
-        // testFile("MonteCarloPi", "");
+        // the result is not always the same
+        testFile("MonteCarloPi", null);
     }
 
     @Test
@@ -77,7 +76,7 @@ public class BackendTest {
 
     @Test
     public void testTicTacToe() {
-        // Putfield com array
+        // Simular stack para ver o erro
         // testFile("TicTacToe", "");
     }
 
@@ -88,7 +87,7 @@ public class BackendTest {
 
     @Test
     public void testTuring() {
-        // Putfield com array
+        // Simular stack para ver o erro
         // testFile("../private/Turing", "");
     }
 

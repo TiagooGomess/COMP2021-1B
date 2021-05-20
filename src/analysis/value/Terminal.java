@@ -65,7 +65,7 @@ public class Terminal extends Value {
 
     public String getOllir() {
         if (symbol.getName().equals("this"))
-            return "this";
+            return "this" + typeToOllir(symbol.getType());
         return getOllirName() + typeToOllir(symbol.getType());
     }
 

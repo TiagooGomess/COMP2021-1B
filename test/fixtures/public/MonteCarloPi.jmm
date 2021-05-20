@@ -1,5 +1,6 @@
 import MathUtils; //lowerLimit,upperLimit
 import ioPlus;
+import io;
 
 class MonteCarloPi {
 	public boolean performSingleEstimate() {
@@ -45,7 +46,7 @@ class MonteCarloPi {
 		int pi_estimate_times_100;
 		int num_samples;
 
-		num_samples = 10;
+		num_samples = 100;
 		pi_estimate_times_100 = new MonteCarloPi().estimatePi100(num_samples);
 
 		ioPlus.printResult(pi_estimate_times_100);
