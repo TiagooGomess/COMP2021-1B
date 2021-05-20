@@ -27,20 +27,40 @@ import static org.specs.comp.ollir.ElementType.*;
  */
 
 public class BackendStage implements JasminBackend {
-    private int currentVariableRegister;
     private Map<String, Integer> variableRegisterMap;
     private String actualNewClass = null;
 
-    private class MethodLimits {
-        int stackLimit = 110;
-        int locals = 110;
+    private static class MethodLimits {
+        int stackLimit = 0;
+        int currentStack = 0;
+        int locals = 0;
 
         public int getStackLimit() {
             return stackLimit;
         }
 
-        public void addStackLimit() {
-            this.stackLimit++;
+        public void removeCurrentStack(int number) {
+            this.currentStack -= number;
+            updateStackLimit();
+        }
+
+        public void removeCurrentStack() {
+            this.currentStack--;
+        }
+
+        public void addCurrentStack() {
+            currentStack++;
+            updateStackLimit();
+        }
+
+        public void addCurrentStack(int number) {
+            currentStack += number;
+            updateStackLimit();
+        }
+
+        private void updateStackLimit() {
+            if (currentStack > stackLimit)
+                stackLimit = currentStack;
         }
 
         public int getLocals() {
@@ -54,7 +74,7 @@ public class BackendStage implements JasminBackend {
 
     ClassUnit classUnit;
     SymbolTable symbolTable;
-    final Map<Method, MethodLimits> methodLimits = new HashMap<>();
+    MethodLimits currentLimits;
     private int actualCompareLabel = 0;
 
     @Override
@@ -153,6 +173,7 @@ public class BackendStage implements JasminBackend {
             }
         }
         builder.append("\n");
+        currentLimits.addCurrentStack();
     }
 
     private void storeFromStack(StringBuilder builder, Element element) {
@@ -164,11 +185,10 @@ public class BackendStage implements JasminBackend {
             addRegister(builder, element);
         }
         builder.append("\n");
+        currentLimits.removeCurrentStack();
     }
 
     private String getJasminInstruction(Instruction instruction) {
-        // TODO: update stackLimit and locals
-        // TODO: [CHECKPOINT2] verify assignments, arithmetic Expressions and method Calls
 
         InstructionType instructionType = instruction.getInstType();
 
@@ -193,7 +213,6 @@ public class BackendStage implements JasminBackend {
             }
             case CALL -> {
                 CallInstruction callInstruction = (CallInstruction) instruction;
-                int numOperands = callInstruction.getNumOperands();
                 CallType invocationType = callInstruction.getInvocationType();
                 Element firstArg = callInstruction.getFirstArg();
                 Element secondArg = callInstruction.getSecondArg();
@@ -213,6 +232,8 @@ public class BackendStage implements JasminBackend {
                         builder.append("invokevirtual ").append(className).append(".").append(((LiteralElement) secondArg).getLiteral().replace("\"", ""));
                         builder.append("(").append(argumentTypes).append(")");
                         builder.append(getJasminReturnType(returnType));
+
+                        currentLimits.removeCurrentStack(listOfOperands.size() - 1);
                     }
                     case invokestatic -> {
                         StringBuilder argumentTypes = new StringBuilder();
@@ -225,16 +246,18 @@ public class BackendStage implements JasminBackend {
                         builder.append(".").append(((LiteralElement) secondArg).getLiteral().replace("\"", ""));
                         builder.append("(").append(argumentTypes).append(")");
                         builder.append(getJasminReturnType(returnType));
+
+                        currentLimits.removeCurrentStack(listOfOperands.size() - 1);
                     }
                     case NEW -> {
                         actualNewClass = ((Operand) firstArg).getName();
                         if (actualNewClass.equals("array")) {
                             pushToStack(builder, listOfOperands.get(0));
                             builder.append("newarray int").append("\n");
-                            // builder.append("dup\n");
                         } else {
                             builder.append("new ").append(actualNewClass).append("\n");
                             builder.append("dup\n");
+                            currentLimits.addCurrentStack(2);
                         }
                     }
                     case invokespecial -> {
@@ -251,10 +274,6 @@ public class BackendStage implements JasminBackend {
                     }
                 }
                 builder.append("\n");
-                /*if (returnType.getTypeOfElement() != VOID) {
-                    builder.append(pushPrefix(returnType.getTypeOfElement()));
-                    builder.append("store_<<LOCAL>>");
-                }*/
             }
             case GOTO -> {
                 GotoInstruction gotoInstruction = (GotoInstruction) instruction;
@@ -286,14 +305,12 @@ public class BackendStage implements JasminBackend {
 
                 if (hasReturnValue && operand != null)
                     builder.append(this.isIntOrBooleanType(elementType) ? "i" : "a");
+                builder.append("return\n");
 
-                builder.append("return");
-
-                builder.append("\n");
+                currentLimits.removeCurrentStack();
             }
             case PUTFIELD -> {
                 PutFieldInstruction putFieldInstruction = (PutFieldInstruction) instruction;
-                Element firstOperand = putFieldInstruction.getFirstOperand();
                 Element secondOperand = putFieldInstruction.getSecondOperand();
                 Element thirdOperand = putFieldInstruction.getThirdOperand();
 
@@ -305,26 +322,21 @@ public class BackendStage implements JasminBackend {
                 builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
                 builder.append(this.getJasminReturnType(thirdOperand.getType()));
                 builder.append("\n");
-
-                // NON-STATIC METHOD -> THIS IS IN STACK POSITION 0
-
+                currentLimits.removeCurrentStack();
             }
             case GETFIELD -> {
                 GetFieldInstruction getFieldInstruction = (GetFieldInstruction) instruction;
-                Element firstOperand = getFieldInstruction.getFirstOperand();
                 Element secondOperand = getFieldInstruction.getSecondOperand();
-                String name = ((Operand) firstOperand).getName();
-                /*if (name.equals("this"))
-                    builder.append("aload_0");
-                else {*/
+
                 builder.append("aload_0\n");
                 builder.append("getfield ");
 
                 builder.append(this.classUnit.getClassName()).append("/").append(((Operand) secondOperand).getName());
                 builder.append(" ").append(this.getJasminReturnType(secondOperand.getType()));
 
-                //}
                 builder.append("\n");
+
+                currentLimits.addCurrentStack();
             }
             case BINARYOPER -> {
                 BinaryOpInstruction binaryOpInstruction = (BinaryOpInstruction) instruction;
@@ -369,6 +381,8 @@ public class BackendStage implements JasminBackend {
                     }
                 }
                 builder.append("\n");
+                if (!(operationType == OperationType.NOT || operationType == OperationType.NOTB))
+                    currentLimits.removeCurrentStack();
             }
             case NOPER -> {
                 SingleOpInstruction singleOpInstruction = (SingleOpInstruction) instruction;
@@ -386,13 +400,14 @@ public class BackendStage implements JasminBackend {
     }
 
     private void resetRegisters() {
-        currentVariableRegister = 0;
+        currentLimits = new MethodLimits();
         variableRegisterMap = new HashMap<>();
         addVariable("this");
     }
 
     private void addVariable(String variableName) {
-        variableRegisterMap.put(variableName, currentVariableRegister++);
+        variableRegisterMap.put(variableName, currentLimits.getLocals());
+        currentLimits.addLocals();
     }
 
     private int getRegister(String variableName) {
@@ -439,8 +454,6 @@ public class BackendStage implements JasminBackend {
         for (Method method : methods) {
             resetRegisters();
 
-            this.methodLimits.put(method, new MethodLimits());
-
             if (method.isConstructMethod()) // already defined
                 continue;
 
@@ -474,8 +487,8 @@ public class BackendStage implements JasminBackend {
                 methodBuilder.append(getJasminInstruction(instruction));
             }
 
-            methodBuilder.insert(0, ".limit locals " + this.methodLimits.get(method).getLocals() + "\n\n");
-            methodBuilder.insert(0, ".limit stack " + this.methodLimits.get(method).getStackLimit() + "\n");
+            methodBuilder.insert(0, ".limit locals " + currentLimits.getLocals() + "\n\n");
+            methodBuilder.insert(0, ".limit stack " + currentLimits.getStackLimit() + "\n");
             if (method.getReturnType().getTypeOfElement() == VOID)
                 methodBuilder.append("return\n");
 
