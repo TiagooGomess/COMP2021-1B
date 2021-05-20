@@ -48,7 +48,7 @@ public class BackendTest {
     @Test
     public void testFindMaximum() {
         // Putfield com array
-        testFile("FindMaximum", "28");
+        testFile("FindMaximum", "Result: 28");
     }
 
     @Test

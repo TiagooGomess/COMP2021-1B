@@ -1,15 +1,17 @@
+import io;
+
 class Test {
     int[] classField;
 
     public static void main(String[] args) {
         Test a;
         a = new Test();
-        a.function();
+        io.println(a.function());
     }
 
     public int function() {
         classField = new int[1];
         classField[0] = 10;
-        return 10;
+        return classField[0];
     }
 }

@@ -297,10 +297,11 @@ public class BackendStage implements JasminBackend {
                 Element secondOperand = putFieldInstruction.getSecondOperand();
                 Element thirdOperand = putFieldInstruction.getThirdOperand();
 
+                builder.append("aload_0\n");
                 this.pushToStack(builder, thirdOperand);
 
                 builder.append("\nputfield ");
-                builder.append(((Operand) firstOperand).getName());
+                builder.append(this.classUnit.getClassName());
                 builder.append("/").append(((Operand) secondOperand).getName()).append(" ");
                 builder.append(this.getJasminReturnType(thirdOperand.getType()));
                 builder.append("\n");
@@ -318,8 +319,9 @@ public class BackendStage implements JasminBackend {
                 else {*/
                 builder.append("aload_0\n");
                 builder.append("getfield ");
-                builder.append(this.getJasminReturnType(secondOperand.getType()));
-                builder.append(" ").append(((Operand) secondOperand).getName());
+
+                builder.append(this.classUnit.getClassName()).append("/").append(((Operand) secondOperand).getName());
+                builder.append(" ").append(this.getJasminReturnType(secondOperand.getType()));
 
                 //}
                 builder.append("\n");

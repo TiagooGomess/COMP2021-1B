@@ -83,7 +83,14 @@ public class Access extends Function {
         addValueToBuilder(builder, table, position, this.method);
         builder.append(";\n");
 
-        builder.append(variable.getOllirName());
+        addValueToBuilder(builder, table, variable, this.method);
+        int index;
+        for (int i = 0; i < 2; i++) {
+            index = builder.lastIndexOf(".");
+            builder.setLength(index);
+        }
+
+        // builder.append(variable.getOllirName());
         builder.append("[");
         builder.append(t.getOllir());
         builder.append("]");
