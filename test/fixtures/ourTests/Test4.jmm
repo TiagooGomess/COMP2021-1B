@@ -1,6 +1,4 @@
-package fixtures.ourTests;
-
 // arrays
 
-public class Test4 {
+class Test4 {
 }

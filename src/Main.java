@@ -52,10 +52,7 @@ public class Main implements JmmParser {
             return;
         List<Report> reports = semanticResult.getReports();
         if (!reports.isEmpty()) {
-            for (Report report: reports) {
-                if (report.getType() == ERROR)
-                    return;
-            }
+            return;
         }
 
 
