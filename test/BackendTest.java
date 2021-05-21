@@ -137,7 +137,7 @@ public class BackendTest {
 
     @Test
     public void testStaticMethods() {
-        testOurFile("StaticMethods", 1);
+        testOurFile("StaticMethods", 3);
     }
 
     @Test

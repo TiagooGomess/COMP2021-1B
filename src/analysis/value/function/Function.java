@@ -168,7 +168,8 @@ public abstract class Function extends Value {
                 Method inferredMethod = createMethodByInference(table, function.methodClass, (Call) function, parameters);
                 possibleParameterLists.put(inferredMethod, null);
                 neededInferredMethod = true;
-            } else {
+            }
+            if (table.getSuper() == null) {
                 for (Method method : methodTypeList.keySet())
                     throw JmmException.invalidTypeForArguments(node, function.getOutputName(), methodTypeList.get(method));
             }

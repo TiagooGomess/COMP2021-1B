@@ -1,10 +1,27 @@
-// Static and nonstatic caller verification and overloading
-// static context
-
 class StaticMethods {
     int field;
 
     public static void main(String[] args) {
+        StaticMethods s;
+
+        // ERROR: Class attribute cannot be used in a static context
         field = 2;
+
+        // ERROR: Method must be called from an instance
+        StaticMethods.function();
+
+        s = new StaticMethods();
+        // right, virtual called from instance
+        s.function();
+
+        // ERROR: static method must have a class reference, not an instance
+        s.main(args);
+
+        // right, static called from class reference
+        StaticMethods.main(args);
+    }
+
+    public int function() {
+        return 0;
     }
 }
