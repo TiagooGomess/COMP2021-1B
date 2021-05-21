@@ -21,6 +21,29 @@ import pt.up.fe.specs.util.SpecsIo;
 
 public class BackendTest {
 
+    private void testFile(String file, long numErrors) {
+        long numberOfErrors;
+        var parseResult = TestUtils.parse(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
+
+        var analysisResult = TestUtils.analyse(parseResult);
+        numberOfErrors = analysisResult.getReports().size();
+        if (numberOfErrors > 0) {
+            assertEquals(numberOfErrors, numErrors);
+            return;
+        }
+
+        var optimizationResult = TestUtils.optimize(analysisResult, false);
+        numberOfErrors = optimizationResult.getReports().size();
+        if (numberOfErrors > 0) {
+            assertEquals(numberOfErrors, numErrors);
+            return;
+        }
+
+        var backendResult = TestUtils.backend(optimizationResult);
+        numberOfErrors = backendResult.getReports().size();
+        assertEquals(numberOfErrors, numErrors);
+    }
+
     private void testFile(String file, String expectedOutput) {
         var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
         TestUtils.noErrors(result.getReports());
@@ -28,6 +51,14 @@ public class BackendTest {
         var output = result.run();
         if (expectedOutput != null)
             assertEquals(expectedOutput, output.trim());
+    }
+
+    private void testOurFile(String name, int expectedErrors) {
+        testFile("../ourTests/" + name, expectedErrors);
+    }
+
+    private void testOurFile(String name, String expectedOutput) {
+        testFile("../ourTests/" + name, expectedOutput);
     }
 
     @Test
@@ -95,7 +126,22 @@ public class BackendTest {
     }
 
     @Test
-    public void testTest() {
-        testFile("Test", "10");
+    public void testOverloading() {
+        testOurFile("Overloading", "3\n-1\n6\n-3");
+    }
+
+    @Test
+    public void testReturnTypes() {
+        testOurFile("ReturnTypes", 1);
+    }
+
+    @Test
+    public void testStaticMethods() {
+        testOurFile("StaticMethods", 1);
+    }
+
+    @Test
+    public void testUninitialized() {
+        testOurFile("Uninitialized", 1);
     }
 }

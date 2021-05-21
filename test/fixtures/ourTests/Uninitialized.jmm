@@ -2,7 +2,7 @@
 
 // Uninitialized variables
 
-class Test1 {
+class Uninitialized {
     public static void main(String[] args) {
         int a;
         int b;

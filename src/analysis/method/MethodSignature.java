@@ -70,8 +70,12 @@ public class MethodSignature {
     @Override
     public int hashCode() {
         int hashCode = 1;
-        for (Type e : this.getParameterTypes())
-            hashCode = 31 * hashCode + e.hashCode();
+        for (Type e : this.getParameterTypes()) {
+            if (e == null)
+                hashCode = 31 * hashCode;
+            else
+                hashCode = 31 * hashCode + e.hashCode();
+        }
         return Objects.hash(isStatic, methodName) + hashCode;
     }
 }

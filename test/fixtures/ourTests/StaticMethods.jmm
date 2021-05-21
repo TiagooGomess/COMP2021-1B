@@ -1,0 +1,10 @@
+// Static and nonstatic caller verification and overloading
+// static context
+
+class StaticMethods {
+    int field;
+
+    public static void main(String[] args) {
+        field = 2;
+    }
+}

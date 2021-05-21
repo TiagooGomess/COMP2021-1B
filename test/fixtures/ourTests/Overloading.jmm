@@ -1,0 +1,35 @@
+import io;
+import OverloadingSuper;
+
+class Overloading extends OverloadingSuper {
+    public static void main(String[] args) {
+        Overloading t;
+        t = new Overloading();
+        // Prints 3
+        io.println(t.sum(1, 2));
+        // Prints -1, call functions from parent class
+        io.println(t.sum(1, true));
+        // prints 6
+        io.println(t.sum(1, 2, 3));
+        // prints -3, the negated sum of 1 and 2
+        io.println(t.sum(1, 2, true));
+    }
+
+    public int sum(int a, int b) {
+        return a + b;
+    }
+
+    public int sum(int a, int b, int c) {
+        return a + b + c;
+    }
+
+    public int sum(int a, int b, boolean negated) {
+        int result;
+        if (negated) {
+            result = 0 - this.sum(a, b);
+        } else {
+            result = this.sum(a, b);
+        }
+        return result;
+    }
+}

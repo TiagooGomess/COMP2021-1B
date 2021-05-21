@@ -99,10 +99,12 @@ public class Method extends Value {
         if (localVariable != null)
             return localVariable;
 
-        // Search in class fields
-        for (Terminal variable : this.parentClass.getAttributes())
-            if (variable.getName().equals(variableName))
-                return variable;
+        if (!isStatic()) {
+            // Search in class fields
+            for (Terminal variable : this.parentClass.getAttributes())
+                if (variable.getName().equals(variableName))
+                    return variable;
+        }
 
         return null;
     }

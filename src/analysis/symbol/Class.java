@@ -118,10 +118,13 @@ public class Class extends Value {
         if (variable != null)
             return variable;
 
-        // If it is not a local variable search in class fields
-        for (Terminal terminal : this.attributes)
-            if (terminal.getName().equals(variableName))
-                return terminal;
+        // If it is not a static method
+        if (!scopeMethod.isStatic()) {
+            // If it is not a local variable search in class fields
+            for (Terminal terminal : this.attributes)
+                if (terminal.getName().equals(variableName))
+                    return terminal;
+        }
 
         // Maybe it is a reference to the class itself
         if (this.className.equals(variableName))

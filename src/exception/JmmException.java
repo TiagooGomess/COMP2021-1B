@@ -1,5 +1,6 @@
 package exception;
 
+import analysis.method.Method;
 import analysis.symbol.Class;
 import analysis.value.Terminal;
 import analysis.value.Value;
@@ -56,7 +57,11 @@ public class JmmException extends Exception {
         return type.isArray() ? type.getName() + "[]" : type.getName();
     }
 
-    public static JmmException undeclaredVariable(JmmNode errorNode, String variableName) {
+    public static JmmException undeclaredVariable(JmmNode errorNode, String variableName, Method method) {
+        if (method.isStatic())
+            for (Terminal attribute : method.getParentClass().getAttributes())
+                if (attribute.getName().equals(variableName))
+                    return new JmmException("Attribute \"" + variableName + "\" of class \"" + method.getParentClass().getName() + "\" cannot be used in a static context", errorNode.get("line"), errorNode.get("col"), false);
         return new JmmException("Variable \"" + variableName + "\" was not declared in the scope", errorNode.get("line"), errorNode.get("col"), false);
     }
 

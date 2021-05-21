@@ -1,0 +1,25 @@
+// find the type of functions that are not stored in a variable at first
+// a.foo();
+// int b = a.foo();
+
+import io;
+import OverloadingSuper;
+
+class ReturnTypes extends OverloadingSuper {
+    public static void main(String[] args) {
+        ReturnTypes r;
+        int result;
+        boolean wrongResult;
+
+        r = new ReturnTypes();
+
+        // Don't know the return type yet
+        r.sum(1, true);
+
+        // Now the compiler undertands that the sum method must return an int
+        result = r.sum(3, false);
+
+        // Error, variable is boolean but method returns int
+        wrongResult = r.sum(4, true);
+    }
+}

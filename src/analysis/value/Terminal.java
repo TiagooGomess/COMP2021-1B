@@ -117,7 +117,7 @@ public class Terminal extends Value {
         if (variable == null) {
             Class parentClass = scopeMethod.getParentClass();
             if (parentClass.getSuperName() == null)
-                throw JmmException.undeclaredVariable(node, variableName);
+                throw JmmException.undeclaredVariable(node, variableName, scopeMethod);
             Terminal terminalVariable = new Terminal(expectedType, variableName);
             parentClass.addAttribute(terminalVariable);
             variable = terminalVariable;

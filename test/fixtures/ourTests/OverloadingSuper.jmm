@@ -1,0 +1,17 @@
+
+class OverloadingSuper {
+
+    public static void main(String[] args) {
+
+    }
+
+    public int sum(int a, boolean negated) {
+        int result;
+        if (negated) {
+            result = 0 - a;
+        } else {
+            result = a;
+        }
+        return result;
+    }
+}
