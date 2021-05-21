@@ -131,6 +131,11 @@ public class BackendTest {
     }
 
     @Test
+    public void testOverloadingSuper() {
+        testOurFile("OverloadingSuper", "8");
+    }
+
+    @Test
     public void testReturnTypes() {
         testOurFile("ReturnTypes", 1);
     }

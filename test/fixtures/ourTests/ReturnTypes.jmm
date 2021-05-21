@@ -1,8 +1,3 @@
-// find the type of functions that are not stored in a variable at first
-// a.foo();
-// int b = a.foo();
-
-import io;
 import OverloadingSuper;
 
 class ReturnTypes extends OverloadingSuper {

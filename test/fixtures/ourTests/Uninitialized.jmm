@@ -1,7 +1,3 @@
-//package fixtures.ourTests;
-
-// Uninitialized variables
-
 class Uninitialized {
     public static void main(String[] args) {
         int a;
