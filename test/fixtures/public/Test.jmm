@@ -1,7 +1,10 @@
-import io;
 
 class Test {
     public static void main(String[] args) {
-        io.println(10);
+        int i;
+        i = 0;
+        while (i < 10)
+            i = i + 1;
+
     }
 }

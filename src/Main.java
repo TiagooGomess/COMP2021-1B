@@ -26,7 +26,7 @@ public class Main implements JmmParser {
         String fileStr;
 
         try {
-            fileStr = Files.readString(Path.of("test/fixtures/public/" + args[0] + ".jmm"));
+            fileStr = Files.readString(Path.of(args[0]));
         } catch (Exception e) {
             System.err.println("--> File not found");
             return;

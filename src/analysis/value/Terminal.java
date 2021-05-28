@@ -55,12 +55,12 @@ public class Terminal extends Value {
     public boolean isReservedWord(String word) {
         return switch (word) {
             case "ret", "putfield", "getfield", "array", "field", "invokespecial", "invokestatic", "construct", "method", "public", "static", "main", "String" -> true;
-            default -> word.startsWith("aux");
+            default -> word.startsWith("aux") || word.startsWith("_");
         };
     }
 
     public String getOllirName() { // Deal with the case when a variable name is a ollir reserved word
-        return (this.isReservedWord(getName()) ? "__" : "") + symbol.getName().replace("$", "__");
+        return (this.isReservedWord(getName()) ? "_" : "") + symbol.getName().replace("$", "__");
     }
 
     public String getOllir() {
