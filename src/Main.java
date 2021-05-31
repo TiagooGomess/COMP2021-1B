@@ -69,6 +69,11 @@ public class Main implements JmmParser {
             return;
 
         System.out.println("--> Success");
+        try {
+            Files.write(Path.of(args[0].split("\\.")[0] + ".j"), jasminResult.getJasminCode().getBytes());
+        } catch (Exception e) {
+            System.out.println("Could not create .j file");
+        }
     }
 
     @Override
