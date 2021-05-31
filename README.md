@@ -12,7 +12,7 @@ NAME3: Miguel Rodrigues Gomes, NR3: 201605908, GRADE3: 13, CONTRIBUTION3: 14%
 
 NAME4: Tiago Gonçalves Gomes, NR4: 201806658, GRADE4: 19, CONTRIBUTION4: 34%
 
-### GLOBAL Grade of the project: 17
+### GLOBAL Grade of the project: 18
 
 ## Compile
 
