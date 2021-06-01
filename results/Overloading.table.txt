@@ -1,0 +1,20 @@
+Class: Overloading
+Super: OverloadingSuper
+
+Imports:
+ - .int[]
+ - .String
+ - .String[]
+ - .io
+ - .OverloadingSuper
+
+Fields:
+ - Overloading this
+
+Methods: 6
+ - int sum(int argument_0 0, boolean argument_1 1)
+ - Overloading %Construction()
+ - int sum(int a 0, int b 1)
+ - int sum(int a 0, int b 1, int c 2)
+ - int sum(int a 0, int b 1, boolean negated 2)
+ - void main(String[] args 0)

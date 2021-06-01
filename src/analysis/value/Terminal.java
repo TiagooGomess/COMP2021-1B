@@ -140,4 +140,8 @@ public class Terminal extends Value {
     public String toString() {
         return this.toString("");
     }
+
+    public String print() {
+        return getType().print() + " " + getName().replace(" ", "_");
+    }
 }

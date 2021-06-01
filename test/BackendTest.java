@@ -12,14 +12,15 @@
  * specific language governing permissions and limitations under the License. under the License.
  */
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.specs.util.SpecsIo;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
 
 public class BackendTest {
 
@@ -47,7 +48,7 @@ public class BackendTest {
     }
 
     private void testFile(String file, String expectedOutput) {
-        var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
+        JasminResult result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
         TestUtils.noErrors(result.getReports());
 
         var output = result.run(Collections.emptyList(), Arrays.asList(TestUtils.getLibsClasspath() + ":./results"));

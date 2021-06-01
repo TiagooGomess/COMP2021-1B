@@ -12,6 +12,7 @@ import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable {
     private final Program program = new Program();
@@ -141,5 +142,46 @@ public class SymbolTable implements pt.up.fe.comp.jmm.analysis.table.SymbolTable
         return this.program.toString();
     }
 
+    @Override
+    public String print() {
+        var builder = new StringBuilder();
 
+        builder.append("Class: " + getClassName() + "\n");
+        var superClass = getSuper() != null ? getSuper() : "java.lang.Object";
+        builder.append("Super: " + superClass + "\n");
+        builder.append("\nImports:");
+        var imports = getImports();
+
+        if (imports.isEmpty()) {
+            builder.append(" <no imports>\n");
+        } else {
+            builder.append("\n");
+            imports.forEach(fullImport -> builder.append(" - " + fullImport + "\n"));
+        }
+
+        var fields = getFields();
+        builder.append("\nFields:");
+        if (fields.isEmpty()) {
+            builder.append(" <no fields>\n");
+        } else {
+            builder.append("\n");
+            fields.forEach(field -> builder.append(" - " + field.print() + "\n"));
+        }
+
+        var methods = this.program.getMainClass().getMethods();
+        builder.append("\nMethods: " + methods.size() + "\n");
+        for (Method method : methods) {
+            var returnType = method.getReturnType();
+            var params = method.getParameters();
+            builder.append(" - " + returnType.print() + " " + method.getName() + "(");
+            var ref = new Object() {
+                int i = 0;
+            };
+            var paramsString = params.stream().map(param -> param != null ? param.print() + " " + ref.i++ : "<null param>")
+                    .collect(Collectors.joining(", "));
+            builder.append(paramsString + ")\n");
+        }
+
+        return builder.toString();
+    }
 }

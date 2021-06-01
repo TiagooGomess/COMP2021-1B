@@ -1,0 +1,1072 @@
+{
+  "rootNode": {
+    "kind": "Program",
+    "attributes": {
+      "col": "1",
+      "line": "1"
+    },
+    "children": [
+      {
+        "kind": "ImportDeclaration",
+        "attributes": {
+          "col": "1",
+          "line": "1",
+          "name": "io"
+        },
+        "children": []
+      },
+      {
+        "kind": "ImportDeclaration",
+        "attributes": {
+          "col": "1",
+          "line": "2",
+          "name": "OverloadingSuper"
+        },
+        "children": []
+      },
+      {
+        "kind": "Class",
+        "attributes": {
+          "col": "1",
+          "extends": "OverloadingSuper",
+          "line": "4",
+          "name": "Overloading"
+        },
+        "children": [
+          {
+            "kind": "Attributes",
+            "attributes": {
+              "col": "5",
+              "line": "5"
+            },
+            "children": []
+          },
+          {
+            "kind": "Methods",
+            "attributes": {
+              "col": "5",
+              "line": "5"
+            },
+            "children": [
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "col": "5",
+                  "isStatic": "true",
+                  "line": "5",
+                  "name": "main",
+                  "type": "void"
+                },
+                "children": [
+                  {
+                    "kind": "MainArgument",
+                    "attributes": {
+                      "col": "29",
+                      "line": "5",
+                      "name": "args",
+                      "type": "String[]"
+                    },
+                    "children": []
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {
+                      "col": "9",
+                      "line": "6"
+                    },
+                    "children": [
+                      {
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "col": "9",
+                          "line": "7",
+                          "name": "t",
+                          "type": "Overloading"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Assignment",
+                        "attributes": {
+                          "col": "13",
+                          "line": "7"
+                        },
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "col": "11",
+                              "line": "7",
+                              "name": "t"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Construction",
+                            "attributes": {
+                              "col": "17",
+                              "line": "7",
+                              "type": "Overloading"
+                            },
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Call",
+                        "attributes": {
+                          "col": "12",
+                          "line": "9"
+                        },
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "col": "11",
+                              "line": "9",
+                              "name": "io"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Method",
+                            "attributes": {
+                              "col": "12",
+                              "line": "9",
+                              "name": "println"
+                            },
+                            "children": [
+                              {
+                                "kind": "Arguments",
+                                "attributes": {
+                                  "col": "31",
+                                  "line": "9"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Call",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "9"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "col": "21",
+                                          "line": "9",
+                                          "name": "t"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Method",
+                                        "attributes": {
+                                          "col": "22",
+                                          "line": "9",
+                                          "name": "sum"
+                                        },
+                                        "children": [
+                                          {
+                                            "kind": "Arguments",
+                                            "attributes": {
+                                              "col": "27",
+                                              "line": "9"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "27",
+                                                  "line": "9",
+                                                  "type": "int",
+                                                  "value": "1"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "30",
+                                                  "line": "9",
+                                                  "type": "int",
+                                                  "value": "2"
+                                                },
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Call",
+                        "attributes": {
+                          "col": "12",
+                          "line": "11"
+                        },
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "col": "11",
+                              "line": "11",
+                              "name": "io"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Method",
+                            "attributes": {
+                              "col": "12",
+                              "line": "11",
+                              "name": "println"
+                            },
+                            "children": [
+                              {
+                                "kind": "Arguments",
+                                "attributes": {
+                                  "col": "34",
+                                  "line": "11"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Call",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "11"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "col": "21",
+                                          "line": "11",
+                                          "name": "t"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Method",
+                                        "attributes": {
+                                          "col": "22",
+                                          "line": "11",
+                                          "name": "sum"
+                                        },
+                                        "children": [
+                                          {
+                                            "kind": "Arguments",
+                                            "attributes": {
+                                              "col": "27",
+                                              "line": "11"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "27",
+                                                  "line": "11",
+                                                  "type": "int",
+                                                  "value": "1"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "33",
+                                                  "line": "11",
+                                                  "type": "boolean",
+                                                  "value": "true"
+                                                },
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Call",
+                        "attributes": {
+                          "col": "12",
+                          "line": "13"
+                        },
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "col": "11",
+                              "line": "13",
+                              "name": "io"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Method",
+                            "attributes": {
+                              "col": "12",
+                              "line": "13",
+                              "name": "println"
+                            },
+                            "children": [
+                              {
+                                "kind": "Arguments",
+                                "attributes": {
+                                  "col": "34",
+                                  "line": "13"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Call",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "13"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "col": "21",
+                                          "line": "13",
+                                          "name": "t"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Method",
+                                        "attributes": {
+                                          "col": "22",
+                                          "line": "13",
+                                          "name": "sum"
+                                        },
+                                        "children": [
+                                          {
+                                            "kind": "Arguments",
+                                            "attributes": {
+                                              "col": "27",
+                                              "line": "13"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "27",
+                                                  "line": "13",
+                                                  "type": "int",
+                                                  "value": "1"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "30",
+                                                  "line": "13",
+                                                  "type": "int",
+                                                  "value": "2"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "33",
+                                                  "line": "13",
+                                                  "type": "int",
+                                                  "value": "3"
+                                                },
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Call",
+                        "attributes": {
+                          "col": "12",
+                          "line": "15"
+                        },
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "col": "11",
+                              "line": "15",
+                              "name": "io"
+                            },
+                            "children": []
+                          },
+                          {
+                            "kind": "Method",
+                            "attributes": {
+                              "col": "12",
+                              "line": "15",
+                              "name": "println"
+                            },
+                            "children": [
+                              {
+                                "kind": "Arguments",
+                                "attributes": {
+                                  "col": "37",
+                                  "line": "15"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Call",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "15"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "col": "21",
+                                          "line": "15",
+                                          "name": "t"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Method",
+                                        "attributes": {
+                                          "col": "22",
+                                          "line": "15",
+                                          "name": "sum"
+                                        },
+                                        "children": [
+                                          {
+                                            "kind": "Arguments",
+                                            "attributes": {
+                                              "col": "27",
+                                              "line": "15"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "27",
+                                                  "line": "15",
+                                                  "type": "int",
+                                                  "value": "1"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "30",
+                                                  "line": "15",
+                                                  "type": "int",
+                                                  "value": "2"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Literal",
+                                                "attributes": {
+                                                  "col": "36",
+                                                  "line": "15",
+                                                  "type": "boolean",
+                                                  "value": "true"
+                                                },
+                                                "children": []
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "col": "5",
+                  "isStatic": "false",
+                  "line": "18",
+                  "name": "sum",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {
+                      "col": "34",
+                      "line": "18"
+                    },
+                    "children": [
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "20",
+                          "line": "18",
+                          "name": "a",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "27",
+                          "line": "18",
+                          "name": "b",
+                          "type": "int"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {
+                      "col": "9",
+                      "line": "19"
+                    },
+                    "children": [
+                      {
+                        "kind": "Return",
+                        "attributes": {
+                          "col": "16",
+                          "line": "19"
+                        },
+                        "children": [
+                          {
+                            "kind": "Operation",
+                            "attributes": {
+                              "col": "20",
+                              "line": "19"
+                            },
+                            "children": [
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "col": "18",
+                                  "line": "19",
+                                  "name": "a"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Operator",
+                                "attributes": {
+                                  "col": "20",
+                                  "line": "19",
+                                  "name": "Addition"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "col": "21",
+                                  "line": "19",
+                                  "name": "b"
+                                },
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "col": "5",
+                  "isStatic": "false",
+                  "line": "22",
+                  "name": "sum",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {
+                      "col": "41",
+                      "line": "22"
+                    },
+                    "children": [
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "20",
+                          "line": "22",
+                          "name": "a",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "27",
+                          "line": "22",
+                          "name": "b",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "34",
+                          "line": "22",
+                          "name": "c",
+                          "type": "int"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {
+                      "col": "9",
+                      "line": "23"
+                    },
+                    "children": [
+                      {
+                        "kind": "Return",
+                        "attributes": {
+                          "col": "16",
+                          "line": "23"
+                        },
+                        "children": [
+                          {
+                            "kind": "Operation",
+                            "attributes": {
+                              "col": "20",
+                              "line": "23"
+                            },
+                            "children": [
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "col": "18",
+                                  "line": "23",
+                                  "name": "a"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Operator",
+                                "attributes": {
+                                  "col": "20",
+                                  "line": "23",
+                                  "name": "Addition"
+                                },
+                                "children": []
+                              },
+                              {
+                                "kind": "Operation",
+                                "attributes": {
+                                  "col": "24",
+                                  "line": "23"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Variable",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "23",
+                                      "name": "b"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "Operator",
+                                    "attributes": {
+                                      "col": "24",
+                                      "line": "23",
+                                      "name": "Addition"
+                                    },
+                                    "children": []
+                                  },
+                                  {
+                                    "kind": "Variable",
+                                    "attributes": {
+                                      "col": "25",
+                                      "line": "23",
+                                      "name": "c"
+                                    },
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "kind": "MethodDeclaration",
+                "attributes": {
+                  "col": "5",
+                  "isStatic": "false",
+                  "line": "26",
+                  "name": "sum",
+                  "type": "int"
+                },
+                "children": [
+                  {
+                    "kind": "Arguments",
+                    "attributes": {
+                      "col": "51",
+                      "line": "26"
+                    },
+                    "children": [
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "20",
+                          "line": "26",
+                          "name": "a",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "27",
+                          "line": "26",
+                          "name": "b",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "Argument",
+                        "attributes": {
+                          "col": "34",
+                          "line": "26",
+                          "name": "negated",
+                          "type": "boolean"
+                        },
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "Body",
+                    "attributes": {
+                      "col": "9",
+                      "line": "27"
+                    },
+                    "children": [
+                      {
+                        "kind": "VariableDeclaration",
+                        "attributes": {
+                          "col": "9",
+                          "line": "28",
+                          "name": "result",
+                          "type": "int"
+                        },
+                        "children": []
+                      },
+                      {
+                        "kind": "If",
+                        "attributes": {
+                          "col": "9",
+                          "line": "28"
+                        },
+                        "children": [
+                          {
+                            "kind": "Condition",
+                            "attributes": {
+                              "col": "12",
+                              "line": "28"
+                            },
+                            "children": [
+                              {
+                                "kind": "Variable",
+                                "attributes": {
+                                  "col": "20",
+                                  "line": "28",
+                                  "name": "negated"
+                                },
+                                "children": []
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "Then",
+                            "attributes": {
+                              "col": "22",
+                              "line": "28"
+                            },
+                            "children": [
+                              {
+                                "kind": "Block",
+                                "attributes": {
+                                  "col": "22",
+                                  "line": "28"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Assignment",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "29"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "col": "20",
+                                          "line": "29",
+                                          "name": "result"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Operation",
+                                        "attributes": {
+                                          "col": "26",
+                                          "line": "29"
+                                        },
+                                        "children": [
+                                          {
+                                            "kind": "Literal",
+                                            "attributes": {
+                                              "col": "24",
+                                              "line": "29",
+                                              "type": "int",
+                                              "value": "0"
+                                            },
+                                            "children": []
+                                          },
+                                          {
+                                            "kind": "Operator",
+                                            "attributes": {
+                                              "col": "26",
+                                              "line": "29",
+                                              "name": "Subtraction"
+                                            },
+                                            "children": []
+                                          },
+                                          {
+                                            "kind": "Call",
+                                            "attributes": {
+                                              "col": "31",
+                                              "line": "29"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "This",
+                                                "attributes": {
+                                                  "col": "26",
+                                                  "line": "29"
+                                                },
+                                                "children": []
+                                              },
+                                              {
+                                                "kind": "Method",
+                                                "attributes": {
+                                                  "col": "31",
+                                                  "line": "29",
+                                                  "name": "sum"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "kind": "Arguments",
+                                                    "attributes": {
+                                                      "col": "36",
+                                                      "line": "29"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "kind": "Variable",
+                                                        "attributes": {
+                                                          "col": "36",
+                                                          "line": "29",
+                                                          "name": "a"
+                                                        },
+                                                        "children": []
+                                                      },
+                                                      {
+                                                        "kind": "Variable",
+                                                        "attributes": {
+                                                          "col": "39",
+                                                          "line": "29",
+                                                          "name": "b"
+                                                        },
+                                                        "children": []
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "Else",
+                            "attributes": {
+                              "col": "16",
+                              "line": "30"
+                            },
+                            "children": [
+                              {
+                                "kind": "Block",
+                                "attributes": {
+                                  "col": "16",
+                                  "line": "30"
+                                },
+                                "children": [
+                                  {
+                                    "kind": "Assignment",
+                                    "attributes": {
+                                      "col": "22",
+                                      "line": "31"
+                                    },
+                                    "children": [
+                                      {
+                                        "kind": "Variable",
+                                        "attributes": {
+                                          "col": "20",
+                                          "line": "31",
+                                          "name": "result"
+                                        },
+                                        "children": []
+                                      },
+                                      {
+                                        "kind": "Call",
+                                        "attributes": {
+                                          "col": "27",
+                                          "line": "31"
+                                        },
+                                        "children": [
+                                          {
+                                            "kind": "This",
+                                            "attributes": {
+                                              "col": "22",
+                                              "line": "31"
+                                            },
+                                            "children": []
+                                          },
+                                          {
+                                            "kind": "Method",
+                                            "attributes": {
+                                              "col": "27",
+                                              "line": "31",
+                                              "name": "sum"
+                                            },
+                                            "children": [
+                                              {
+                                                "kind": "Arguments",
+                                                "attributes": {
+                                                  "col": "32",
+                                                  "line": "31"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "kind": "Variable",
+                                                    "attributes": {
+                                                      "col": "32",
+                                                      "line": "31",
+                                                      "name": "a"
+                                                    },
+                                                    "children": []
+                                                  },
+                                                  {
+                                                    "kind": "Variable",
+                                                    "attributes": {
+                                                      "col": "35",
+                                                      "line": "31",
+                                                      "name": "b"
+                                                    },
+                                                    "children": []
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "Return",
+                        "attributes": {
+                          "col": "16",
+                          "line": "33"
+                        },
+                        "children": [
+                          {
+                            "kind": "Variable",
+                            "attributes": {
+                              "col": "22",
+                              "line": "33",
+                              "name": "result"
+                            },
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "reports": []
+}
