@@ -1,0 +1,45 @@
+package fixtures.libs.java;
+
+import io;
+
+class OverloadingSuper {
+    int[] a;
+
+    public static void main(String[] args) {
+        int result;
+
+        OverloadingSuper o;
+        o = new OverloadingSuper();
+
+        o.initializeArray();
+        result = o.getElement(4);
+        io.print(result);
+    }
+
+    public int sum(int a, boolean negated) {
+        int result;
+        if (negated) {
+            result = 0 - a;
+        } else {
+            result = a;
+        }
+        return result;
+    }
+
+    public int initializeArray() {
+        int i;
+        a = new int[10];
+
+        i = 0;
+        while (i < a.length) {
+            a[i] = i * 2;
+            i = i + 1;
+        }
+
+        return a.length;
+    }
+
+    public int getElement(int index) {
+        return a[index];
+    }
+}

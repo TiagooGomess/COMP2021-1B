@@ -59,9 +59,8 @@ public class JasminResult {
 
     /**
      * Compiles the generated Jasmin code using the Jasmin tool.
-     * 
-     * @param outputDir
-     *            the folder where the class file will written
+     *
+     * @param outputDir the folder where the class file will written
      * @return a reference to the .class file
      */
     public File compile(File outputDir) {
@@ -72,7 +71,7 @@ public class JasminResult {
 
     /**
      * Compiles the generated Jasmin code using the Jasmin tool.
-     * 
+     *
      * @return the compiled class file
      */
     public File compile() {
@@ -86,14 +85,10 @@ public class JasminResult {
 
     /**
      * Compiles and runs the current Jasmin code.
-     * 
-     * @param args
-     *            arguments for the Jasmin program
-     * @param classpath
-     *            additional paths for the classpath
-     * @param input
-     *            input to give to the program that will run
-     * 
+     *
+     * @param args      arguments for the Jasmin program
+     * @param classpath additional paths for the classpath
+     * @param input     input to give to the program that will run
      * @return the output that is printed by the Jasmin program
      */
     public String run(List<String> args, List<String> classpath, String input) {
@@ -114,6 +109,7 @@ public class JasminResult {
         command.add("java");
         command.add("-cp");
         command.add(classpathArg);
+        System.out.println(classpathArg);
         command.add(classname);
         command.addAll(args);
 
@@ -153,9 +149,8 @@ public class JasminResult {
 
     /**
      * Compiles and runs the current Jasmin code.
-     * 
-     * @param args
-     *            arguments for the Jasmin program
+     *
+     * @param args arguments for the Jasmin program
      * @return the output that is printed by the Jasmin program
      */
     public String run(List<String> args) {
@@ -164,7 +159,7 @@ public class JasminResult {
 
     /**
      * Compiles and runs the current Jasmin code.
-     * 
+     *
      * @return the output that is printed by the Jasmin program
      */
     public String run() {

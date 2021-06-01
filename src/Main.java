@@ -13,6 +13,7 @@ import pt.up.fe.comp.jmm.report.ReportType;
 import analysis.JmmVisitor;
 
 import java.awt.*;
+import java.io.File;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,10 +71,17 @@ public class Main implements JmmParser {
 
         System.out.println("--> Success");
         try {
+            //File file = Path.of(".").toFile();
+            //file.delete();
+            //file.mkdirs();
+            //jasminResult.compile(file);
+            // jasminResult.compile();
             Files.write(Path.of(args[0].split("\\.")[0] + ".j"), jasminResult.getJasminCode().getBytes());
         } catch (Exception e) {
             System.out.println("Could not create .j file");
         }
+
+        jasminResult.run();
     }
 
     @Override

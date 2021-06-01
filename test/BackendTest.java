@@ -19,6 +19,8 @@ import org.junit.Test;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.specs.util.SpecsIo;
 
+import java.util.*;
+
 public class BackendTest {
 
     private void testFile(String file, long numErrors) {
@@ -48,6 +50,8 @@ public class BackendTest {
         var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
         TestUtils.noErrors(result.getReports());
 
+        // List<String> classPath = Arrays.asList(TestUtils.getLibsClasspath());
+        // classPath.add(".");
         var output = result.run();
         if (expectedOutput != null)
             assertEquals(expectedOutput, output.trim());
