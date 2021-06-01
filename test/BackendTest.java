@@ -129,10 +129,10 @@ public class BackendTest {
         // testFile("Life", "");
     }
 
-    @Test
+    /*@Test
     public void testOverloading() {
         testOurFile("Overloading", "3\n-1\n6\n-3");
-    }
+    }*/
 
     @Test
     public void testOverloadingSuper() {

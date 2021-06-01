@@ -1,0 +1,15 @@
+Class: HelloWorld
+Super: java.lang.Object
+
+Imports:
+ - .int[]
+ - .String
+ - .String[]
+ - .ioPlus
+
+Fields:
+ - HelloWorld this
+
+Methods: 2
+ - HelloWorld %Construction()
+ - void main(String[] args)

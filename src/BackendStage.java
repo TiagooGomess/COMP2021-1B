@@ -496,12 +496,6 @@ public class BackendStage implements JasminBackend {
             jasminCode.append("\n.end method\n\n");
         }
 
-        try {
-            Files.writeString(Path.of("results/code.j"), jasminCode);
-        } catch (Exception e) {
-            System.out.println(jasminCode);
-        }
-
         return jasminCode.toString();
     }
 

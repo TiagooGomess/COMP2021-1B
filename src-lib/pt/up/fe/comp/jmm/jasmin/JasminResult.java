@@ -109,7 +109,6 @@ public class JasminResult {
         command.add("java");
         command.add("-cp");
         command.add(classpathArg);
-        System.out.println(classpathArg);
         command.add(classname);
         command.addAll(args);
 

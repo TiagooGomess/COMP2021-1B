@@ -1,25 +1,18 @@
 import analysis.AnalysisStage;
-import analysis.symbol.SymbolTable;
-import pt.up.fe.comp.TestUtils;
-import pt.up.fe.comp.jmm.JmmNode;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
-import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.jasmin.JasminUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp.jmm.report.ReportType;
-import analysis.JmmVisitor;
 
-import java.awt.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static pt.up.fe.comp.jmm.report.ReportType.ERROR;
 
 public class Main implements JmmParser {
 
@@ -56,11 +49,24 @@ public class Main implements JmmParser {
             return;
         }
 
+        try {
+            Files.writeString(Path.of("results/table.txt"), semanticResult.getSymbolTable().print());
+        } catch (Exception e) {
+            System.err.println("--> File not found");
+            return;
+        }
 
         OptimizationStage optimizationStage = new OptimizationStage();
         OllirResult ollirResult = optimizationStage.toOllir(semanticResult);
         if (ollirResult == null || !ollirResult.getReports().isEmpty())
             return;
+
+        try {
+            Files.writeString(Path.of("results/code.ollir"), ollirResult.getOllirCode());
+        } catch (Exception e) {
+            System.err.println("--> File not found");
+            return;
+        }
 
         System.out.println("--> Generating Jasmin Code...");
 
@@ -69,18 +75,17 @@ public class Main implements JmmParser {
         if (!jasminResult.getReports().isEmpty())
             return;
 
-        System.out.println("--> Success");
         try {
-            //File file = Path.of(".").toFile();
-            //file.delete();
-            //file.mkdirs();
-            //jasminResult.compile(file);
-            // jasminResult.compile();
-            Files.write(Path.of(args[0].split("\\.")[0] + ".j"), jasminResult.getJasminCode().getBytes());
+            File file = Path.of(args[0].split("\\.")[0] + ".j").toFile();
+            (new FileOutputStream(file)).write(jasminResult.getJasminCode().getBytes());
+            JasminUtils.assemble(file, Path.of("results").toFile());
+            jasminResult.compile(new File("results"));
         } catch (Exception e) {
-            System.out.println("Could not create .j file");
+            System.err.println("--> Could not assemble file");
+            return;
         }
 
+        System.out.println("--> Running code\n");
         jasminResult.run();
     }
 

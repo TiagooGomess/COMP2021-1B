@@ -32,12 +32,6 @@ public class OptimizationStage implements JmmOptimization {
         // Convert the AST to a String containing the equivalent OLLIR code
         String ollirCode = AnalysisStage.visit(semanticsResult.getRootNode()).getOllir(); // Convert node ...
 
-        try {
-            Files.writeString(Path.of("results/code.ollir"), ollirCode);
-        } catch (Exception e) {
-            System.out.println(ollirCode);
-        }
-
         // More reports from this stage
         List<Report> reports = new ArrayList<>();
 
