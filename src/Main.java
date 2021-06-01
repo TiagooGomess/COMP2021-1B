@@ -1,4 +1,5 @@
 import analysis.AnalysisStage;
+import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.JmmParser;
 import pt.up.fe.comp.jmm.JmmParserResult;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
@@ -12,6 +13,8 @@ import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Main implements JmmParser {
@@ -86,7 +89,7 @@ public class Main implements JmmParser {
         }
 
         System.out.println("--> Running code\n");
-        jasminResult.run();
+        jasminResult.run(Collections.emptyList(), Arrays.asList(TestUtils.getLibsClasspath() + ":./results"));
     }
 
     @Override

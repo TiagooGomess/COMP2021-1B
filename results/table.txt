@@ -1,15 +1,20 @@
-Class: HelloWorld
-Super: java.lang.Object
+Class: Overloading
+Super: OverloadingSuper
 
 Imports:
  - .int[]
  - .String
  - .String[]
- - .ioPlus
+ - .io
+ - .OverloadingSuper
 
 Fields:
- - HelloWorld this
+ - Overloading this
 
-Methods: 2
- - HelloWorld %Construction()
+Methods: 6
+ - int sum(int argument 0, boolean argument 1)
+ - Overloading %Construction()
+ - int sum(int argument 0, boolean argument 1)
+ - int sum(int argument 0, boolean argument 1)
+ - int sum(int argument 0, boolean argument 1)
  - void main(String[] args)

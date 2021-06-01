@@ -52,7 +52,7 @@ public class BackendTest {
 
         // List<String> classPath = Arrays.asList(TestUtils.getLibsClasspath());
         // classPath.add(".");
-        var output = result.run();
+        var output = result.run(Collections.emptyList(), Arrays.asList(TestUtils.getLibsClasspath() + ":./results"));
         if (expectedOutput != null)
             assertEquals(expectedOutput, output.trim());
     }
@@ -129,10 +129,10 @@ public class BackendTest {
         // testFile("Life", "");
     }
 
-    /*@Test
+    @Test
     public void testOverloading() {
         testOurFile("Overloading", "3\n-1\n6\n-3");
-    }*/
+    }
 
     @Test
     public void testOverloadingSuper() {
