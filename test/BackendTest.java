@@ -50,8 +50,6 @@ public class BackendTest {
         var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/" + file + ".jmm"));
         TestUtils.noErrors(result.getReports());
 
-        // List<String> classPath = Arrays.asList(TestUtils.getLibsClasspath());
-        // classPath.add(".");
         var output = result.run(Collections.emptyList(), Arrays.asList(TestUtils.getLibsClasspath() + ":./results"));
         if (expectedOutput != null)
             assertEquals(expectedOutput, output.trim());
@@ -130,14 +128,14 @@ public class BackendTest {
     }
 
     @Test
-    public void testOverloading() {
-        testOurFile("Overloading", "3\n-1\n6\n-3");
-    }
-
-    @Test
     public void testOverloadingSuper() {
         testOurFile("OverloadingSuper", "8");
     }
+
+    /*@Test
+    public void testOverloading() {
+        testOurFile("Overloading", "3\n-1\n6\n-3");
+    }*/
 
     @Test
     public void testReturnTypes() {

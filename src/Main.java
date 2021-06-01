@@ -21,6 +21,7 @@ public class Main implements JmmParser {
 
     public static void main(String[] args) {
         String fileStr;
+        String className = Path.of(args[0]).getFileName().toString().split("\\.")[0];
 
         try {
             fileStr = Files.readString(Path.of(args[0]));
@@ -35,7 +36,7 @@ public class Main implements JmmParser {
         JmmParserResult parserResult = m.parse(fileStr);
         try {
             System.out.println("--> Generating AST...");
-            Files.writeString(Path.of("results/ast.json"), parserResult.toJson());
+            Files.writeString(Path.of("results/" + className + ".ast.json"), parserResult.toJson());
         } catch (Exception e) {
             System.err.println("--> File not found");
             return;
@@ -53,7 +54,7 @@ public class Main implements JmmParser {
         }
 
         try {
-            Files.writeString(Path.of("results/table.txt"), semanticResult.getSymbolTable().print());
+            Files.writeString(Path.of("results/" + className + ".table.txt"), semanticResult.getSymbolTable().print());
         } catch (Exception e) {
             System.err.println("--> File not found");
             return;
@@ -65,7 +66,7 @@ public class Main implements JmmParser {
             return;
 
         try {
-            Files.writeString(Path.of("results/code.ollir"), ollirResult.getOllirCode());
+            Files.writeString(Path.of("results/" + className + ".ollir"), ollirResult.getOllirCode());
         } catch (Exception e) {
             System.err.println("--> File not found");
             return;
@@ -79,7 +80,7 @@ public class Main implements JmmParser {
             return;
 
         try {
-            File file = Path.of(args[0].split("\\.")[0] + ".j").toFile();
+            File file = new File("results/" + className + ".j");
             (new FileOutputStream(file)).write(jasminResult.getJasminCode().getBytes());
             JasminUtils.assemble(file, Path.of("results").toFile());
             jasminResult.compile(new File("results"));
