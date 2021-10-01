@@ -2,18 +2,6 @@
 
 For this project, you need to [install Gradle](https://gradle.org/install/)
 
-## GROUP: 1B
-
-NAME1: Alexandre Almeida de Abreu Filho, NR1: 201800168, GRADE1: 19 , CONTRIBUTION1: 38%
-
-NAME2: João Paulo Nunes, NR2: 201705457, GRADE2: 13, CONTRIBUTION2: 14%
-
-NAME3: Miguel Rodrigues Gomes, NR3: 201605908, GRADE3: 13, CONTRIBUTION3: 14%
-
-NAME4: Tiago Gonçalves Gomes, NR4: 201806658, GRADE4: 19, CONTRIBUTION4: 34%
-
-### GLOBAL Grade of the project: 18
-
 ## Compile
 
 To compile the program, run ``gradle build``. This will compile your classes to ``classes/java/main``.
